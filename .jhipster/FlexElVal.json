@@ -1,0 +1,51 @@
+{
+  "name": "FlexElVal",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "hour",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "min",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "pfmaxUp",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "pfmaxDn",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qfmaxUp",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qfmaxDn",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "flexProfile",
+      "otherEntityRelationshipName": "flexElVal",
+      "relationshipName": "flexProfile"
+    }
+  ],
+  "entityTableName": "flex_el_val",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095036"
+}

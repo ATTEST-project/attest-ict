@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity OutputFile.
+    -->
+    <changeSet id="20211222095054-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="tool_id"
+                                 baseTableName="output_file"
+                                 constraintName="fk_output_file__tool_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tool"/>
+
+        <addForeignKeyConstraint baseColumnNames="network_id"
+                                 baseTableName="output_file"
+                                 constraintName="fk_output_file__network_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="network"/>
+    </changeSet>
+</databaseChangeLog>

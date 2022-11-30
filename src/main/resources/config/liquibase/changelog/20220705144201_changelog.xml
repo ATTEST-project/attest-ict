@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="lara.pinato (generated)" id="1657032144266-1">
+        <addColumn tableName="gen_el_val">
+            <column name="generator_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1657032144266-2">
+        <addForeignKeyConstraint baseColumnNames="generator_id" baseTableName="gen_el_val" constraintName="FKhnfsgwbv3eisl60ntumrawscq" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="generator" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1657032144266-3">
+        <dropColumn columnName="bus_num" tableName="gen_el_val"/>
+    </changeSet>
+	<changeSet author="lara.pinato" id="1657032144266-4">
+		<modifyDataType columnName="country"  newDataType="varchar(4)"  tableName="network"/>       
+    </changeSet>
+</databaseChangeLog>

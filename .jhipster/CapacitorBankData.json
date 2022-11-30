@@ -1,0 +1,39 @@
+{
+  "name": "CapacitorBankData",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "nodeId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "bankId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "qnom",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "capacitor",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "capacitor_bank_data",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095043"
+}

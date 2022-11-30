@@ -1,0 +1,18 @@
+.list-item-sub {
+  background-color: #10272f;
+  color: white;
+
+  &:hover {
+    background-color: #dcdcdc;
+    color: #10272f;
+  }
+}
+
+.list-item-sub::selection {
+  color: #10272f;
+
+  &:hover {
+    background-color: #dcdcdc !important;
+    color: #10272f;
+  }
+}

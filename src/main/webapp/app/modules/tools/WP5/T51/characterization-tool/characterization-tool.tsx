@@ -1,0 +1,215 @@
+import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
+import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, Offcanvas, OffcanvasBody, OffcanvasHeader } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import carouselImage1 from '../../../../../../content/images/carousel_img_1.png';
+import Divider from 'app/shared/components/divider/divider';
+import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import { Link } from 'react-router-dom';
+import Config from 'app/modules/tools/WP5/T51/characterization-tool/config/config';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { runT511Tool, reset as retry } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-execution.reducer';
+import { downloadResults } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-table.reducer';
+
+const T51Characterization = (props: any) => {
+  const divRef = React.useRef<HTMLDivElement>();
+
+  const dispatch = useAppDispatch();
+
+  const methods = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = methods;
+
+  const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
+
+  if (!network) {
+    props.history?.goBack();
+    return;
+  }
+
+  const response = useAppSelector(state => state.t511ToolExecution.entity);
+  const isRunning = useAppSelector(state => state.t511ToolExecution.loading);
+  const completed = useAppSelector(state => state.t511ToolExecution.updateSuccess);
+
+  const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [form, setForm] = React.useState(null);
+
+  const cleanDataForm = (form: any) => {
+    const configs = [...form.config];
+    const configCleaned = [];
+    for (const config of configs) {
+      const { inputFile, inputAuxFile, variables, variables2, results, selectedVariables, ...rest } = config;
+      const fileName = inputFile[0].name;
+      const auxFileName = inputAuxFile[0]?.name || '';
+      const variablesKeys = Object.keys(variables).filter(k => variables[k]);
+      const resultsKeys = Object.keys(results).filter(k => results[k]);
+      configCleaned.push({
+        ...rest,
+        path: fileName,
+        path2: auxFileName,
+        selectedVariables,
+        variables: [...variablesKeys],
+        results: [...resultsKeys],
+        component1_field: selectedVariables,
+        component2_field: variables2,
+        variables2: variables2 || '',
+        components: [],
+        components2: [],
+      });
+    }
+    return { configs: [...configCleaned] };
+  };
+
+  const submitMethod = data => {
+    /* eslint-disable-next-line no-console */
+    console.log('Form data: ', data);
+    const finalForm = {
+      networkId: network.id,
+      toolName: TOOLS_INFO.T51_CHARACTERIZATION.name,
+      files: [...data.config.map(element => element.inputFile[0])],
+      jsonConfig: JSON.stringify({ ...cleanDataForm(data) }),
+    };
+    /* eslint-disable-next-line no-console */
+    console.log('Final form data: ', finalForm);
+    setForm({ ...finalForm });
+    setOpenModal(true);
+  };
+
+  const checkAndRun = () => {
+    /* eslint-disable-next-line no-console */
+    console.log('RUN!');
+    setOpenModal(false);
+    setTimeout(() => {
+      dispatch(
+        runT511Tool({
+          ...form,
+        })
+      );
+    }, 500);
+  };
+
+  const checkCompleted = () => {
+    return completed;
+  };
+
+  const checkCompletedWithError = () => {
+    return completed && response?.status === 'ko';
+  };
+
+  const download = () => {
+    dispatch(
+      downloadResults({
+        networkId: response.args?.networkId,
+        toolName: response.args?.toolName,
+        simulationId: response.simulationId,
+      })
+    );
+  };
+
+  const retryToolRun = () => {
+    dispatch(retry());
+  };
+
+  return (
+    <div ref={divRef}>
+      {isRunning && <LoadingOverlay ref={divRef} />}
+      <Offcanvas isOpen={openOffCanvas} toggle={() => setOpenOffCanvas(false)}>
+        <OffcanvasHeader toggle={() => setOpenOffCanvas(false)}>{'WP5 Tools'}</OffcanvasHeader>
+        <OffcanvasBody>{'Tool_x'}</OffcanvasBody>
+      </Offcanvas>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Button color="dark" onClick={() => setOpenOffCanvas(true)}>
+          {<FontAwesomeIcon icon="bars" />}
+        </Button>
+        <img alt="wp5" src={carouselImage1} width={100} height={70} />
+        <h4 style={{ marginLeft: 20 }}>{'T5.1 Characterization Tool'}</h4>
+      </div>
+      <Divider />
+      {network && (
+        <>
+          <NetworkInfo network={network} />
+          <Divider />
+          <FormProvider {...methods}>
+            <Form onSubmit={handleSubmit(submitMethod)}>
+              <Config />
+              <Divider />
+              <div style={{ float: 'right' }}>
+                {!checkCompleted() ? (
+                  <>
+                    <Button color="primary" onClick={() => reset()}>
+                      <FontAwesomeIcon icon="redo" />
+                      {' Reset'}
+                    </Button>{' '}
+                    <Button color="primary" type="submit">
+                      <FontAwesomeIcon icon="play" />
+                      {' Run '}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button color="primary" onClick={retryToolRun}>
+                      <FontAwesomeIcon icon="redo" />
+                      {' Retry'}
+                    </Button>{' '}
+                    {checkCompletedWithError() ? (
+                      <Button disabled className="rounded-circle" color="danger" type="button">
+                        <FontAwesomeIcon icon="exclamation" />
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          tag={Link}
+                          to={{ pathname: '/tools/t51/characterization/results', state: { response, fromConfigPage: true } }}
+                          color="success"
+                          type="button"
+                        >
+                          <FontAwesomeIcon icon="poll" />
+                          {' Show Results'}
+                        </Button>{' '}
+                        <Button color="success" type="button" onClick={download}>
+                          <FontAwesomeIcon icon="file-download" />
+                          {' Download Results'}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </Form>
+          </FormProvider>
+        </>
+      )}
+      <Divider />
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button tag={Link} to="/tools/t51" color="info">
+          <FontAwesomeIcon icon="arrow-left" />
+          {' Back'}
+        </Button>
+      </div>
+      {form && (
+        <Modal isOpen={openModal}>
+          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
+          <ModalBody>
+            {'Check the configuration...'}
+            <pre>{JSON.stringify({ ...form, files: form.files.map((v: File) => v.name) }, null, 2)}</pre>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
+            <Button color="primary" onClick={checkAndRun}>
+              Run
+            </Button>{' '}
+          </ModalFooter>
+        </Modal>
+      )}
+    </div>
+  );
+};
+
+export default T51Characterization;

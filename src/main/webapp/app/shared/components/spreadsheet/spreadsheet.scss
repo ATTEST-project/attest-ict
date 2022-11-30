@@ -1,0 +1,28 @@
+/* fix for content not displayed correctly */
+#x-spreadsheet-demo * {
+  box-sizing: content-box;
+}
+
+.x-spreadsheet-dropdown-title {
+  color: black !important;
+}
+
+.x-spreadsheet-overlayer {
+  cursor: cell;
+}
+
+.x-spreadsheet-tooltip {
+  z-index: 9999 !important;
+}
+
+.x-spreadsheet-tooltip:before {
+  z-index: 9999 !important;
+}
+
+.x-spreadsheet-editor .x-spreadsheet-editor-area textarea {
+  color: black !important;
+}
+
+.custom-bottombar {
+  height: 80px !important;
+}

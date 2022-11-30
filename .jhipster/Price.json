@@ -1,0 +1,44 @@
+{
+  "name": "Price",
+  "fields": [
+    {
+      "fieldName": "electricityEnergy",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "gasEnergy",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "secondaryBand",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "secondaryUp",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "secondaryDown",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "secondaryRatioUp",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "secondaryRatioDown",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "price",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095050"
+}

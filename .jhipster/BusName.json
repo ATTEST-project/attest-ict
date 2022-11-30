@@ -1,0 +1,29 @@
+{
+  "name": "BusName",
+  "fields": [
+    {
+      "fieldName": "busName",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "bus",
+      "otherEntityRelationshipName": "busName",
+      "relationshipName": "bus",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "bus_name",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095020"
+}

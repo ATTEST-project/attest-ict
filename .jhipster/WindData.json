@@ -1,0 +1,24 @@
+{
+  "name": "WindData",
+  "fields": [
+    {
+      "fieldName": "windSpeed",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "hour",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "wind_data",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095058"
+}

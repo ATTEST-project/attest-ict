@@ -1,0 +1,35 @@
+{
+  "name": "DsoTsoConnection",
+  "fields": [
+    {
+      "fieldName": "tsoNetworkName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dsoBusNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "tsoBusNum",
+      "fieldType": "Long"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "dsoTsoConnection",
+      "relationshipName": "dsoNetwork"
+    }
+  ],
+  "entityTableName": "dso_tso_connection",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20220118135914"
+}

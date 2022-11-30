@@ -1,0 +1,121 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="lara.pinato (generated)" id="1658148436171-1">
+        <createTable tableName="branch_el_val">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="branch_el_valPK"/>
+            </column>
+            <column name="branch_id_on_subst" type="BIGINT"/>
+            <column name="hour" type="INT"/>
+            <column name="min" type="INT"/>
+            <column name="nominal_voltage" type="VARCHAR(255)"/>
+            <column name="p" type="DOUBLE"/>
+            <column name="q" type="DOUBLE"/>
+            <column name="status" type="INT"/>
+            <column name="branch_id" type="BIGINT"/>
+            <column name="branch_profile_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-2">
+        <createTable tableName="branch_profile">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="branch_profilePK"/>
+            </column>
+            <column name="mode" type="INT"/>
+            <column name="season" type="VARCHAR(255)"/>
+            <column name="time_interval" type="DOUBLE"/>
+            <column name="typical_day" type="VARCHAR(255)"/>
+            <column name="upload_date_time" type="datetime(6)"/>
+            <column name="input_file_id" type="BIGINT"/>
+            <column name="network_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-3">
+        <addColumn tableName="transf_el_val">
+            <column name="branch_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-4">
+        <addColumn tableName="load_el_val">
+            <column name="bus_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-5">
+        <addColumn tableName="gen_el_val">
+            <column name="gen_id_on_subst" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-6">
+        <addColumn tableName="load_el_val">
+            <column name="load_id_on_subst" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-7">
+        <addColumn tableName="branch_extension">
+            <column name="m_rid" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-8">
+        <addColumn tableName="bus_extension">
+            <column name="m_rid" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-9">
+        <addColumn tableName="gen_el_val">
+            <column name="nominal_voltage" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-10">
+        <addColumn tableName="load_el_val">
+            <column name="nominal_voltage" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-11">
+        <addColumn tableName="transf_el_val">
+            <column name="nominal_voltage" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-12">
+        <addColumn tableName="transf_el_val">
+            <column name="status" type="integer"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-13">
+        <addColumn tableName="transf_el_val">
+            <column name="trasf_id_on_subst" type="bigint"/>
+        </addColumn>
+    </changeSet>
+	
+    <changeSet author="lara.pinato (generated)" id="1658148436171-14">
+        <addUniqueConstraint columnNames="input_file_id" constraintName="UC_BRANCH_PROFILEINPUT_FILE_ID_COL" tableName="branch_profile"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-15">
+        <addForeignKeyConstraint baseColumnNames="branch_profile_id" baseTableName="branch_el_val" constraintName="FK34v71co5h9wdblfh8107ejyqw" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="branch_profile" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-16">
+        <addForeignKeyConstraint baseColumnNames="input_file_id" baseTableName="branch_profile" constraintName="FK84kgj94hrbww1nchkehwpre8b" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="input_file" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-17">
+        <addForeignKeyConstraint baseColumnNames="network_id" baseTableName="branch_profile" constraintName="FKad1ct71s4ukmv06bvyparkq55" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="network" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-18">
+        <addForeignKeyConstraint baseColumnNames="branch_id" baseTableName="branch_el_val" constraintName="FKd2wdcfukhq3wqpp9p6tojmd78" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="branch" validate="true"/>
+    </changeSet>
+	
+	
+    <changeSet author="lara.pinato (generated)" id="1658148436171-19">
+        <addForeignKeyConstraint baseColumnNames="branch_id" baseTableName="transf_el_val" constraintName="FKkjeh5gajb77wug7mpqmvv2o4w" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="branch" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-20">
+        <addForeignKeyConstraint baseColumnNames="bus_id" baseTableName="load_el_val" constraintName="FKm20bnxms1o505cro1s69xybs5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="bus" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-21">
+        <dropColumn columnName="bus_num" tableName="load_el_val"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-22">
+        <dropColumn columnName="fbus" tableName="transf_el_val"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1658148436171-23">
+        <dropColumn columnName="tbus" tableName="transf_el_val"/>
+    </changeSet>
+</databaseChangeLog>

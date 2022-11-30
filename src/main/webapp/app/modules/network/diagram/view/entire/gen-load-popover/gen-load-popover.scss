@@ -1,0 +1,25 @@
+.popover-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popover {
+  max-width: 800px !important;
+  max-height: 650px;
+  min-width: 400px;
+  min-height: 350px;
+  overflow: hidden;
+  resize: both;
+}
+
+.resize-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 20px 20px;
+  border-color: transparent transparent lightyellow transparent;
+}

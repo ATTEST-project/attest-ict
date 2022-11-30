@@ -1,0 +1,44 @@
+{
+  "Country": "UK",
+  "Case name": "case3",
+  "Scenario 1": {
+    "Total investment cost (EUR-million)": 0.11,
+    "Flexibility investment cost (EUR-million)": 0.5,
+    "Net Present Operation Cost (EUR-million)": 0.7,
+    "2020": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [0, 2.0, 0, 0.75],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    },
+    "2030": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [0.4, 1, 2, 2],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    },
+    "2040": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [1, 0.5, 0.8, 1],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    }
+  },
+  "Scenario 2": {
+    "Total investment cost (EUR-million)": 0.3,
+    "Flexibility investment cost (EUR-million)": 0.8,
+    "Net Present Operation Cost (EUR-million)": 0.1,
+    "2020": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [0, 2.0, 0, 0.75],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    },
+    "2030": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [0, 0, 0, 0],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    },
+    "2040": {
+      "Operation cost (EUR-million/year)": 0,
+      "Branch investment (MVA)": [0, 0, 0, 0],
+      "Flexibility investment (MW)": [0, 0, 0, 0]
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "name": "Network",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "mpcName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "country",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isDeleted",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "networkDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "version",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "creationDateTime",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "updateDateTime",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "bus",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "bus",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "generator",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "generator"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "branch",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "branch"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "storage",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "storage",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "transformer",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "transformer"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "capacitorBankData",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "capacitor",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "inputFile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "inputFile",
+      "otherEntityField": "fileName"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "assetUGCable",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "assetUgCable",
+      "otherEntityField": "sectionLabel"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "assetTransformer",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "assetTransformer",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "billingConsumption",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "billingConsumption",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "billingDer",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "billingDer",
+      "otherEntityField": "busNum"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "lineCable",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "lineCable"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "genProfile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "genProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "loadProfile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "loadProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "flexProfile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "flexProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "transfProfile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "transfProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "branchProfile",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "branchProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "topologyBus",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "topologyBus"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "dsoTsoConnection",
+      "otherEntityRelationshipName": "dsoNetwork",
+      "relationshipName": "dsoTsoConnection"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "baseMVA",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "baseMVA",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "voltageLevel",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "voltageLevel",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "simulation",
+      "otherEntityRelationshipName": "network",
+      "relationshipName": "simulation"
+    }
+  ],
+  "entityTableName": "network",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095017"
+}

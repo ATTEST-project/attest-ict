@@ -1,0 +1,66 @@
+{
+  "name": "Tool",
+  "fields": [
+    {
+      "fieldName": "workPackage",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "num",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "path",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "inputFile",
+      "otherEntityRelationshipName": "tool",
+      "relationshipName": "inputFile",
+      "otherEntityField": "fileName"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "outputFile",
+      "otherEntityRelationshipName": "tool",
+      "relationshipName": "outputFile",
+      "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "tool",
+      "relationshipName": "task"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "toolParameter",
+      "otherEntityRelationshipName": "tool",
+      "relationshipName": "parameter"
+    }
+  ],
+  "entityTableName": "tool",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20220127153413"
+}

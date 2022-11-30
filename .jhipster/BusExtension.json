@@ -1,0 +1,69 @@
+{
+  "name": "BusExtension",
+  "fields": [
+    {
+      "fieldName": "hasGen",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "isLoad",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "snomMva",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "sx",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "sy",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "gx",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "gy",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "incrementCost",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "decrementCost",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "mRid",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "bus",
+      "otherEntityRelationshipName": "busExtension",
+      "relationshipName": "bus",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "bus_extension",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095022"
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity BusExtension.
+    -->
+    <changeSet id="20211222095022-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="bus_id"
+                                 baseTableName="bus_extension"
+                                 constraintName="fk_bus_extension__bus_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="bus"/>
+    </changeSet>
+</databaseChangeLog>

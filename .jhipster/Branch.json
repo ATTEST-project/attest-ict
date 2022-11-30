@@ -1,0 +1,94 @@
+{
+  "name": "Branch",
+  "fields": [
+    {
+      "fieldName": "fbus",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "tbus",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "r",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "x",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "b",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "ratea",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rateb",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "ratec",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "tapRatio",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "angle",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "angmin",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "angmax",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "transfElVal",
+      "otherEntityRelationshipName": "branch",
+      "relationshipName": "transfElVal"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "branchElVal",
+      "otherEntityRelationshipName": "branch",
+      "relationshipName": "branchElVal"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "branchExtension",
+      "otherEntityRelationshipName": "branch",
+      "relationshipName": "branchExtension",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "branch",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "branch",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095023"
+}

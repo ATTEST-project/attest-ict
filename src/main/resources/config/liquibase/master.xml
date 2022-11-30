@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <property name="now" value="now()" dbms="h2"/>
+    <property name="now" value="now()" dbms="mysql, mariadb"/>
+    <property name="floatType" value="float4" dbms="postgresql, h2"/>
+    <property name="floatType" value="float" dbms="mysql, oracle, mssql, mariadb"/>
+    <property name="clobType" value="clob" dbms="h2"/>
+    <property name="clobType" value="clob" dbms="mysql, oracle, mssql, mariadb, postgresql"/>
+    <property name="uuidType" value="varchar(36)" dbms="h2, mysql, mariadb"/>
+    <property name="datetimeType" value="datetime(6)" dbms="mysql, mariadb"/>
+    <property name="datetimeType" value="datetime" dbms="oracle, mssql, postgresql, h2"/>
+
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095017_added_entity_Network.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095018_added_entity_BaseMVA.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095019_added_entity_Bus.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095020_added_entity_BusName.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095021_added_entity_BusCoordinate.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095022_added_entity_BusExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095023_added_entity_Branch.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095024_added_entity_LoadProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095025_added_entity_LoadElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095026_added_entity_Generator.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095027_added_entity_GeneratorExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095028_added_entity_GenTag.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095029_added_entity_GenProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095030_added_entity_GenElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095031_added_entity_BillingDer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095032_added_entity_Storage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095033_added_entity_StorageCost.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095034_added_entity_ToolLogFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095035_added_entity_FlexProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095036_added_entity_FlexElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095037_added_entity_FlexCost.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095038_added_entity_TransfElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095039_added_entity_GenCost.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095040_added_entity_ProtectionTool.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095041_added_entity_Transformer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095042_added_entity_WeatherForecast.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095043_added_entity_CapacitorBankData.xml" relativeToChangelogFile="false"/>
+	<include file="config/liquibase/changelog/20211222095044_added_entity_LineCable.xml" relativeToChangelogFile="false"/>
+	<include file="config/liquibase/changelog/20211222095047_added_entity_AssetTransformer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095048_added_entity_Node.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095049_added_entity_SolarData.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095050_added_entity_Price.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095051_added_entity_AssetUGCable.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095052_added_entity_Topology.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095054_added_entity_OutputFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095055_added_entity_TopologyBus.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095056_added_entity_VoltageLevel.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095057_added_entity_TransfProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095058_added_entity_WindData.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095059_added_entity_BillingConsumption.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095100_added_entity_BranchExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095101_added_entity_Task.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220117180813_added_entity_InputFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220118135914_added_entity_DsoTsoConnection.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220127153413_added_entity_Tool.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220718093729_added_entity_BranchElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220718093730_added_entity_BranchProfile.xml" relativeToChangelogFile="false"/>
+	<!-- 20221025 add new entities: Simulation and ToolParameter  -->
+    <include file="config/liquibase/changelog/20221025153844_added_entity_Simulation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20221025153845_added_entity_ToolParameter.xml" relativeToChangelogFile="false"/>
+	
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20211222095018_added_entity_constraints_BaseMVA.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095019_added_entity_constraints_Bus.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095020_added_entity_constraints_BusName.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095021_added_entity_constraints_BusCoordinate.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095022_added_entity_constraints_BusExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095023_added_entity_constraints_Branch.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095024_added_entity_constraints_LoadProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095025_added_entity_constraints_LoadElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095026_added_entity_constraints_Generator.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095027_added_entity_constraints_GeneratorExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095028_added_entity_constraints_GenTag.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095029_added_entity_constraints_GenProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095030_added_entity_constraints_GenElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095031_added_entity_constraints_BillingDer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095032_added_entity_constraints_Storage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095034_added_entity_constraints_ToolLogFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095035_added_entity_constraints_FlexProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095036_added_entity_constraints_FlexElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095037_added_entity_constraints_FlexCost.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095038_added_entity_constraints_TransfElVal.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095039_added_entity_constraints_GenCost.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095040_added_entity_constraints_ProtectionTool.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095041_added_entity_constraints_Transformer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095043_added_entity_constraints_CapacitorBankData.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095044_added_entity_constraints_LineCable.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095047_added_entity_constraints_AssetTransformer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095051_added_entity_constraints_AssetUGCable.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095054_added_entity_constraints_OutputFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095055_added_entity_constraints_TopologyBus.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095056_added_entity_constraints_VoltageLevel.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095057_added_entity_constraints_TransfProfile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095059_added_entity_constraints_BillingConsumption.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095100_added_entity_constraints_BranchExtension.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095101_added_entity_constraints_Task.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20211222095052_added_entity_constraints_Topology.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220117180813_added_entity_constraints_InputFile.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220118135914_added_entity_constraints_DsoTsoConnection.xml" relativeToChangelogFile="false"/>
+	<!-- 2022/07/18 add new tables BranchElVal, Brancn Profile --> 
+	<include file="config/liquibase/changelog/20220718093729_added_entity_constraints_BranchElVal.xml" relativeToChangelogFile="false"/>
+	<include file="config/liquibase/changelog/20220718093730_added_entity_constraints_BranchProfile.xml" relativeToChangelogFile="false"/>
+	<!-- 2022/10/26 add constraint for new tables: Simulation and Tool Parameter -->
+	<include file="config/liquibase/changelog/20221025153844_added_entity_constraints_Simulation.xml" relativeToChangelogFile="false"/>
+	<include file="config/liquibase/changelog/20221025153845_added_entity_constraints_ToolParameter.xml" relativeToChangelogFile="false"/>
+	<!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+	
+	<!-- drop columns:x0, ro from table: Branch -->
+	<include file="config/liquibase/changelog/20220221095841_drop_column_Branch.xml" relativeToChangelogFile="false"/>
+	<!-- add unique constraint to Nework.name -->
+	<include file="config/liquibase/changelog/202206091758_added_constr_network.xml" relativeToChangelogFile="false"/>
+	
+	<!-- ADD onoToOne relationship  BETWEEN LoadProfile, TransfProfile, GenProfile, FlexProfile and InputFile -->
+	<include file="config/liquibase/changelog/20220701092202_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 20220705 ADD oneToMany relationship  BETWEEN Generator and GenElVal, drop column busNum in genElVal,  change Network country length -->
+	<include file="config/liquibase/changelog/20220705144201_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 20220705 ADD not null constraint for country field of network table -->
+	<include file="config/liquibase/changelog/20220706095515_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 2022/07/18 add mrid on busExtension. branchExtension, add relationship between branch and transf_el_val, branch and branch_el_val, load_el_val e bus  -->
+	<include file="config/liquibase/changelog/20220718124522_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 2022/10/26 ADD new fields: Description and isDeleted on Network entity, ADD new fk between task-simulation, tool-tool_parameter, output_file-simulation -->
+	<include file="config/liquibase/changelog/20221026100358_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 2022/11/03 ADD new fk  from simulation and network_id, add unique constraint on simulation UUID attribute -->
+	<include file="config/liquibase/changelog/20221103163947_changelog.xml" relativeToChangelogFile="false"/>
+	
+	<!-- 2022/11/29 Drop Duplicate Constraint fk_tool_parameter__tool_id -->
+	<include file="config/liquibase/changelog/202211291849_drop_constraints_ToolParameter.xml" relativeToChangelogFile="false"/>
+	
+</databaseChangeLog>
+
+

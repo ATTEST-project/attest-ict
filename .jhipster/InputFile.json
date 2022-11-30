@@ -1,0 +1,89 @@
+{
+  "name": "InputFile",
+  "fields": [
+    {
+      "fieldName": "fileName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "data",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    },
+    {
+      "fieldName": "uploadTime",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "tool",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "tool"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "genProfile",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "genProfile",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "flexProfile",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "flexProfile",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "loadProfile",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "loadProfile",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "transfProfile",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "transfProfile",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "branchProfile",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "branchProfile",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "network"
+    },
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "simulation",
+      "otherEntityRelationshipName": "inputFile",
+      "relationshipName": "simulation",
+      "otherEntityField": "uuid",
+      "ownerSide": false
+    }
+  ],
+  "entityTableName": "input_file",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20220117180813"
+}

@@ -1,0 +1,87 @@
+{
+  "name": "AssetUGCable",
+  "fields": [
+    {
+      "fieldName": "sectionLabel",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "circuitId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "conductorCrossSectionalArea",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "sheathMaterial",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "designVoltage",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "operatingVoltage",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "insulationTypeSheath",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "conductorMaterial",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "age",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "faultHistory",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lengthOfCableSectionMeters",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "sectionRating",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "numberOfCores",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "netPerformanceCostOfFailureEuro",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "repairTimeHour",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "assetUgCable",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "asset_ug_cable",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095051"
+}

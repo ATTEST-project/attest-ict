@@ -1,0 +1,53 @@
+{
+  "name": "OutputFile",
+  "fields": [
+    {
+      "fieldName": "fileName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "data",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    },
+    {
+      "fieldName": "uploadTime",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "tool",
+      "otherEntityRelationshipName": "outputFile",
+      "relationshipName": "tool"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "outputFile",
+      "relationshipName": "network"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "simulation",
+      "otherEntityRelationshipName": "outputFile",
+      "relationshipName": "simulation",
+      "otherEntityField": "uuid"
+    }
+  ],
+  "entityTableName": "output_file",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095054"
+}

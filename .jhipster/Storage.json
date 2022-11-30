@@ -1,0 +1,99 @@
+{
+  "name": "Storage",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "ps",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qs",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "energy",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "eRating",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "chargeRating",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "dischargeRating",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "chargeEfficiency",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "thermalRating",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qmin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qmax",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "r",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "x",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "pLoss",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qLoss",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "socInitial",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "socMin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "socMax",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "storage",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "storage",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095032"
+}

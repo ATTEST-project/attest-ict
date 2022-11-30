@@ -1,0 +1,7 @@
+.not-selected-error {
+  border: 1px solid red !important;
+
+  & > span {
+    color: red;
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "TransfProfile",
+  "fields": [
+    {
+      "fieldName": "season",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "typicalDay",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "mode",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "timeInterval",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "uploadDateTime",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "inputFile",
+      "otherEntityRelationshipName": "transfProfile",
+      "relationshipName": "inputFile",
+      "otherEntityField": "fileName",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "transfElVal",
+      "otherEntityRelationshipName": "transfProfile",
+      "relationshipName": "transfElVal"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "transfProfile",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "transf_profile",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095057"
+}

@@ -1,0 +1,55 @@
+{
+  "name": "Transformer",
+  "fields": [
+    {
+      "fieldName": "fbus",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "tbus",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "min",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "max",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "totalTaps",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "tap",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "manufactureYear",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "commissioningYear",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "transformer",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "transformer",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095041"
+}

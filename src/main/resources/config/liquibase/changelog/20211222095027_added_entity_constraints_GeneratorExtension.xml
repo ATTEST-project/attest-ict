@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity GeneratorExtension.
+    -->
+    <changeSet id="20211222095027-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="generator_id"
+                                 baseTableName="generator_extension"
+                                 constraintName="fk_generator_extension__generator_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="generator"/>
+    </changeSet>
+</databaseChangeLog>

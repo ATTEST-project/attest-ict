@@ -1,0 +1,60 @@
+{
+  "name": "Simulation",
+  "fields": [
+    {
+      "fieldName": "uuid",
+      "fieldType": "UUID",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "configFile",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "simulation",
+      "relationshipName": "network"
+    },
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "inputFile",
+      "otherEntityRelationshipName": "simulation",
+      "relationshipName": "inputFile",
+      "otherEntityField": "fileName",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "simulation",
+      "relationshipName": "task",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "outputFile",
+      "otherEntityRelationshipName": "simulation",
+      "relationshipName": "outputFile",
+      "otherEntityField": "name"
+    }
+  ],
+  "entityTableName": "simulation",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20221025153844"
+}

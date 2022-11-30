@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity DsoTsoConnection.
+    -->
+    <changeSet id="20220118135914-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="dso_network_id"
+                                 baseTableName="dso_tso_connection"
+                                 constraintName="fk_dso_tso_connection__dso_network_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="network"/>
+    </changeSet>
+</databaseChangeLog>

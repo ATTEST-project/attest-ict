@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity BranchProfile.
+    -->
+    <changeSet id="20220718093730-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="input_file_id"
+                                 baseTableName="branch_profile"
+                                 constraintName="fk_branch_profile__input_file_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="input_file"/>
+
+        <addForeignKeyConstraint baseColumnNames="network_id"
+                                 baseTableName="branch_profile"
+                                 constraintName="fk_branch_profile__network_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="network"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,33 @@
+{
+  "name": "BusCoordinate",
+  "fields": [
+    {
+      "fieldName": "x",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "y",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "bus",
+      "otherEntityRelationshipName": "busCoordinate",
+      "relationshipName": "bus",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "bus_coordinate",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095021"
+}

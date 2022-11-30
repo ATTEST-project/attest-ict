@@ -1,0 +1,32 @@
+{
+  "name": "StorageCost",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "costA",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "costB",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "costC",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "storage_cost",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095033"
+}

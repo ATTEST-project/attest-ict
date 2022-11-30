@@ -1,0 +1,36 @@
+{
+  "name": "VoltageLevel",
+  "fields": [
+    {
+      "fieldName": "v1",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "v2",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "v3",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "voltageLevel",
+      "relationshipName": "network",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "voltage_level",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095056"
+}

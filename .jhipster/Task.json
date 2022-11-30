@@ -1,0 +1,60 @@
+{
+  "name": "Task",
+  "fields": [
+    {
+      "fieldName": "taskStatus",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "info",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dateTimeStart",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "dateTimeEnd",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "toolLogFile",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "toolLogFile",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "simulation",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "simulation",
+      "otherEntityField": "uuid",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "tool",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "tool"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "task",
+      "relationshipName": "user"
+    }
+  ],
+  "entityTableName": "task",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095101"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "BaseMVA",
+  "fields": [
+    {
+      "fieldName": "baseMva",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "baseMVA",
+      "relationshipName": "network",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "base_mva",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095018"
+}

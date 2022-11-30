@@ -1,0 +1,22 @@
+.list-item-root {
+  background-color: #10272f;
+  color: white;
+
+  &:hover {
+    background-color: #dcdcdc;
+    color: #10272f;
+  }
+}
+
+.list-item-selected {
+  color: #10272f;
+
+  &:hover {
+    background-color: #dcdcdc !important;
+    color: #10272f;
+  }
+}
+
+.svg-bg {
+  background: #dcdcdc;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "WeatherForecast",
+  "fields": [
+    {
+      "fieldName": "solarProfile",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "outsideTemp",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [],
+  "entityTableName": "weather_forecast",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095042"
+}

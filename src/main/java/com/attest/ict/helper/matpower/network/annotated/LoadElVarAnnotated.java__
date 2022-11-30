@@ -1,0 +1,247 @@
+package com.attest.ict.helper.matpower.network.annotated;
+
+import com.attest.ict.domain.LoadElVar;
+import com.univocity.parsers.annotations.Parsed;
+
+public class LoadElVarAnnotated extends LoadElVar {
+
+    @Parsed(index = 0)
+    public double getT0() {
+        return super.getT0();
+    }
+
+    @Parsed(index = 0, field = "t0")
+    public void setT0(double t0) {
+        super.setT0(t0);
+    }
+
+    @Parsed(index = 1)
+    public double getT1() {
+        return super.getT1();
+    }
+
+    @Parsed(index = 1, field = "t1")
+    public void setT1(double t1) {
+        super.setT1(t1);
+    }
+
+    @Parsed(index = 2)
+    public double getT2() {
+        return super.getT2();
+    }
+
+    @Parsed(index = 2, field = "t2")
+    public void setT2(double t2) {
+        super.setT2(t2);
+    }
+
+    @Parsed(index = 3)
+    public double getT3() {
+        return super.getT3();
+    }
+
+    @Parsed(index = 3, field = "t3")
+    public void setT3(double t3) {
+        super.setT3(t3);
+    }
+
+    @Parsed(index = 4)
+    public double getT4() {
+        return super.getT4();
+    }
+
+    @Parsed(index = 4, field = "t4")
+    public void setT4(double t4) {
+        super.setT4(t4);
+    }
+
+    @Parsed(index = 5)
+    public double getT5() {
+        return super.getT5();
+    }
+
+    @Parsed(index = 5, field = "t5")
+    public void setT5(double t5) {
+        super.setT5(t5);
+    }
+
+    @Parsed(index = 6)
+    public double getT6() {
+        return super.getT6();
+    }
+
+    @Parsed(index = 6, field = "t6")
+    public void setT6(double t6) {
+        super.setT6(t6);
+    }
+
+    @Parsed(index = 7)
+    public double getT7() {
+        return super.getT7();
+    }
+
+    @Parsed(index = 7, field = "t7")
+    public void setT7(double t7) {
+        super.setT7(t7);
+    }
+
+    @Parsed(index = 8)
+    public double getT8() {
+        return super.getT8();
+    }
+
+    @Parsed(index = 8, field = "t8")
+    public void setT8(double t8) {
+        super.setT8(t8);
+    }
+
+    @Parsed(index = 9)
+    public double getT9() {
+        return super.getT9();
+    }
+
+    @Parsed(index = 9, field = "t9")
+    public void setT9(double t9) {
+        super.setT9(t9);
+    }
+
+    @Parsed(index = 10)
+    public double getT10() {
+        return super.getT10();
+    }
+
+    @Parsed(index = 10, field = "t10")
+    public void setT10(double t10) {
+        super.setT10(t10);
+    }
+
+    @Parsed(index = 11)
+    public double getT11() {
+        return super.getT11();
+    }
+
+    @Parsed(index = 11, field = "t11")
+    public void setT11(double t11) {
+        super.setT11(t11);
+    }
+
+    @Parsed(index = 12)
+    public double getT12() {
+        return super.getT12();
+    }
+
+    @Parsed(index = 12, field = "t12")
+    public void setT12(double t12) {
+        super.setT12(t12);
+    }
+
+    @Parsed(index = 13)
+    public double getT13() {
+        return super.getT13();
+    }
+
+    @Parsed(index = 13, field = "t13")
+    public void setT13(double t13) {
+        super.setT13(t13);
+    }
+
+    @Parsed(index = 14)
+    public double getT14() {
+        return super.getT14();
+    }
+
+    @Parsed(index = 14, field = "t14")
+    public void setT14(double t14) {
+        super.setT14(t14);
+    }
+
+    @Parsed(index = 15)
+    public double getT15() {
+        return super.getT15();
+    }
+
+    @Parsed(index = 15, field = "t15")
+    public void setT15(double t15) {
+        super.setT15(t15);
+    }
+
+    @Parsed(index = 16)
+    public double getT16() {
+        return super.getT16();
+    }
+
+    @Parsed(index = 16, field = "t16")
+    public void setT16(double t16) {
+        super.setT16(t16);
+    }
+
+    @Parsed(index = 17)
+    public double getT17() {
+        return super.getT17();
+    }
+
+    @Parsed(index = 17, field = "t17")
+    public void setT17(double t17) {
+        super.setT17(t17);
+    }
+
+    @Parsed(index = 18)
+    public double getT18() {
+        return super.getT18();
+    }
+
+    @Parsed(index = 18, field = "t18")
+    public void setT18(double t18) {
+        super.setT18(t18);
+    }
+
+    @Parsed(index = 19)
+    public double getT19() {
+        return super.getT19();
+    }
+
+    @Parsed(index = 19, field = "t19")
+    public void setT19(double t19) {
+        super.setT19(t19);
+    }
+
+    @Parsed(index = 20)
+    public double getT20() {
+        return super.getT20();
+    }
+
+    @Parsed(index = 20, field = "t20")
+    public void setT20(double t20) {
+        super.setT20(t20);
+    }
+
+    @Parsed(index = 21)
+    public double getT21() {
+        return super.getT21();
+    }
+
+    @Parsed(index = 21, field = "t21")
+    public void setT21(double t21) {
+        super.setT21(t21);
+    }
+
+    @Parsed(index = 22)
+    public double getT22() {
+        return super.getT22();
+    }
+
+    @Parsed(index = 22, field = "t22")
+    public void setT22(double t22) {
+        super.setT22(t22);
+    }
+
+    @Parsed(index = 23)
+    public double getT23() {
+        return super.getT23();
+    }
+
+    @Parsed(index = 23, field = "t23")
+    public void setT23(double t23) {
+        super.setT23(t23);
+    }
+}

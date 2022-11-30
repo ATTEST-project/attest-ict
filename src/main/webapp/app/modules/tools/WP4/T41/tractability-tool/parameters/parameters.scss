@@ -1,0 +1,26 @@
+.param-container {
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.input-number-pos > label {
+  float: left;
+  margin-right: 15px;
+  margin-top: 5px;
+}
+
+.input-number-pos > input {
+  width: 100px;
+}
+
+.input-checkbox-pos {
+  margin-bottom: 0 !important;
+  margin-top: 20px;
+}
+
+.input-checkbox-pos > input {
+  float: left;
+  margin-right: 10px;
+}

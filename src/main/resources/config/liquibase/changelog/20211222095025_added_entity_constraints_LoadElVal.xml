@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity LoadElVal.
+    -->
+    <changeSet id="20211222095025-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="load_profile_id"
+                                 baseTableName="load_el_val"
+                                 constraintName="fk_load_el_val__load_profile_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="load_profile"/>
+    </changeSet>
+</databaseChangeLog>

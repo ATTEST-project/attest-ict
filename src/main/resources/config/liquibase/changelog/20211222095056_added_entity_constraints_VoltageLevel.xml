@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity VoltageLevel.
+    -->
+    <changeSet id="20211222095056-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="network_id"
+                                 baseTableName="voltage_level"
+                                 constraintName="fk_voltage_level__network_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="network"/>
+    </changeSet>
+</databaseChangeLog>

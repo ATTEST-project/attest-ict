@@ -1,0 +1,12 @@
+.highlight {
+  stroke: yellow !important;
+  stroke-width: 0.1%;
+}
+
+.network-svg-div {
+  height: calc(100vh - 300px);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: white;
+}

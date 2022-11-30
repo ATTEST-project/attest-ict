@@ -1,0 +1,14 @@
+.variables-container {
+  border: 1px solid white;
+  padding: 10px;
+  height: 120px;
+  overflow-y: scroll;
+}
+
+.input-row-checkbox {
+  margin-bottom: 0 !important;
+}
+
+.input-row-checkbox > input {
+  margin-left: 10px;
+}

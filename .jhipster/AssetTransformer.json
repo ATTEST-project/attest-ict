@@ -1,0 +1,75 @@
+{
+  "name": "AssetTransformer",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "voltageRatio",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "insulationMedium",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "indoorOutdoor",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "annualMaxLoadKva",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "age",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "externalCondition",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "ratingKva",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "numConnectedCustomers",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "numSensitiveCustomers",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "backupSupply",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "costOfFailureEuro",
+      "fieldType": "Long"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "assetTransformer",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "asset_transformer",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095047"
+}

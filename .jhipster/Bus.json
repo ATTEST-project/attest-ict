@@ -1,0 +1,103 @@
+{
+  "name": "Bus",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "activePower",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "reactivePower",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "conductance",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "susceptance",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "area",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "vm",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "va",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "baseKv",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "zone",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "vmax",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "vmin",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "loadElVal",
+      "otherEntityRelationshipName": "bus",
+      "relationshipName": "loadELVal"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "busName",
+      "otherEntityRelationshipName": "bus",
+      "relationshipName": "busName",
+      "otherEntityField": "busName",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "busExtension",
+      "otherEntityRelationshipName": "bus",
+      "relationshipName": "busExtension",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "busCoordinate",
+      "otherEntityRelationshipName": "bus",
+      "relationshipName": "busCoordinate",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "bus",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "bus",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095019"
+}

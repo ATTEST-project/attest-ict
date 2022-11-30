@@ -1,0 +1,84 @@
+{
+  "name": "BranchExtension",
+  "fields": [
+    {
+      "fieldName": "stepSize",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "actTap",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "minTap",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "maxTap",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "normalTap",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "nominalRatio",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rIp",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rN",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "r0",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "x0",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "b0",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "length",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "normStat",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "g",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "mRid",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "branch",
+      "otherEntityRelationshipName": "branchExtension",
+      "relationshipName": "branch",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "branch_extension",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095100"
+}

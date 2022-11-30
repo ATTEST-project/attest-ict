@@ -1,0 +1,134 @@
+{
+  "name": "Generator",
+  "fields": [
+    {
+      "fieldName": "busNum",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "pg",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qg",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qmax",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qmin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "vg",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "mBase",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "pmax",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "pmin",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "pc1",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "pc2",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qc1min",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qc1max",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qc2min",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "qc2max",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rampAgc",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "ramp10",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "ramp30",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rampQ",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "apf",
+      "fieldType": "Long"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "genElVal",
+      "otherEntityRelationshipName": "generator",
+      "relationshipName": "genElVal"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "generatorExtension",
+      "otherEntityRelationshipName": "generator",
+      "relationshipName": "generatorExtension",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "genTag",
+      "otherEntityRelationshipName": "generator",
+      "relationshipName": "genTag",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "genCost",
+      "otherEntityRelationshipName": "generator",
+      "relationshipName": "genCost",
+      "ownerSide": false
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "generator",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "generator",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095026"
+}

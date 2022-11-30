@@ -1,0 +1,49 @@
+{
+  "name": "GenCost",
+  "fields": [
+    {
+      "fieldName": "model",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "startup",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "shutdown",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "nCost",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "costPF",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "costQF",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "generator",
+      "otherEntityRelationshipName": "genCost",
+      "relationshipName": "generator",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "gen_cost",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095039"
+}

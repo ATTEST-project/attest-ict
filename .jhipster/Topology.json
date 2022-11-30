@@ -1,0 +1,36 @@
+{
+  "name": "Topology",
+  "fields": [
+    {
+      "fieldName": "powerLineBranch",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "p1",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "p2",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "topologyBus",
+      "otherEntityRelationshipName": "topology",
+      "relationshipName": "powerLineBranchParent",
+      "otherEntityField": "powerLineBranch"
+    }
+  ],
+  "entityTableName": "topology",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095052"
+}

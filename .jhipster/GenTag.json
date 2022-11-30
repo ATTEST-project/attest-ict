@@ -1,0 +1,29 @@
+{
+  "name": "GenTag",
+  "fields": [
+    {
+      "fieldName": "genTag",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "generator",
+      "otherEntityRelationshipName": "genTag",
+      "relationshipName": "generator",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "gen_tag",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095028"
+}

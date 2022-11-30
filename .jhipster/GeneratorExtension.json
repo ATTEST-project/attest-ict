@@ -1,0 +1,37 @@
+{
+  "name": "GeneratorExtension",
+  "fields": [
+    {
+      "fieldName": "idGen",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "statusCurt",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "dgType",
+      "fieldType": "Integer"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "generator",
+      "otherEntityRelationshipName": "generatorExtension",
+      "relationshipName": "generator",
+      "otherEntityField": "busNum",
+      "ownerSide": true
+    }
+  ],
+  "entityTableName": "generator_extension",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095027"
+}

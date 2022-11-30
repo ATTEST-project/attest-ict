@@ -1,0 +1,36 @@
+#div-svg {
+  & svg {
+    // necessary because the default (inline-block) adds vertical space
+    // to our otherwise pixel accurate computations (this makes a
+    // scrollbar appear in fullscreen mode)
+    display: block;
+  }
+
+  & polyline {
+    pointer-events: none;
+  }
+
+  & .sld-label,
+  .sld-graph-label {
+    fill: black;
+  }
+
+  & .sld-disconnector:not(.sld-fictitious),
+  :not(.sld-breaker):not(.sld-disconnector):not(.sld-load-break-switch).sld-disconnected,
+  .sld-feeder-disconnected,
+  .sld-feeder-disconnected-connected {
+    stroke: black;
+  }
+
+  & .arrow {
+    fill: white;
+  }
+
+  & .sld-flash,
+  .sld-lock {
+    stroke: none;
+    fill: black;
+  }
+
+  overflow: hidden;
+}

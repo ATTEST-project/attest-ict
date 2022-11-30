@@ -1,0 +1,47 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="lara.pinato (generated)" id="1656667345124-1">
+        <addColumn tableName="flex_profile">
+            <column name="input_file_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-2">
+        <addColumn tableName="gen_profile">
+            <column name="input_file_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-3">
+        <addColumn tableName="load_profile">
+            <column name="input_file_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-4">
+        <addColumn tableName="transf_profile">
+            <column name="input_file_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-5">
+        <addUniqueConstraint columnNames="input_file_id" constraintName="UC_FLEX_PROFILEINPUT_FILE_ID_COL" tableName="flex_profile"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-6">
+        <addUniqueConstraint columnNames="input_file_id" constraintName="UC_GEN_PROFILEINPUT_FILE_ID_COL" tableName="gen_profile"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-7">
+        <addUniqueConstraint columnNames="input_file_id" constraintName="UC_LOAD_PROFILEINPUT_FILE_ID_COL" tableName="load_profile"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-8">
+        <addUniqueConstraint columnNames="input_file_id" constraintName="UC_TRANSF_PROFILEINPUT_FILE_ID_COL" tableName="transf_profile"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-9">
+        <addForeignKeyConstraint baseColumnNames="input_file_id" baseTableName="load_profile" constraintName="FK63hbijj2eb0fb4987ql4cahh4" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="input_file" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-10">
+        <addForeignKeyConstraint baseColumnNames="input_file_id" baseTableName="gen_profile" constraintName="FKd46b7cr0mtg2ebi5yil04t4l7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="input_file" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-11">
+        <addForeignKeyConstraint baseColumnNames="input_file_id" baseTableName="flex_profile" constraintName="FKkjdxeo4ls4cgo1pylvooqepgs" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="input_file" validate="true"/>
+    </changeSet>
+    <changeSet author="lara.pinato (generated)" id="1656667345124-12">
+        <addForeignKeyConstraint baseColumnNames="input_file_id" baseTableName="transf_profile" constraintName="FKqv1rq7l22pkgrmy54ikytpks7" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="input_file" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

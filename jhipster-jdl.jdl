@@ -1,0 +1,740 @@
+// id di ogni entity viene generato in automatico
+
+//20221025 add new attibute description, isDeleted
+entity Network {
+  name String,
+  mpcName String,
+  country String,
+  type String,
+  description String,
+  isDeleted Boolean required,
+  networkDate Instant,
+  version Integer,
+  creationDateTime Instant,
+  updateDateTime Instant 
+}
+
+entity BaseMVA {
+  baseMva Double
+}
+
+entity Bus {
+  busNum Long,
+  type Integer,
+  activePower Double,
+  reactivePower Double,
+  conductance Double,
+  susceptance Double,
+  area Long,
+  vm Double,
+  va Double,
+  baseKv Double,
+  zone Long,
+  vmax Double,
+  vmin Double
+}
+
+entity BusName {
+  busName String
+}
+
+entity BusCoordinate {
+  x Double,
+  y Double
+}
+ 
+//20220715 add new column mRid as referece to CIM model
+entity BusExtension {
+  hasGen Integer,
+  isLoad Integer,
+  snomMva Double,
+  sx Double,
+  sy Double,
+  gx Double,
+  gy Double,
+  status Integer,
+  incrementCost Integer,
+  decrementCost Integer,
+  mRid String
+}
+
+entity Branch {
+  fbus Long,
+  tbus Long,
+  r Double,
+  x Double,
+  b Double, 
+  ratea Double,
+  rateb Double,
+  ratec Double,
+  tapRatio Double,
+  angle Double,
+  status Integer,
+  angmin Integer,
+  angmax Integer
+}
+
+entity LoadProfile {
+  season String,
+  typicalDay String,
+  mode Integer,
+  timeInterval Double,
+  uploadDateTime Instant
+}
+
+//20220715 start update
+// add  loadIdOnSubst, nominalVoltage, add referece to Bus Table instead of busNum 
+entity LoadElVal {
+  //busNum Long,
+  hour Integer,
+  min Integer,
+  p Double,
+  q Double,
+  loadIdOnSubst Long,
+  nominalVoltage String  
+}
+
+// add new table Branch Profile (test cases for HR contains branch profile and time series value for branch
+entity BranchProfile {
+  season String,
+  typicalDay String,
+  mode Integer,
+  timeInterval Double,
+  uploadDateTime Instant
+}
+
+// add new table
+entity BranchElVal {
+  hour Integer,
+  min Integer,
+  p Double,
+  q Double,
+  status Integer,
+  branchIdOnSubst Long,
+  nominalVoltage String  
+}
+// 20220715 end update
+
+
+entity Generator {
+  busNum Long,
+  pg Double,
+  qg Double,
+  qmax Double,
+  qmin Double,
+  vg Double,
+  mBase Double,
+  status Integer,
+  pmax Double,
+  pmin Double,
+  pc1 Double,
+  pc2 Double,
+  qc1min Double,
+  qc1max Double,
+  qc2min Double,
+  qc2max Double,
+  rampAgc Double,
+  ramp10 Double,
+  ramp30 Double,
+  rampQ Double,
+  apf Long
+}
+
+entity GeneratorExtension {
+  idGen Integer,  //se lo chiamo id lo vede come una chiave da generare in automatico
+  statusCurt Integer,
+  dgType Integer
+}
+
+entity GenTag {
+  genTag String
+}
+
+entity GenProfile {
+  season String,
+  typicalDay String,
+  mode Integer,
+  timeInterval Double,
+  uploadDateTime Instant
+}
+
+// 20220705 remove busNum, add reference to generator's table (on the same bus it's possible to find more than one generator)
+// 20220717 add genSubstId  and nominalVoltage
+entity GenElVal {
+ // busNum Long,  
+  hour Integer,
+  min Integer,
+  p Double,
+  q Double,
+  status Integer,
+  voltageMagnitude Double,
+  genIdOnSubst Long,
+  nominalVoltage String  
+}
+
+entity BillingDer {
+  busNum Long,
+  maxPowerKw Long,
+  type String
+}
+
+entity Storage {
+  busNum Long,
+  ps Double,
+  qs Double,
+  energy Double,
+  eRating Double,
+  chargeRating Double,
+  dischargeRating Double,
+  chargeEfficiency Double,
+  thermalRating Double,
+  qmin Double,
+  qmax Double,
+  r Double,
+  x Double,
+  pLoss Double,
+  qLoss Double,
+  status Integer,
+  socInitial Double,
+  socMin Double,
+  socMax Double
+}
+
+entity StorageCost {
+  busNum Long,
+  costA Double,
+  costB Double,
+  costC Double
+}
+
+entity ToolLogFile {
+  fileName String,
+  //2022/02/27 renamed FileType with description
+  //fileType String,
+  description String,
+  data Blob, // byte[],
+  uploadTime Instant
+}
+
+entity FlexProfile {
+  season String,
+  typicalDay String,
+  mode Integer,
+  timeInterval Double,
+  uploadDateTime Instant
+}
+
+entity FlexElVal {
+  busNum Long,
+  hour Integer,
+  min Integer,
+  pfmaxUp Double,
+  pfmaxDn Double,
+  qfmaxUp Double,
+  qfmaxDn Double
+}
+
+entity FlexCost {
+  busNum Long,
+  model Integer ,
+  nCost Long,
+  costPr Double,
+  costQr Double,
+  costPf String,
+  costQf String
+}
+
+//20220715 remove fbus,tbus, add reference to branch's table, add new columns: transfIdOnSubst, nominalVoltage, status
+entity TransfElVal { 
+  hour Integer,
+  min Integer,
+  tapRatio Double,
+  status Integer,
+  trasfIdOnSubst Long,
+  nominalVoltage String
+}  
+
+entity GenCost {
+  model Integer,
+  startup Double,
+  shutdown Double,
+  nCost Long,
+  costPF String,
+  costQF String
+}
+
+entity ProtectionTool {
+  type String
+}
+
+entity Transformer {
+  fbus Long,
+  tbus Long,
+  min Double,
+  max Double,
+  totalTaps Integer,
+  tap Integer,
+  manufactureYear Integer,
+  commissioningYear Integer
+}
+
+entity WeatherForecast {
+  solarProfile Double,
+  outsideTemp Double
+}
+
+entity CapacitorBankData {
+  busNum Long,
+  nodeId String,
+  bankId String,
+  qnom Double
+}
+
+entity LineCable {
+  fbus Long,
+  tbus Long,
+  lengthKm Double,
+  typeOfInstallation String
+}
+
+entity InputFile {
+  fileName String,
+  //fileType String,
+  //27/01/2022 renamed fileType with description
+  description String
+  data Blob, //byte[],
+  uploadTime Instant
+}
+
+
+entity AssetTransformer {
+  busNum Long,
+  voltageRatio String,
+  insulationMedium String,
+  type String,
+  indoorOutdoor String,
+  annualMaxLoadKva Integer,
+  age Integer,
+  externalCondition String,
+  ratingKva Integer,
+  numConnectedCustomers Integer,
+  numSensitiveCustomers Integer,
+  backupSupply String,
+  costOfFailureEuro Long
+}
+
+entity Node {
+  networkId String,
+  loadId Long,
+  name String
+}
+
+entity SolarData {
+  p Double,
+  hour Integer
+}
+
+entity Price {
+  electricityEnergy Double,
+  gasEnergy Double,
+  secondaryBand Double,
+  secondaryUp Double,
+  secondaryDown Double,
+  secondaryRatioUp Double,
+  secondaryRatioDown Double
+}
+
+entity AssetUGCable {
+  sectionLabel String,
+  circuitId Long,
+  conductorCrossSectionalArea Integer,
+  sheathMaterial String,
+  designVoltage String,
+  operatingVoltage String,
+  insulationTypeSheath String,
+  conductorMaterial String,
+  age Integer,
+  faultHistory Integer,
+  lengthOfCableSectionMeters Integer,
+  sectionRating Integer,
+  type String,
+  numberOfCores Integer,
+  netPerformanceCostOfFailureEuro String,
+  repairTimeHour Integer
+}
+
+entity Topology {
+  powerLineBranch String,
+  p1 String,
+  p2 String
+}
+
+
+entity OutputFile {
+  fileName String,
+  //27/01/2022 renamed fileType with descriptio
+  description String,
+  data Blob, //byte[],
+  uploadTime Instant
+}
+
+entity TopologyBus {
+  powerLineBranch String,
+  busName1 String,
+  busName2 String
+}
+
+entity VoltageLevel {
+  v1 Double,
+  v2 Double,
+  v3 Double
+}
+
+entity TransfProfile {
+  season String,
+  typicalDay String,
+  mode Integer,
+  timeInterval Double,
+  uploadDateTime Instant
+}
+
+entity WindData {
+  windSpeed Double,
+  hour Integer
+}
+
+entity BillingConsumption {
+  busNum Long,
+  type String,
+  totalEnergyConsumption Long,
+  unitOfMeasure String
+}
+
+//202207 add mRid to identify branch on CIM Model
+entity BranchExtension {
+  stepSize Double,
+  actTap Double,
+  minTap Double,
+  maxTap Double,
+  normalTap Double,
+  nominalRatio Double,
+  rIp Double,
+  rN Double,
+  r0 Double,
+  x0 Double,
+  b0 Double,
+  length Double,
+  normStat Integer,
+  g Double,
+  mRid String
+}
+
+//2022/01/27 remove toolName,  replace taskDate with dateTimeStart and dateTimeEnd
+entity Task {
+  taskStatus String,
+  info String,  
+  dateTimeStart Instant,
+  dateTimeEnd Instant
+}
+
+entity DsoTsoConnection {
+  tsoNetworkName String,
+  dsoBusNum Long,
+  tsoBusNum Long
+}
+
+//20220127 Add New Entity
+entity Tool {
+  workPackage String required,
+  num String required, 
+  name String required unique,
+  path String,
+  description String    
+}
+
+
+//20221025 add new Entity ToolParameter
+entity ToolParameter {
+  name String required,
+  defaultValue String required,
+  isEnabled Boolean required,
+  description String,
+  lastUpdate Instant
+}
+
+//20221025 add new Entity Simulation
+entity Simulation {
+  uuid UUID required,
+  description String,  
+  configFile Blob required //byte[]  
+}
+
+
+
+relationship OneToOne {
+  BaseMVA{network} to Network{baseMVA}
+}
+
+relationship OneToOne {  
+  VoltageLevel{network} to Network{voltageLevel} 
+}
+
+// 2022/01/27 inverto la relazione
+relationship OneToOne {  
+  // ToolLogFile{task} to Task{toolLogFile} 
+  Task{toolLogFile} to ToolLogFile{task} 
+}    
+
+relationship OneToOne {  
+  GeneratorExtension{generator(busNum)} to Generator{generatorExtension} 
+}
+
+relationship OneToOne {  
+  GenTag{generator(busNum)} to Generator{genTag} 
+}
+
+relationship OneToOne {  
+  GenCost{generator(busNum)} to Generator{genCost} 
+}  
+
+relationship OneToOne {  
+  BranchExtension{branch} to Branch{branchExtension} 
+}
+
+relationship OneToOne {  
+  ProtectionTool{branch} to Branch 
+}
+
+
+relationship OneToOne {  
+  BusName{bus(busNum)} to Bus{busName(busName)} 
+}
+
+relationship OneToOne {
+  BusExtension{bus(busNum)} to Bus{busExtension} 
+}
+
+relationship OneToOne {
+  BusCoordinate{bus(busNum)} to Bus{busCoordinate}
+}
+
+
+// oneToMany Relationships
+relationship OneToMany {
+  Network{bus(busNum)} to Bus{network}
+}
+
+//2022/07/05 modifiy 
+relationship OneToMany { 
+// Network{generator(busNum)} to Generator{network}
+   Network{generator} to Generator{network}
+}
+//2022/07/05 modifiy  end
+
+relationship OneToMany { 
+  Network{branch} to Branch{network}
+}
+
+relationship OneToMany { 
+  Network{storage(busNum)} to Storage{network}
+}
+
+relationship OneToMany { 
+  Network{transformer} to Transformer{network}
+}
+
+relationship OneToMany { 
+  Network{capacitor(busNum)} to CapacitorBankData{network}
+}
+
+relationship OneToMany { 
+  Network{InputFile(fileName)} to InputFile{network}
+}
+  
+relationship OneToMany { 
+  Network{assetUgCable(sectionLabel)} to AssetUGCable{network}
+}
+
+relationship OneToMany { 
+  Network{assetTransformer(busNum)} to AssetTransformer{network}
+}
+
+relationship OneToMany { 
+  Network{billingConsumption(busNum)} to BillingConsumption{network}
+}
+
+relationship OneToMany { 
+  Network{billingDer(busNum)} to BillingDer{network}
+}
+
+relationship OneToMany { 
+  Network{lineCable} to  LineCable{network}
+}
+
+relationship OneToMany { 
+  Network{genProfile} to GenProfile{network}
+}
+
+relationship OneToMany { 
+  Network{loadProfile} to LoadProfile{network}
+}
+
+relationship OneToMany { 
+  Network{flexProfile} to FlexProfile{network}
+}
+
+relationship OneToMany { 
+  Network{transfProfile} to  TransfProfile{network}
+}
+
+//20220718 add
+relationship OneToMany { 
+  Network{branchProfile} to  BranchProfile{network}
+}
+
+relationship OneToMany { 
+  Network{storage(busNum)} to  Storage{network}
+} 
+
+relationship OneToMany { 
+  Network{topologyBus} to TopologyBus{network}
+}  
+
+relationship OneToMany {  
+	Network{dsoTsoConnection}  to DsoTsoConnection{dsoNetwork} 
+}
+
+
+relationship OneToMany { 
+  TopologyBus{topology} to Topology{powerLineBranchParent(powerLineBranch)}
+}  
+
+relationship OneToMany { 
+  GenProfile{genElVal} to GenElVal{genProfile}
+}
+
+relationship OneToMany { 
+  LoadProfile{loadElVal} to LoadElVal{loadProfile}
+}
+
+relationship OneToMany { 
+  FlexProfile{flexElVal} to FlexElVal{flexProfile} 
+}
+
+relationship OneToMany { 
+  FlexProfile{flexCost} to FlexCost{flexProfile} 
+}
+
+relationship OneToMany {
+  TransfProfile{transfElVal} to TransfElVal{transfProfile}
+}
+
+//2022/07/05 add
+relationship OneToMany {
+	Generator{genElVal} to GenElVal{generator} 
+}
+
+//2022/07/15 add
+relationship OneToMany {
+	Bus{loadELVal} to LoadElVal{bus} 
+}
+
+relationship OneToMany {
+	Branch{transfElVal} to TransfElVal{branch} 
+}
+
+relationship OneToMany {
+	Branch{branchElVal} to BranchElVal{branch}
+}
+
+relationship OneToMany {
+  BranchProfile{branchElVal} to BranchElVal{branchProfile}
+}
+
+// Set ManyToOne Relationships
+
+//2022/07/01 corretto il nome dell'attributo di inputFile
+//2022/01/27 add 
+relationship ManyToOne { 
+   InputFile{tool} to Tool{InputFile(fileName)}
+}
+
+relationship ManyToOne { 
+   OutputFile{tool} to Tool{outputFile(name)}
+}
+
+relationship ManyToOne { 
+   Task{tool} to Tool{task} 
+}
+
+relationship ManyToOne {
+  ProtectionTool{bus} to Bus
+} 
+
+relationship ManyToOne {
+  OutputFile{network} to Network
+}
+
+relationship ManyToOne { 
+  Task{user} to User 
+}
+
+//20221025 add new relationship between OutputFile and simulation
+relationship ManyToOne {
+  OutputFile{simulation(uuid)} to Simulation{outputFile(name)}
+}
+
+//20221025 add new relationship between OutputFile and simulation
+relationship ManyToOne {
+  ToolParameter{tool(num)} to Tool{parameter}
+}
+
+//20221103 add new relationship Simulation and Network
+relationship ManyToOne {  
+	Simulation{network} to Network{simulation} 
+}
+
+
+//20221025 add new relationship between Simulation and InputFile
+relationship ManyToMany {
+  Simulation{InputFile(fileName)} to InputFile{simulation(uuid)}
+}
+
+// Set OneToOne Relationships
+
+//2022/06/30  add 
+relationship OneToOne {
+  GenProfile{InputFile(fileName)} to InputFile{genProfile}
+}
+
+relationship OneToOne {
+  FlexProfile{InputFile(fileName)} to InputFile{flexProfile}
+}
+
+relationship OneToOne {
+  LoadProfile{InputFile(fileName)} to InputFile{loadProfile}
+}
+
+relationship OneToOne {
+  TransfProfile{InputFile(fileName)} to InputFile{transfProfile}
+}
+
+//2022/07/17  add
+relationship OneToOne {
+  BranchProfile{InputFile(fileName)} to InputFile{branchProfile}
+}
+
+//2022/10/25 add new relationship between Task and Simulation
+relationship OneToOne {  
+    Task{simulation(uuid)} to Simulation{task} 
+}    
+
+
+// Set pagination options
+paginate all with pagination
+
+dto * with mapstruct
+
+service all with serviceImpl
+
+filter all

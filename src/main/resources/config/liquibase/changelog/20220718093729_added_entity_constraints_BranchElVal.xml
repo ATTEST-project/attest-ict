@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity BranchElVal.
+    -->
+    <changeSet id="20220718093729-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="branch_id"
+                                 baseTableName="branch_el_val"
+                                 constraintName="fk_branch_el_val__branch_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch"/>
+
+        <addForeignKeyConstraint baseColumnNames="branch_profile_id"
+                                 baseTableName="branch_el_val"
+                                 constraintName="fk_branch_el_val__branch_profile_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="branch_profile"/>
+    </changeSet>
+</databaseChangeLog>

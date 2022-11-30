@@ -1,0 +1,41 @@
+{
+  "name": "TopologyBus",
+  "fields": [
+    {
+      "fieldName": "powerLineBranch",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "busName1",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "busName2",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "topology",
+      "otherEntityRelationshipName": "powerLineBranchParent",
+      "relationshipName": "topology"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "network",
+      "otherEntityRelationshipName": "topologyBus",
+      "relationshipName": "network"
+    }
+  ],
+  "entityTableName": "topology_bus",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20211222095055"
+}
