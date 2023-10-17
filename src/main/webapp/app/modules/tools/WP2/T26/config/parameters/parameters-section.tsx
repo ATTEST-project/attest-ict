@@ -4,7 +4,9 @@ import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import Divider from 'app/shared/components/divider/divider';
 
-const ParametersSection = () => {
+const ParametersSection = (props: any) => {
+  const { marketNotSelected } = props;
+
   const {
     register,
     formState: { errors },
@@ -13,6 +15,8 @@ const ParametersSection = () => {
   return (
     <div className="section-with-border">
       <h6>{'Parameters'}</h6>
+      {marketNotSelected && <div> Please Select at least one market! </div>}
+
       <Divider />
       <Row md="3">
         <Col>

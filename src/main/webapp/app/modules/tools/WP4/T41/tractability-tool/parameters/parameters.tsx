@@ -13,7 +13,7 @@ const ParametersSection = props => {
     reset,
   } = useFormContext();
 
-  const [showParameters, setShowParameters] = React.useState<boolean>(false);
+  const [showParameters, setShowParameters] = React.useState<boolean>(true);
 
   return (
     <>
@@ -28,6 +28,8 @@ const ParametersSection = props => {
           </div>
         </div>
         <Collapse isOpen={showParameters}>
+          <Divider />
+
           <Row>
             <Col md="3">
               <ValidatedField
@@ -48,7 +50,6 @@ const ParametersSection = props => {
           <Row>
             <Col md="3">
               <ValidatedField
-                className="input-checkbox-pos"
                 register={register}
                 error={errors?.parameters?.scenario}
                 id={'scenario'}
@@ -72,13 +73,14 @@ const ParametersSection = props => {
                   register={register}
                   error={errors?.parameters?.flex_apc}
                   id={'flex_apc'}
-                  label="Flex APC"
+                  label="Flex APC. This option will always be set to 1."
                   name="parameters[flex_apc]"
                   data-cy="flex_apc"
                   type="checkbox"
                 />
               </Col>
             </Row>
+            {/*
             <Row className="param-container">
               <span>OLTC Transformer</span>
               <Col md="3">
@@ -106,8 +108,10 @@ const ParametersSection = props => {
                 />
               </Col>
             </Row>
+            */}
+
             <Row className="param-container">
-              <span>Reactive Power from RES</span>
+              <span>Reactive Power provision from RES</span>
               <Col md="3">
                 <ValidatedField
                   className="input-checkbox-pos"
@@ -121,61 +125,73 @@ const ParametersSection = props => {
                 />
               </Col>
             </Row>
+
             <Row className="param-container">
-              <span>Participation of Flexible</span>
+              <span>With Flexibility (Participation of Flexible Load And Usage of Electrical Storage and OLTC transformer)</span>
               <Col md="3">
                 <ValidatedField
                   className="input-checkbox-pos"
                   register={register}
-                  error={errors?.parameters?.flex_fl}
-                  id={'flex_fl'}
-                  label="Flex FL"
-                  name="parameters[flex_fl]"
-                  data-cy="flex_fl"
-                  type="checkbox"
-                />
-              </Col>
-              <Col md="3">
-                <ValidatedField
-                  className="input-checkbox-pos"
-                  register={register}
-                  error={errors?.parameters?.fl_bin}
-                  id={'fl_bin'}
-                  label="Flex Bin"
-                  name="parameters[fl_bin]"
-                  data-cy="fl_bin"
-                  type="checkbox"
-                />
-              </Col>
-            </Row>
-            <Row className="param-container">
-              <span>Usage of Electrical Storage</span>
-              <Col md="3">
-                <ValidatedField
-                  className="input-checkbox-pos"
-                  register={register}
-                  error={errors?.parameters?.flex_str}
-                  id={'flex_str'}
-                  label="Flex STR"
-                  name="parameters[flex_str]"
-                  data-cy="flex_str"
-                  type="checkbox"
-                />
-              </Col>
-              <Col md="3">
-                <ValidatedField
-                  className="input-checkbox-pos"
-                  register={register}
-                  error={errors?.parameters?.str_bin}
-                  id={'str_bin'}
-                  label="STR Bin"
-                  name="parameters[str_bin]"
-                  data-cy="str_bin"
+                  error={errors?.parameters?.with_flex}
+                  id={'with_flex'}
+                  label="With Flexibility"
+                  name="parameters[with_flex]"
+                  data-cy="with_flex"
                   type="checkbox"
                 />
               </Col>
             </Row>
           </div>
+          <Divider />
+          <Row>
+            <Col md="3">
+              <ValidatedField
+                register={register}
+                id={'case_name'}
+                label="Case Name"
+                name="parameters[case_name]"
+                data-cy="case_name"
+                type="text"
+                validate={{ required: false }}
+              />
+            </Col>
+            <Col md="3">
+              <ValidatedField
+                register={register}
+                label="Season"
+                id={'season'}
+                name="parameters[season]"
+                data-cy="season"
+                type="select"
+                validate={{ required: false }}
+              >
+                <option value="" hidden>
+                  Select the season...
+                </option>
+                <option value="Su">Summer</option>
+                <option value="W">Winter</option>
+              </ValidatedField>
+            </Col>
+            <Col md="3">
+              <ValidatedField
+                register={register}
+                label="Year"
+                id={'year'}
+                name="parameters[year]"
+                data-cy="year"
+                type="select"
+                validate={{ required: false }}
+              >
+                <option value="" hidden>
+                  Select the year...
+                </option>
+                <option value="2020">2020</option>
+                <option value="2030">2030</option>
+                <option value="2040">2040</option>
+                <option value="2050">2050</option>
+              </ValidatedField>
+            </Col>
+          </Row>
         </Collapse>
       </div>
     </>

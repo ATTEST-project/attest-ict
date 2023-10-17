@@ -156,4 +156,9 @@ public class GeneratorServiceImpl implements GeneratorService {
     public Optional<Generator> findByIdAndNetworkId(Long genId, Long networkId) {
         return generatorRepository.findByIdAndNetworkId(genId, networkId);
     }
+
+    @Override
+    public List<Generator> findByNetworkIdAndPg(Long networkId, Double pg) {
+        return generatorRepository.findByNetworkIdAndPg(networkId, pg);
+    }
 }

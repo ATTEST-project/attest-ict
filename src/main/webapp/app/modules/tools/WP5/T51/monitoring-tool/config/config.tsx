@@ -138,7 +138,7 @@ const Config = (props: any) => {
               </div>
             </Col>
             <Col>
-              <Label htmlFor="wind-temp">Wind Temperature (°C)</Label>
+              <Label htmlFor="wind-temp">Winding Temperature (°C)</Label>
               <div id="wind-temp" className="variables-container">
                 {variables?.map((variable, i) => (
                   <ValidatedField

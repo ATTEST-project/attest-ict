@@ -7,6 +7,9 @@ import { useAppDispatch } from 'app/config/store';
 import { getEntities } from 'app/entities/network/network-search.reducer';
 import NetworkSearchResults from 'app/shared/components/network-search/results/network-search-results-1';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAppSelector } from 'app/config/store';
+import { generateNetworkTypeOptions } from 'app/shared/util/authorizationUtils';
+import { generateCountryOptions } from 'app/shared/util/options-map-utils';
 
 const initialSearchState: { [key: string]: any } = {
   type: '',
@@ -18,10 +21,17 @@ const initialSearchState: { [key: string]: any } = {
 
 const NetworkSearch = props => {
   const dispatch = useAppDispatch();
+  /* eslint-disable-next-line no-console */
+  // console.log('NetworkSearch props: ', JSON.stringify(props));
 
   const getDefaultValues = () => {
     return JSON.parse(sessionStorage.getItem('lastSearch'));
   };
+  const currentUser = useAppSelector(state => state.authentication.account);
+  const authorities = currentUser.authorities;
+
+  const networkTypeOptions = generateNetworkTypeOptions(authorities);
+  const countryOptions = generateCountryOptions();
 
   const {
     handleSubmit,
@@ -35,8 +45,6 @@ const NetworkSearch = props => {
   const [showResults, setShowResults] = React.useState<boolean>(true);
 
   const submitForm = data => {
-    /* eslint-disable-next-line no-console */
-    console.log('Form data: ', data);
     sessionStorage.setItem('lastSearch', JSON.stringify(data));
     setLoading(true);
     setNetworks(null);
@@ -86,12 +94,14 @@ const NetworkSearch = props => {
               validate={{ required: true }}
             >
               <option value="" hidden>
-                Country...
+                Select Country...
               </option>
-              <option value="HR">Croatia</option>
-              <option value="PT">Portugal</option>
-              <option value="ES">Spain</option>
-              <option value="UK">United Kingdom</option>
+              {countryOptions?.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {' '}
+                  {option.label}{' '}
+                </option>
+              ))}
             </ValidatedField>
           </Col>
           <Col>
@@ -105,11 +115,22 @@ const NetworkSearch = props => {
               type="select"
               validate={{ required: true }}
             >
-              <option value="" hidden>
-                Type...
-              </option>
-              <option value="DX">Distribution</option>
-              <option value="TX">Transmission</option>
+              {/* Check whether networkTypeOptions has only one element */}
+              {networkTypeOptions && networkTypeOptions.length === 1 ? (
+                <option value={networkTypeOptions[0].value}> {networkTypeOptions[0].label} </option>
+              ) : (
+                <>
+                  <option value="" hidden>
+                    Select the Type...
+                  </option>
+                  {networkTypeOptions?.map((option, index) => (
+                    <option key={index} value={option.value}>
+                      {' '}
+                      {option.label}{' '}
+                    </option>
+                  ))}
+                </>
+              )}
             </ValidatedField>
           </Col>
           <Col>

@@ -20,11 +20,21 @@ interface ToolRunParams {
   parameterNames?: string[];
   parameterValues?: string[];
   profileIds?: number[];
+  otherToolOutputFileIds?: number[];
 }
 
 const apiUrl = 'api/tools/wp4/run';
 
-const generateFormData = ({ networkId, toolName, filesDesc, files, parameterNames, parameterValues, profileIds }: ToolRunParams) => {
+const generateFormData = ({
+  networkId,
+  toolName,
+  filesDesc,
+  files,
+  parameterNames,
+  parameterValues,
+  profileIds,
+  otherToolOutputFileIds,
+}: ToolRunParams) => {
   const formData = new FormData();
   formData.append('networkId', networkId.toString());
   formData.append('toolName', toolName);
@@ -55,12 +65,19 @@ const generateFormData = ({ networkId, toolName, filesDesc, files, parameterName
       formData.append('profilesId', profileIds[i].toString());
     }
   }
+
+  if (otherToolOutputFileIds) {
+    for (let i = 0; i < otherToolOutputFileIds.length; ++i) {
+      formData.append('otherToolOutputFileIds', otherToolOutputFileIds[i].toString());
+    }
+  }
+
   return formData;
 };
 
 export const runTool = createAsyncThunk(
   'tools/run',
-  async ({ networkId, toolName, filesDesc, files, parameterNames, parameterValues, profileIds }: ToolRunParams) => {
+  async ({ networkId, toolName, filesDesc, files, parameterNames, parameterValues, profileIds, otherToolOutputFileIds }: ToolRunParams) => {
     const formData = generateFormData({
       networkId,
       toolName,
@@ -69,6 +86,7 @@ export const runTool = createAsyncThunk(
       parameterNames,
       parameterValues,
       profileIds,
+      otherToolOutputFileIds,
     });
     return await axios.post<any>(apiUrl, formData, {
       headers: { 'content-type': 'multipart/form-data' },

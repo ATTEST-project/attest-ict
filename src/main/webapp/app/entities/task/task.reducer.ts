@@ -19,22 +19,18 @@ interface UserIQueryParams {
   page?: number;
   size?: number;
   sort?: string;
-  userId: string;
+  userId?: string;
 }
 
 const apiUrl = 'api/tasks';
 
 // Actions
-
-export const getEntities = createAsyncThunk('task/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
-  const requestUrl = `${apiUrl}${sort ? `?page=${page}&size=${size}&sort=${sort}&` : '?'}cacheBuster=${new Date().getTime()}`;
-  return axios.get<ITask[]>(requestUrl);
-});
-
-export const getEntitiesByUserId = createAsyncThunk('task/fetch_entity_list', async ({ page, size, sort, userId }: UserIQueryParams) => {
-  const requestUrl = `${apiUrl}${
-    sort ? `?page=${page}&size=${size}&sort=${sort}&userId.equals=${userId}&` : '?'
-  }cacheBuster=${new Date().getTime()}`;
+export const getEntities = createAsyncThunk('task/fetch_entity_list', async ({ page, size, sort, userId }: UserIQueryParams) => {
+  let requestUrl = `${apiUrl}${sort ? `?page=${page}&size=${size}&sort=${sort}&` : '?'}cacheBuster=${new Date().getTime()}`;
+  if (userId)
+    requestUrl = `${apiUrl}${
+      sort ? `?page=${page}&size=${size}&sort=${sort}&userId.equals=${userId}&` : '?'
+    }cacheBuster=${new Date().getTime()}`;
   return axios.get<ITask[]>(requestUrl);
 });
 
@@ -82,7 +78,19 @@ export const deleteEntity = createAsyncThunk(
   async (id: string | number, thunkAPI) => {
     const requestUrl = `${apiUrl}/${id}`;
     const result = await axios.delete<ITask>(requestUrl);
-    thunkAPI.dispatch(getEntities({}));
+    // thunkAPI.dispatch(getEntities({}));
+    return result;
+  },
+  { serializeError: serializeAxiosError }
+);
+
+//  kill the task with id on ongoing status
+export const killEntity = createAsyncThunk(
+  'task/kill_entity',
+  async (id: string | number, thunkAPI) => {
+    const requestUrl = `${apiUrl}/kill/${id}`;
+    const result = await axios.patch<ITask>(requestUrl);
+    // thunkAPI.dispatch(getEntities({}));
     return result;
   },
   { serializeError: serializeAxiosError }
@@ -104,7 +112,12 @@ export const TaskSlice = createEntitySlice({
         state.updateSuccess = true;
         state.entity = {};
       })
-      .addMatcher(isFulfilled(getEntities, getEntitiesByUserId), (state, action) => {
+      .addCase(killEntity.fulfilled, (state, action) => {
+        state.updating = false;
+        state.updateSuccess = true;
+        state.entity = action.payload.data;
+      })
+      .addMatcher(isFulfilled(getEntities), (state, action) => {
         return {
           ...state,
           loading: false,
@@ -123,7 +136,7 @@ export const TaskSlice = createEntitySlice({
         state.updateSuccess = false;
         state.loading = true;
       })
-      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity), state => {
+      .addMatcher(isPending(createEntity, updateEntity, partialUpdateEntity, deleteEntity, killEntity), state => {
         state.errorMessage = null;
         state.updateSuccess = false;
         state.updating = true;

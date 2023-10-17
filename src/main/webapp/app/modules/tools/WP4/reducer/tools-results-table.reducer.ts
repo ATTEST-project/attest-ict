@@ -31,6 +31,7 @@ export const showTable = createAsyncThunk(
       toolName,
       uuid: simulationId,
     };
+
     return await axios.get<any>(apiTableUrl, { params });
   },
   { serializeError: serializeAxiosError }

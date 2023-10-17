@@ -13,11 +13,13 @@ import NetworkActions from 'app/modules/network/actions/network-actions';
 import NetworkData from 'app/modules/network/data/network-data';
 import NetworkDiagram from 'app/modules/network/diagram/network-diagram';
 import NetworkMap from 'app/modules/network/map/network-map';
+import NetworkImportFromCimRepo from 'app/modules/network/cim-repo/network-import-from-cim-repo';
 
 const Routes = ({ match }) => (
   <>
     <Switch>
       <ErrorBoundaryRoute exact path={`${match.url}/new`} component={NetworkUpdate} />
+      <ErrorBoundaryRoute exact path={`${match.url}/import-cim`} component={NetworkImportFromCimRepo} />
       <ErrorBoundaryRoute exact path={`${match.url}/:id/edit`} component={NetworkUpdate} />
       <ErrorBoundaryRoute exact path={`${match.url}/:id`} component={NetworkDetail} />
       <ErrorBoundaryRoute exact path={`${match.url}/:id/upload`} component={NetworkUpload} />
@@ -26,6 +28,7 @@ const Routes = ({ match }) => (
       <ErrorBoundaryRoute exact path={`${match.url}/:id/map`} component={NetworkMap} />
       <ErrorBoundaryRoute path={match.url} component={Network} />
     </Switch>
+
     <ErrorBoundaryRoute exact path={`${match.url}/:id/export`} component={NetworkExportDialog} />
     <ErrorBoundaryRoute exact path={`${match.url}/:id/delete`} component={NetworkDeleteDialog} />
   </>

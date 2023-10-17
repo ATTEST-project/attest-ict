@@ -45,6 +45,8 @@ public class TaskCriteria implements Serializable, Criteria {
 
     private Boolean distinct;
 
+    private StringFilter toolNum;
+
     public TaskCriteria() {}
 
     public TaskCriteria(TaskCriteria other) {
@@ -57,6 +59,7 @@ public class TaskCriteria implements Serializable, Criteria {
         this.simulationId = other.simulationId == null ? null : other.simulationId.copy();
         this.toolId = other.toolId == null ? null : other.toolId.copy();
         this.userId = other.userId == null ? null : other.userId.copy();
+        this.toolNum = other.toolNum == null ? null : other.toolNum.copy();
         this.distinct = other.distinct;
     }
 
@@ -199,6 +202,24 @@ public class TaskCriteria implements Serializable, Criteria {
     public void setUserId(StringFilter userId) {
         this.userId = userId;
     }
+
+    //20231003 added new criteria for sorting by toolNum in task page
+    public StringFilter getToolNum() {
+        return toolNum;
+    }
+
+    public StringFilter toolNum() {
+        if (toolNum == null) {
+            toolNum = new StringFilter();
+        }
+        return toolNum;
+    }
+
+    public void setToolNum(StringFilter toolNum) {
+        this.toolNum = toolNum;
+    }
+
+    //20231003 modify
 
     public Boolean getDistinct() {
         return distinct;

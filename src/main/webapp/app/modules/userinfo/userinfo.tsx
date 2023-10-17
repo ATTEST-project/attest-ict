@@ -14,6 +14,10 @@ export const UserInfo = (props: RouteComponentProps) => {
 
   const currentUser = useAppSelector(state => state.authentication.account);
 
+  // --- 2023/09/2023
+
+  const authorities = currentUser.authorities;
+
   const goToPrevPage = () => {
     props.history.goBack();
   };
@@ -41,6 +45,11 @@ export const UserInfo = (props: RouteComponentProps) => {
         <dl className="jh-entity-details">
           <dt>Last Name</dt>
           <dd>{currentUser.lastName}</dd>
+        </dl>
+
+        <dl className="jh-entity-details">
+          <dt>Roles</dt>
+          <dd>{currentUser.authorities.join(',')}</dd>
         </dl>
         <Button onClick={goToPrevPage} color="info" data-cy="entityUserInfoBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>

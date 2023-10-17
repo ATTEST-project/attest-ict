@@ -10,8 +10,8 @@ Main page styles
 }
 
 .home-main-div {
-  background: white;
-  color: #10272f;
+  background: #303030;
+  color: #009fe3;
 }
 
 .home-container {
@@ -19,9 +19,26 @@ Main page styles
   justify-content: center;
 }
 
-.home-logo {
-  size: 50px;
-  max-width: 50%;
-  height: auto;
+.home-container-img {
   width: 100%;
+  height: 100%;
+}
+
+.first-column {
+  flex: 1; /*   [max] [min] [ideal size] */
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+
+.second-column {
+  display: grid;
+  padding: 5px;
+  width: 565px;
+  row-gap: 10px;
+  border: 1px solid #ccc;
+}
+
+.home-card {
+  border: 1px solid #052b67;
+  background-color: white;
 }

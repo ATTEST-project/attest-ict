@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoadElValRepository extends JpaRepository<LoadElVal, Long>, JpaSpecificationExecutor<LoadElVal> {
     List<LoadElVal> findAll();
-    /* 
+    /*
     @Query(value = "select lev.* from load_el_val lev join bus b on b.bus_id = lev.bus_id where b.network_id=:networkId", nativeQuery = true)
     List<LoadElVal> getLoadElValsByNetworkId(@Param("networkId") Long networkId);
 
@@ -29,8 +29,6 @@ public interface LoadElValRepository extends JpaRepository<LoadElVal, Long>, Jpa
  */
     //Find all profile linked to one networkId
     List<LoadElVal> findByLoadProfileNetworkId(@Param("networkId") Long networkId);
-
-    List<LoadElVal> findByLoadProfileId(Long loadProfileId);
 
     @Query(value = LoadCustomQuery.LOAD_P_Q_GROUP_BY_SEASON, nativeQuery = true)
     List<Tuple> findLoadPQGroupBySeason(@Param("networkId") Long networkId, @Param("busId") Long busId);

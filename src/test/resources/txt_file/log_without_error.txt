@@ -1,0 +1,441 @@
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_PATH="C:\ATTEST\Julia-167\bin\julia.exe" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set CONDA_PATH="C:\ProgramData\miniforge3\condabin\conda" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_DEPOT_PATH=C:\ATTEST\tools\juliaenvs\T41V2\.julia 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set TOOL_PATH="C:\ATTEST\tools\WP4\T41V2" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set CONDA_ENV_PATH="C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_PROJECT_PATH="C:\ATTEST\tools\juliaenvs\T41V2\T41V2_JL_ENV" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>call cd "C:\ATTEST\tools\WP4\T41V2" 
+
+C:\ATTEST\tools\WP4\T41V2>call "C:\ProgramData\miniforge3\condabin\conda" activate "C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env" 
+
+(C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env) C:\ATTEST\tools\WP4\T41V2>call "C:\ATTEST\Julia-167\bin\julia.exe" --project="C:\ATTEST\tools\juliaenvs\T41V2\T41V2_JL_ENV" launch.jl -j \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\launch.json   || goto :error 
+Parsed args:
+launcher:  json-file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\launch.json
+Parsed parameters:
+launcher:  flex_str  =>  1
+launcher:  oltc_bin  =>  1
+launcher:  auxiliary_file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex_flex.ods
+launcher:  fl_bin  =>  1
+launcher:  scenario  =>  1
+launcher:  scenario_file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\scenario_gen.ods
+launcher:  outlog_file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\output_data\OutLog.xlsx
+launcher:  flex_oltc  =>  1
+launcher:  network_file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods
+launcher:  season  =>  W
+launcher:  output_file  =>  \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\output_data\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex_output.xlsx
+launcher:  year  =>  2050
+launcher:  with_flex  =>  1
+launcher:  flex_apc  =>  1
+launcher:  ntp  =>  24
+launcher:  str_bin  =>  1
+launcher:  flex_fl  =>  1
+launcher:  case_name  =>  UK__2050_W_with_Flex
+launcher:  flex_adpf  =>  1
+C:\ATTEST\tools\WP4\T41V2
+C:\ATTEST\tools\WP4\T41V2
+Case: UK__2050_W_with_Flex
+Running the case: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods @2023-06-22T15:56:25.231
+Writing to Excel: Append = true;	Iter#0,	Data : false, false, false, false
+"No OLTC transfomer found in the original data T2.3""An OLTC transfomer is added in the network"WP6 dumping parameters values (parameter name/ julia variable name)
+WP6 case_name/TheKey: UK__2050_W_with_Flex
+WP6 filename_mat/network_file: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods
+WP6 filename_addt/auxiliary_file: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex_flex.ods
+WP6 file_op/output_file: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\output_data\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex_output.xlsx
+WP6 filename/scenario_file: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\scenario_gen.ods
+WP6 OutLog/outlog_file: \ATSIM\WP4\T41\78208f19-cf27-457a-92ff-ccab0a5a4a42\output_data\OutLog.xlsx
+WP6 nTP/ntp: 24
+WP6 scenario/scenario: 1
+WP6 flex_apc: 1
+WP6 flex_oltc: 1
+WP6 oltc_bin: 1
+WP6 flex_adpf: 1
+WP6 flex_fl: 1
+WP6 fl_bin: 1
+WP6 flex_str: 1
+WP6 str_bin: 1
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.4, running with linear solver MUMPS 5.4.1.
+
+Number of nonzeros in equality constraint Jacobian...:    87120
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:   199920
+
+Total number of variables............................:    15120
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:    15120
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  0.0000000e+00 1.18e-02 3.40e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  1.8198087e+02 4.08e-04 4.92e+00  -1.0 7.64e-02    -  1.00e+00 1.00e+00h  1
+   2  1.8716474e+02 5.87e-07 5.51e-01  -1.0 2.25e-03    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 2
+
+                                   (scaled)                 (unscaled)
+Objective...............:   1.8716473684289994e+02    1.8716473684289994e+02
+Dual infeasibility......:   6.3932930061127990e-09    6.3932930061127990e-09
+Constraint violation....:   4.5807968134664589e-07    5.8733556158353795e-07
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   4.5807968134664589e-07    5.8733556158353795e-07
+
+
+Number of objective function evaluations             = 3
+Number of objective gradient evaluations             = 3
+Number of equality constraint evaluations            = 3
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 3
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 2
+Total seconds in IPOPT                               = 3.783
+
+EXIT: Optimal Solution Found.
+Objective value: 187.16473684289994
+Solver Time: 8.396999835968018
+0 Voltage limit violations.
+413 Current limit violations.
+413 Total Violations were found.
+
+Writing to Excel: Append = false;	Iter#0,	Data : true, 413, 1, false
+Flexibility optimization will commence
+============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+"Linear Iteration: 1" 
+"SQL_iteration: 1" 
+Version identifier: 20.1.0.0 | 2020-11-10 | 9bedb6d68
+CPXPARAM_Read_DataCheck                          1
+CPXPARAM_Threads                                 1
+CPXPARAM_SolutionType                            2
+CPXPARAM_Barrier_Algorithm                       3
+CPXPARAM_Simplex_Tolerances_Optimality           1.0000000000000001e-05
+Tried aggregator 4 times.
+MIP Presolve eliminated 75715 rows and 5855 columns.
+MIP Presolve added 2880 rows and 0 columns.
+MIP Presolve modified 88663 coefficients.
+Aggregator did 8174 substitutions.
+Reduced MIP has 26031 rows, 21491 columns, and 90913 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.34 sec. (287.24 ticks)
+Probing time = 0.01 sec. (8.79 ticks)
+Tried aggregator 1 time.
+Detecting symmetries...
+MIP Presolve modified 1920 coefficients.
+Reduced MIP has 26031 rows, 21491 columns, and 89953 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.09 sec. (58.97 ticks)
+Probing time = 0.01 sec. (9.05 ticks)
+Clique table members: 240.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: none, using 1 thread.
+Root relaxation solution time = 0.58 sec. (663.20 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0       17.7015   286                     17.7015    13097         
+      0     0       17.7177   212                   Cuts: 441    14199         
+      0     0       17.7178   212                    Cuts: 10    14205         
+      0     0       17.7178   212                   Covers: 1    14206         
+Detecting symmetries...
+      0     2       17.7178   212                     17.7179    14206         
+Elapsed time = 9.00 sec. (7734.01 ticks, tree = 0.01 MB, solutions = 0)
+     10    12       17.7260   208                     17.7187    14216         
+     24    26       17.7199   204                     17.7201    14230         
+     30    32       17.7287   200                     17.7204    14238         
+     41    43       17.7238   194                     17.7210    14249         
+     51    53       17.7268   194                     17.7213    14259         
+     63    65       17.7220   188                     17.7222    14271         
+     75    77       17.7225   184                     17.7225    14283         
+     88    90       17.7242   174                     17.7227    14298         
+    100   102       17.7261   162                     17.7227    14311         
+    160   162       17.7422   106                     17.7227    14375         
+Elapsed time = 12.09 sec. (11306.53 ticks, tree = 1.39 MB, solutions = 0)
+    240   242       17.7787    44                     17.7227    14461         
+*   293   293      integral     0       17.8113       17.7227    14516    0.50%
+    383   366       17.7295    84       17.8113       17.7228    14849    0.50%
+    474   433       17.7596    12       17.8113       17.7228    15066    0.50%
+*   494   415      integral     0       17.8025       17.7228    15161    0.45%
+*   496   284      integral     0       17.7508       17.7228    15163    0.16%
+*   498   282      integral     0       17.7505       17.7228    15165    0.16%
+    573   355       17.7362    88       17.7505       17.7230    15271    0.15%
+
+Performing restart 1
+
+Repeating presolve.
+Tried aggregator 2 times.
+MIP Presolve eliminated 11 rows and 0 columns.
+MIP Presolve modified 132 coefficients.
+Aggregator did 32 substitutions.
+Reduced MIP has 25988 rows, 21459 columns, and 89813 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.06 sec. (47.68 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 25988 rows, 21459 columns, and 89813 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.08 sec. (56.73 ticks)
+Represolve time = 0.36 sec. (216.33 ticks)
+*   608+    0                           17.7502       17.7230             0.15%
+*   608+    0                           17.7500       17.7230             0.15%
+*   608+    0                           17.7482       17.7230             0.14%
+*   608+    0                           17.7465       17.7230             0.13%
+*   608+    0                           17.7453       17.7230             0.13%
+*   608+    0                           17.7452       17.7230             0.13%
+
+Repeating presolve.
+Tried aggregator 1 time.
+MIP Presolve eliminated 15587 rows and 12875 columns.
+MIP Presolve modified 724 coefficients.
+Reduced MIP has 10401 rows, 8584 columns, and 41096 nonzeros.
+Reduced MIP has 2016 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.02 sec. (26.18 ticks)
+Tried aggregator 2 times.
+MIP Presolve modified 96 coefficients.
+Aggregator did 48 substitutions.
+Reduced MIP has 10353 rows, 8536 columns, and 41000 nonzeros.
+Reduced MIP has 2016 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.05 sec. (29.51 ticks)
+Represolve time = 0.17 sec. (149.14 ticks)
+*   608+    0                           17.7452       17.7373             0.04%
+
+Repeating presolve.
+Tried aggregator 2 times.
+MIP Presolve eliminated 7764 rows and 6401 columns.
+MIP Presolve modified 2666 coefficients.
+Aggregator did 126 substitutions.
+Reduced MIP has 2463 rows, 2009 columns, and 10483 nonzeros.
+Reduced MIP has 504 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (13.26 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 2463 rows, 2009 columns, and 10483 nonzeros.
+Reduced MIP has 504 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.01 sec. (5.56 ticks)
+Represolve time = 0.06 sec. (55.30 ticks)
+    608     0       17.7393    22       17.7452       Cuts: 2    35518    0.03%
+    608     2       17.7420     8       17.7452       17.7421    35518    0.02%
+*   610     1      integral     0       17.7442       17.7433    35525    0.01%
+Sql Itr: 1
+Objective value: 17.744230852741996
+Solver Time 28.55299997329712
+The OPF model is Feasible and is solved SUCEESSFULLY!
+  0.062861 seconds (102.88 k allocations: 3.570 MiB, 90.72% compilation time)
+  0.005924 seconds (64.80 k allocations: 1.209 MiB)
+"SQL_iteration: 2" 
+
+Gomory fractional cuts applied:  9
+
+Root node processing (before b&c):
+  Real time             =    8.95 sec. (7695.02 ticks)
+Sequential b&c:
+  Real time             =   19.59 sec. (21880.57 ticks)
+                          ------------
+Total (root+branch&cut) =   28.55 sec. (29575.60 ticks)
+Version identifier: 20.1.0.0 | 2020-11-10 | 9bedb6d68
+CPXPARAM_Read_DataCheck                          1
+CPXPARAM_Threads                                 1
+CPXPARAM_SolutionType                            2
+CPXPARAM_Barrier_Algorithm                       3
+CPXPARAM_Simplex_Tolerances_Optimality           1.0000000000000001e-05
+Tried aggregator 4 times.
+MIP Presolve eliminated 75702 rows and 5960 columns.
+MIP Presolve added 2880 rows and 0 columns.
+MIP Presolve modified 88468 coefficients.
+Aggregator did 8132 substitutions.
+Reduced MIP has 26086 rows, 21428 columns, and 90960 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.36 sec. (278.06 ticks)
+Probing time = 0.02 sec. (8.85 ticks)
+Tried aggregator 1 time.
+Detecting symmetries...
+MIP Presolve modified 1920 coefficients.
+Reduced MIP has 26086 rows, 21428 columns, and 90000 nonzeros.
+Reduced MIP has 5040 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.09 sec. (62.31 ticks)
+Probing time = 0.02 sec. (8.99 ticks)
+Clique table members: 240.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: none, using 1 thread.
+Root relaxation solution time = 0.55 sec. (599.31 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0       21.4487   228                     21.4487    14169         
+*     0+    0                           21.4948       21.4487             0.21%
+      0     0       21.4488   228       21.4948      Cuts: 13    14239    0.21%
+Detecting symmetries...
+      0     2       21.4488   228       21.4948       21.4488    14239    0.21%
+Elapsed time = 4.55 sec. (4442.79 ticks, tree = 0.01 MB, solutions = 1)
+     20    22       21.4489   218       21.4948       21.4488    14259    0.21%
+     37    39       21.4497   208       21.4948       21.4488    14276    0.21%
+     50    52       21.4504   202       21.4948       21.4488    14295    0.21%
+     70    72       21.4534   184       21.4948       21.4488    14347    0.21%
+     90    92       21.4569   164       21.4948       21.4488    14387    0.21%
+    110   112       21.4618   144       21.4948       21.4488    14409    0.21%
+    130   132       21.4660   124       21.4948       21.4488    14429    0.21%
+    150   152       21.4721   104       21.4948       21.4488    14449    0.21%
+    170   172       21.4775    84       21.4948       21.4488    14470    0.21%
+    249   241       21.4946    32       21.4948       21.4488    14559    0.21%
+Elapsed time = 7.16 sec. (7848.46 ticks, tree = 2.14 MB, solutions = 1)
+    325   254       21.4488   226       21.4948       21.4488    14666    0.21%
+    413   300        cutoff             21.4948       21.4488    14890    0.21%
+    500   357       21.4747   112       21.4948       21.4488    15144    0.21%
+    576   389       21.4889    60       21.4948       21.4488    15267    0.21%
+    678   433       21.4946     6       21.4948       21.4488    15403    0.21%
+*   687   433      integral     0       21.4947       21.4488    15414    0.21%
+    800   544       21.4879   124       21.4947       21.4488    15585    0.21%
+    920   661       21.4894   118       21.4947       21.4488    15767    0.21%
+    976   710       21.4786   208       21.4947       21.4488    15838    0.21%
+
+Performing restart 1
+
+Repeating presolve.
+Tried aggregator 2 times.
+MIP Presolve eliminated 4 rows and 4 columns.
+MIP Presolve modified 2736 coefficients.
+Aggregator did 42 substitutions.
+Reduced MIP has 26040 rows, 21382 columns, and 89820 nonzeros.
+Reduced MIP has 5036 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.05 sec. (47.94 ticks)
+Tried aggregator 1 time.
+MIP Presolve modified 24 coefficients.
+Reduced MIP has 26040 rows, 21382 columns, and 89820 nonzeros.
+Reduced MIP has 5036 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.09 sec. (57.09 ticks)
+Represolve time = 0.30 sec. (209.25 ticks)
+*   981+    0                           21.4947       21.4488             0.21%
+*   981+    0                           21.4945       21.4488             0.21%
+
+Repeating presolve.
+Tried aggregator 1 time.
+MIP Presolve eliminated 23431 rows and 19239 columns.
+Reduced MIP has 2609 rows, 2143 columns, and 9976 nonzeros.
+Reduced MIP has 504 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.02 sec. (18.96 ticks)
+Tried aggregator 2 times.
+MIP Presolve modified 24 coefficients.
+Aggregator did 12 substitutions.
+Reduced MIP has 2597 rows, 2131 columns, and 9952 nonzeros.
+Reduced MIP has 504 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (6.67 ticks)
+Represolve time = 0.08 sec. (62.26 ticks)
+Sql Itr: 2
+Objective value: 21.494497747124456
+Solver Time 24.84500002861023
+The OPF model is Feasible and is solved SUCEESSFULLY!
+  0.005999 seconds (69.13 k allocations: 1.560 MiB)
+  0.005556 seconds (64.80 k allocations: 1.209 MiB)
+
+Implied bound cuts applied:  1
+Gomory fractional cuts applied:  4
+
+Root node processing (before b&c):
+  Real time             =    4.50 sec. (4410.20 ticks)
+Sequential b&c:
+  Real time             =   20.34 sec. (24982.89 ticks)
+                          ------------
+Total (root+branch&cut) =   24.84 sec. (29393.09 ticks)
+AC-Power Flow at SQL Loop Iteration: 1
+
+This is Ipopt version 3.14.4, running with linear solver MUMPS 5.4.1.
+
+Number of nonzeros in equality constraint Jacobian...:    87120
+Number of nonzeros in inequality constraint Jacobian.:    29760
+Number of nonzeros in Lagrangian Hessian.............:   228720
+
+Total number of variables............................:    15120
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:    15120
+Total number of inequality constraints...............:    15360
+        inequality constraints with only lower bounds:     7680
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:     7680
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  0.0000000e+00 4.21e+00 3.40e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  9.9435812e+01 8.15e-02 2.75e+02  -1.0 1.03e-01    -  9.69e-01 1.00e+00h  1
+   2  1.9885492e+02 3.34e-05 2.98e+00  -1.0 8.28e-02    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 2
+
+                                   (scaled)                 (unscaled)
+Objective...............:   1.9885492367548085e+02    1.9885492367548085e+02
+Dual infeasibility......:   8.5266211194654181e-10    8.5266211194654181e-10
+Constraint violation....:   4.6652872778531320e-06    3.3354245089042139e-05
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   4.6652872778531320e-06    3.3354245089042139e-05
+
+
+Number of objective function evaluations             = 3
+Number of objective gradient evaluations             = 3
+Number of equality constraint evaluations            = 3
+Number of inequality constraint evaluations          = 3
+Number of equality constraint Jacobian evaluations   = 3
+Number of inequality constraint Jacobian evaluations = 3
+Number of Lagrangian Hessian evaluations             = 2
+Total seconds in IPOPT                               = 0.989
+
+EXIT: Optimal Solution Found.
+Objective value: 198.85492367548085
+Solver Time: 3.249000072479248
+Finished SQL_Loop without error.
+Finished running && Writing to Excel @2023-06-22T15:59:20.750
+Writing to Excel: Append = false;	Iter#0,	Data : true, 413, 1, true
+Finished writing final results to excel.
+
+(C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env) C:\ATTEST\tools\WP4\T41V2>call "C:\ProgramData\miniforge3\condabin\conda" deactivate 
+
+C:\ATTEST\tools\WP4\T41V2>exit /b 0 

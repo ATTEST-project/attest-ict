@@ -1,7 +1,6 @@
 package com.attest.ict.repository;
 
 import com.attest.ict.domain.Generator;
-import com.attest.ict.service.dto.GeneratorDTO;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,4 +33,6 @@ public interface GeneratorRepository extends JpaRepository<Generator, Long>, Jpa
     List<Generator> findByBusNumAndNetworkIdOrderByIdAsc(@Param("busNum") Long busNum, @Param("netwotkId") Long networkId);
 
     Optional<Generator> findByIdAndNetworkId(@Param("genId") Long genId, @Param("netwotkId") Long networkId);
+
+    List<Generator> findByNetworkIdAndPg(@Param("networkId") Long networkId, @Param("gg") Double pg);
 }

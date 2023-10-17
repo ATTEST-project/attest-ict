@@ -16,6 +16,7 @@ const CostPerYear = () => {
             <th>2020</th>
             <th>2030</th>
             <th>2040</th>
+            <th>2050</th>
           </tr>
         </thead>
         <tbody>
@@ -24,12 +25,14 @@ const CostPerYear = () => {
             <td>{jsonResponse['Scenario 1']['2020'] ? jsonResponse['Scenario 1']['2020']['Operation cost (EUR-million/year)'] : ''}</td>
             <td>{jsonResponse['Scenario 1']['2030'] ? jsonResponse['Scenario 1']['2030']['Operation cost (EUR-million/year)'] : ''}</td>
             <td>{jsonResponse['Scenario 1']['2040'] ? jsonResponse['Scenario 1']['2040']['Operation cost (EUR-million/year)'] : ''}</td>
+            <td>{jsonResponse['Scenario 1']['2050'] ? jsonResponse['Scenario 1']['2050']['Operation cost (EUR-million/year)'] : ''}</td>
           </tr>
           <tr>
             <td>Scenario 2</td>
             <td>{jsonResponse['Scenario 2']['2020'] ? jsonResponse['Scenario 2']['2020']['Operation cost (EUR-million/year)'] : ''}</td>
             <td>{jsonResponse['Scenario 2']['2030'] ? jsonResponse['Scenario 2']['2030']['Operation cost (EUR-million/year)'] : ''}</td>
             <td>{jsonResponse['Scenario 2']['2040'] ? jsonResponse['Scenario 2']['2040']['Operation cost (EUR-million/year)'] : ''}</td>
+            <td>{jsonResponse['Scenario 2']['2050'] ? jsonResponse['Scenario 2']['2050']['Operation cost (EUR-million/year)'] : ''}</td>
           </tr>
         </tbody>
       </Table>

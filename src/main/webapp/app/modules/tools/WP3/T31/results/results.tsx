@@ -1,33 +1,42 @@
 import React from 'react';
-import case3_outputs from './sample-data/case3_outputs.json';
-import pt2020_outputs from './sample-data/investment_result_PT_Transmission_Network_PT_2020_ods_pt1.json';
 import { Button, Col, Input, List, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Table } from 'reactstrap';
-import Divider from 'app/shared/components/divider/divider';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+
 import TotalCost from 'app/modules/tools/WP3/T31/results/section/total-cost/total-cost';
 import BranchInvestment from 'app/modules/tools/WP3/T31/results/section/branch-investment/branch-investment';
-import CostPerYear from 'app/modules/tools/WP3/T31/results/section/cost-per-year/cost-per-year';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import OperationCostPerYear from 'app/modules/tools/WP3/T31/results/section/cost-per-year/operation-cost-per-year';
+import TotalInvestCostYear from 'app/modules/tools/WP3/T31/results/section/cost-per-year/total-investment-cost-per-year';
 import AllResults from 'app/modules/tools/WP3/T31/results/section/all/all-results';
 import FlexInvestment from 'app/modules/tools/WP3/T31/results/section/flex-investment/flex-investment';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { showCharts } from 'app/modules/tools/WP3/T31/reducer/tool-results.reducer';
-import { Link } from 'react-router-dom';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+
+import Divider from 'app/shared/components/divider/divider';
+
 import { pathButton } from 'app/shared/reducers/back-button-path';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T31Results = (props: any) => {
-  /* eslint-disable-next-line no-console */
-  console.log('T31 Results ');
+  const toolDescription = TOOLS_INFO.T31_OPT_TOOL_DX.description;
   const dispatch = useAppDispatch();
-
+  const task = useAppSelector(state => state.task);
   const taskEntity = useAppSelector(state => state.task.entity);
 
-  const response = useAppSelector(state => state.t31ToolExecution.entity) || {
+  // const response = useAppSelector(state => state.t31ToolExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
     },
     simulationId: taskEntity?.simulationUuid,
   };
+
+  /* eslint-disable-next-line no-console */
+  console.log('T31 Response: ', response);
+
   const results = useAppSelector(state => state.t31ToolResults.entity);
 
   const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
@@ -41,7 +50,7 @@ const T31Results = (props: any) => {
         simulationId: response.simulationId,
       })
     );
-  }, []);
+  }, [taskEntity]);
 
   const changeSection = (newSection: string) => {
     setSection(newSection);
@@ -51,7 +60,8 @@ const T31Results = (props: any) => {
   const sections = {
     all: <AllResults />,
     total: <TotalCost />,
-    costY: <CostPerYear />,
+    operationCostYear: <OperationCostPerYear />,
+    totalInvestCostYear: <TotalInvestCostYear />,
     brInv: <BranchInvestment />,
     flexInv: <FlexInvestment />,
   };
@@ -77,7 +87,10 @@ const T31Results = (props: any) => {
                   <Button onClick={() => changeSection('total')}>Total Cost</Button>
                 </li>
                 <li>
-                  <Button onClick={() => changeSection('costY')}>Cost Per Year</Button>
+                  <Button onClick={() => changeSection('operationCostYear')}>OperationCost Per Year</Button>
+                </li>
+                <li>
+                  <Button onClick={() => changeSection('totalInvestCostYear')}> Total Investment Cost Per Year</Button>
                 </li>
                 <li>
                   <Button onClick={() => changeSection('brInv')}>Branch Investment</Button>
@@ -92,7 +105,8 @@ const T31Results = (props: any) => {
             <Button color="dark" onClick={() => setOpenOffCanvas(true)}>
               <FontAwesomeIcon icon="bars" />
             </Button>
-            <h4 style={{ marginLeft: 20 }}>T3.1 Results</h4>
+
+            <ToolTitle imageAlt={WP_IMAGE.WP3.alt} title={toolDescription} imageSrc={WP_IMAGE.WP3.src} />
           </div>
           <Table>
             <thead>

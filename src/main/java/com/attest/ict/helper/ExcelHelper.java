@@ -1,5 +1,6 @@
 package com.attest.ict.helper;
 
+import com.attest.ict.custom.utils.FileUtils;
 import com.attest.ict.domain.Branch;
 import com.attest.ict.domain.Bus;
 import com.attest.ict.domain.Generator;
@@ -24,13 +25,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ExcelHelper {
 
     // type of excel document
-    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public static String TYPE = FileUtils.CONTENT_TYPE.get("xlsx"); //"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     // first sheet and related header
     static String[] FIRSTSHEETHEADERs = { "busi", "type", "Pd", "Qd", "Gs", "Bs", "area", "Vm", "Va", "baseKV", "zone", "Vmax", "Vmin" };
@@ -94,22 +94,11 @@ public class ExcelHelper {
         networkRepository = this.networkRepository1;
     }
 
-    /* hasExcelFormat method
-     * return true if the file is an xlsx file, else otherwise
-     */
-    public static boolean hasExcelFormat(MultipartFile file) {
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-
-        return true;
-    }
-
     /* appToExcel method
      * import data to an excel file (first three sheets)
      */
     public static ByteArrayInputStream appToExcel(List<Bus> buses, List<Branch> branches, List<Generator> generators) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet[] sheet = new Sheet[3];
             sheet[0] = workbook.createSheet(FIRSTSHEET);
             sheet[1] = workbook.createSheet(SECONDSHEET);

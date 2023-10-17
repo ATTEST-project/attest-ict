@@ -80,7 +80,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .headers()
             .contentSecurityPolicy(jHipsterProperties.getSecurity().getContentSecurityPolicy())
             .and()
-            .contentSecurityPolicy("style-src 'self' https://fonts.googleapis.com https://unpkg.com/leaflet@1.4.0/dist/leaflet.css 'unsafe-inline';")
+            //2022/12/16 move  unsafe-inline before list size
+            .contentSecurityPolicy("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com/leaflet@1.4.0/dist/leaflet.css ;")
+            //.contentSecurityPolicy("style-src 'self' https://fonts.googleapis.com https://unpkg.com/leaflet@1.4.0/dist/leaflet.css 'unsafe-inline';")
         .and()
             .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
         .and()

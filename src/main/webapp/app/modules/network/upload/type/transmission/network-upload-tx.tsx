@@ -9,6 +9,9 @@ const NetworkUploadTX = props => {
 
   const inputFileEntities = useAppSelector(state => state.inputFile.entities);
 
+  const [txNRows, setTxNRows] = React.useState(1);
+  const callbackTxNRows = (value: number) => setTxNRows(prevState => prevState + value);
+
   return (
     <>
       <div className="upload-file-row">
@@ -17,9 +20,12 @@ const NetworkUploadTX = props => {
           {inputFileEntities && <FilesUploaded networkId={network.id} files={inputFileEntities} isTx />}
         </div>
         {/* <LabelsRow section="gen" /> */}
-        <div style={{ marginBottom: 20 }}>
-          <UploadFileRowDT acceptType=".xlsx" networkId={network.id} isTX />
-        </div>
+
+        {[...Array(txNRows).keys()].map((e, i) => (
+          <div key={i} style={{ marginBottom: 20 }}>
+            <UploadFileRowDT acceptType=".xlsx" nRows={txNRows} callbackNRows={callbackTxNRows} networkId={network.id} isTX />
+          </div>
+        ))}
       </div>
     </>
   );

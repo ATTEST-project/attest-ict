@@ -8,6 +8,8 @@ export const convertDateTimeToServer = date => (date ? dayjs(date).toDate() : nu
 
 export const displayDefaultDateTime = () => dayjs().startOf('day').format(APP_LOCAL_DATETIME_FORMAT);
 
+export const displayCurrentDateTime = () => dayjs().format(APP_LOCAL_DATETIME_FORMAT);
+
 export const getSeasonFromDate = (date: string | Date) => {
   let dateToCheck;
   if (typeof date === 'string') {

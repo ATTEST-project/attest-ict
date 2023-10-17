@@ -1,0 +1,54 @@
+/* ==========================================================================
+Main page styles
+========================================================================== */
+.hipster {
+  display: inline-block;
+  width: 100%;
+  height: 497px;
+  background: url('../../../content/images/jhipster_family_member_3.svg') no-repeat center top;
+  background-size: contain;
+}
+
+.home-main-div {
+  background: #303030;
+  color: #009fe3;
+}
+
+.home-container-img {
+  width: 100%;
+  height: 100%;
+}
+
+.home-container-grid {
+  display: grid;
+  grid-template-rows: 40%, 30%, 30%;
+  grid-template-columns: 600px 1fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 20px;
+  grid-template-areas:
+    'map  col1'
+    'tool col1'
+    'task col1';
+}
+
+.grid-item1 {
+  grid-area: col1;
+  border: 1px solid #ccc;
+}
+
+.grid-item2 {
+  grid-area: map;
+}
+
+.grid-item3 {
+  grid-area: tool;
+}
+
+.grid-item4 {
+  grid-area: task;
+}
+
+.home-card {
+  border: 1px solid #052b67;
+  background-color: white;
+}

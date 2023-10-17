@@ -45,10 +45,14 @@ export const NetworkDetail = (props: RouteComponentProps<{ id: string }>) => {
             <span id="description">Description</span>
           </dt>
           <dd>{networkEntity.description}</dd>
-          <dt>
-            <span id="isDeleted">Is Deleted</span>
-          </dt>
-          <dd>{networkEntity.isDeleted ? 'true' : 'false'}</dd>
+
+          {/* Comment 2023/10/12
+              The functionality for logical deletion of the network has not been implemented yet
+              <dt>
+                <span id="isDeleted">Is Deleted</span>
+              </dt>
+              <dd>{networkEntity.isDeleted ? 'true' : 'false'}</dd>
+          */}
           <dt>
             <span id="networkDate">Network Date</span>
           </dt>

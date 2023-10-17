@@ -7,10 +7,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const TertiarySection = () => {
   const {
     register,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
-  const [showTertiarySection, setTertiarySection] = React.useState<boolean>(false);
+  const [showTertiarySection, setTertiarySection] = React.useState<boolean>(true);
+
+  const run_energy = getValues('parameters.run_energy');
+  const run_secondary = getValues('parameters.run_secondary');
+  const run_tertiary = getValues('parameters.run_tertiary');
+
+  /* eslint-disable-next-line no-console */
+  console.log(' Tetiary-Section: run_energy:  ' + run_energy);
+  /* eslint-disable-next-line no-console */
+  console.log(' Tetiary-Section: run_secondary:  ' + run_secondary);
+  /* eslint-disable-next-line no-console */
+  console.log(' Tetiary-Section: run_tertiary:  ' + run_tertiary);
 
   return (
     <div className="section-with-border">
@@ -33,6 +45,7 @@ const TertiarySection = () => {
               label="Gen Bid Prices File"
               type="file"
               accept=".csv"
+              validate={{ required: !run_energy && run_tertiary }}
             />
           </Col>
           <Col>
@@ -43,6 +56,7 @@ const TertiarySection = () => {
               label="Gen Bid Quantity File"
               type="file"
               accept=".csv"
+              validate={{ required: !run_energy && run_tertiary }}
             />
           </Col>
           <Col>
@@ -53,6 +67,7 @@ const TertiarySection = () => {
               label="Tertiary Req File"
               type="file"
               accept=".csv"
+              validate={{ required: run_tertiary }}
             />
           </Col>
         </Row>

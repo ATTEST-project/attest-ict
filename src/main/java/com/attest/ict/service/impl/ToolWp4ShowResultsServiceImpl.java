@@ -1,135 +1,264 @@
 package com.attest.ict.service.impl;
 
-import com.attest.ict.chart.utils.T41ResultsChartsDataSet;
-import com.attest.ict.chart.utils.T44ResultsChartsDataSet;
-import com.attest.ict.chart.utils.TSGResultsChartsDataSet;
+import com.attest.ict.chart.utils.*;
 import com.attest.ict.config.ToolsConfiguration;
 import com.attest.ict.custom.tools.utils.ToolSimulationReferencies;
 import com.attest.ict.custom.utils.ConverterUtils;
 import com.attest.ict.custom.utils.FileUtils;
-import com.attest.ict.domain.OutputFile;
 import com.attest.ict.helper.excel.exception.ExcelReaderFileException;
 import com.attest.ict.helper.excel.model.FlexibleOption;
 import com.attest.ict.helper.excel.model.FlexibleOptionWithContin;
-import com.attest.ict.helper.excel.reader.T41ResultsReader;
-import com.attest.ict.helper.excel.reader.T44FileOutputFormat;
-import com.attest.ict.helper.excel.reader.T44ResultsReader;
+import com.attest.ict.helper.excel.reader.*;
+import com.attest.ict.helper.excel.util.ExcelFileFormat;
 import com.attest.ict.helper.ods.exception.OdsReaderFileException;
 import com.attest.ict.helper.ods.reader.OdsTSGResultsReader;
 import com.attest.ict.helper.ods.reader.model.ScenarioValues;
+import com.attest.ict.helper.ods.utils.TSGFileOutputFormat;
 import com.attest.ict.service.ToolWp4ShowResultsService;
 import com.attest.ict.service.dto.NetworkDTO;
 import com.attest.ict.service.dto.ToolDTO;
-import com.attest.ict.service.dto.custom.T41ResultsDTO;
-import com.attest.ict.service.dto.custom.T44ResultsDTO;
-import com.attest.ict.service.dto.custom.TSGResultsDTO;
+import com.attest.ict.service.dto.custom.*;
+import com.attest.ict.tools.constants.ToolFileFormat;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ToolWp4ShowResultsServiceImpl implements ToolWp4ShowResultsService {
 
-    private final Logger log = LoggerFactory.getLogger(ToolWp4ShowResultsServiceImpl.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ToolWp4ShowResultsServiceImpl.class);
 
-    private String attestToolsDir;
+    private final String attestToolsDir;
 
-    private String toolsPathSimulation;
+    private final String toolsPathSimulation;
 
     public ToolWp4ShowResultsServiceImpl(ToolsConfiguration toolsConfig) {
-        // ATTEST/tools
+        //ATTEST/tools: Tool's installation PATH
         this.attestToolsDir = toolsConfig.getPath();
-        log.debug("attestToolsDir {}", attestToolsDir);
+        LOGGER.debug("ToolWp4ShowResultsServiceImpl() - AttestToolsDir {}", attestToolsDir);
 
-        // ATSIM
+        //ATSIM: Simulation Working Dir
         this.toolsPathSimulation = toolsConfig.getPathSimulation();
-        log.debug("toolsPathSimulation {}", toolsPathSimulation);
+        LOGGER.debug("ToolWp4ShowResultsServiceImpl() - toolsPathSimulation {}", toolsPathSimulation);
+    }
+
+    //--- Scenario Gen Tool Wind and PV
+
+    @Override
+    public TSGResultsDTO windAndPVCharts(NetworkDTO networkDto, ToolDTO toolDto, String uuid)
+        throws FileNotFoundException, OdsReaderFileException {
+        Map<String, List<ScenarioValues>> mapDataForSheet = new HashMap<String, List<ScenarioValues>>();
+        File scenarioResultsFile = this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, TSGFileOutputFormat.toolOutputFile);
+        OdsTSGResultsReader reader = new OdsTSGResultsReader(scenarioResultsFile);
+        mapDataForSheet = reader.parseOdsTSGResults();
+
+        TSGResultsChartsDataSet resultsChartDataSet = new TSGResultsChartsDataSet();
+        return resultsChartDataSet.tsgPrepareChartsDataSet(mapDataForSheet);
+    }
+
+    //--- T41 ---
+    @Override
+    public T41ResultsPagesDTO t41PagesToShow(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws Exception {
+        // --- search simulation's produced by Tool during simulation uuid from FS
+        T41ResultsReader reader = new T41ResultsReader();
+        T41ResultsPagesDTO resultToShowInTable = new T41ResultsPagesDTO();
+        try {
+            File outputFileResult =
+                this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T41FileOutputFormat.OUTPUT_FILES_EXTENSION);
+            if (!T41ResultsReader.isT41Results(outputFileResult)) {
+                LOGGER.warn("t41PagesToShow() - File with extension: " + T41FileOutputFormat.OUTPUT_FILES_EXTENSION + " not Found!");
+            }
+            LOGGER.info("t41PagesToShow() - Reading output file: {}", outputFileResult.getName());
+            resultToShowInTable = reader.getPagesToShow(outputFileResult);
+        } catch (FileNotFoundException fnfe) {
+            LOGGER.warn(fnfe.getMessage());
+        }
+        // Read logFile
+        try {
+            File outlogFile = this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T41FileOutputFormat.OUTPUT_LOG_FILE);
+            if (!T41FileOutputFormat.OUTPUT_LOG_FILE.equals(outlogFile.getName())) {
+                throw new FileNotFoundException("File : " + outlogFile.getName() + " not Found!");
+            }
+            LOGGER.info("t41PagesToShow() - Reading log file: {}", outlogFile.getName());
+            List<T41LogInfoDTO> logInfoDTOList = reader.parseOutLogFile(outlogFile);
+            if (logInfoDTOList != null && !logInfoDTOList.isEmpty()) {
+                resultToShowInTable.setLogInfos(logInfoDTOList);
+            }
+        } catch (FileNotFoundException | ExcelReaderFileException outLogEx) {
+            LOGGER.warn(
+                "t41PagesToShow() - " +
+                " Exception Unable to read log file: " +
+                T41FileOutputFormat.OUTPUT_LOG_FILE +
+                ", Exception: " +
+                outLogEx.getMessage()
+            );
+        }
+
+        try {
+            LOGGER.info("t41PagesToShow() - Reading file: {}", ToolFileFormat.CONFIG_FILE);
+            File launchFile = this.getLaunchFile(toolDto, uuid, ToolFileFormat.CONFIG_FILE);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ToolConfigParameters configParameters = objectMapper.readValue(launchFile, ToolConfigParameters.class);
+            LOGGER.debug("t41PagesToShow() - Reading configParameters: {}", configParameters.toString());
+            resultToShowInTable.setToolConfigParameters(configParameters);
+        } catch (FileNotFoundException fnfex) {
+            LOGGER.warn(fnfex.getMessage());
+        } catch (IOException ioe) {
+            LOGGER.warn("t41PagesToShow() - Unable to read configuration's parameters from launch.json file: ", ioe.getMessage());
+        }
+
+        return resultToShowInTable;
     }
 
     @Override
-    /**
-     *
-     */
-    public Map<String, Integer> t44TableResults(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws FileNotFoundException {
-        T44ResultsReader reader = new T44ResultsReader();
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
+    public T41TableDataDTO t41TablesData(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String title, Integer nSc) throws Exception {
+        File outputFileResult = this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T41FileOutputFormat.OUTPUT_FILES_EXTENSION);
+        if (!T41ResultsReader.isT41Results(outputFileResult)) {
+            throw new FileNotFoundException("File : " + outputFileResult.getName() + " not Found!");
+        }
+        T41ResultsReader reader = new T41ResultsReader();
+        return reader.parseResultsBySheetNameAndScenario(outputFileResult, title, nSc);
+    }
 
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
+    @Override
+    public T41FlexResultsDTO t41Charts(NetworkDTO networkDto, ToolDTO toolDto, String uuid)
+        throws FileNotFoundException, ExcelReaderFileException {
+        LOGGER.info("t41Charts() - Reading file and prepare JSON file for charts visualization");
 
-        Map<String, List<FlexibleOptionWithContin>> mapAllExcelData = new HashMap<String, List<FlexibleOptionWithContin>>();
-        int numFileRead = reader.readAllFileInDir(outputDir, mapAllExcelData);
+        File outputFileResult = this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T41FileOutputFormat.OUTPUT_FILES_EXTENSION);
+        if (!T41ResultsReader.isT41Results(outputFileResult)) {
+            throw new FileNotFoundException("File with extension: " + T41FileOutputFormat.OUTPUT_FILES_EXTENSION + " not Found!");
+        }
+        Map<String, List<FlexibleOption>> mapDataForSheet = new HashMap<String, List<FlexibleOption>>();
+        T41ResultsReader reader = new T41ResultsReader();
+        mapDataForSheet = reader.parseFlexDataSheets(outputFileResult);
 
-        if (numFileRead == 0) {
+        // outputDir doesn't contain file
+        if (mapDataForSheet.isEmpty()) {
             // Tool doesn't produce output files
-            return Collections.EMPTY_MAP;
+            T41FlexResultsDTO emptyResult = new T41FlexResultsDTO();
+            emptyResult.setCharts(Collections.EMPTY_LIST);
+            return emptyResult;
+        }
+        T41ResultsChartsDataSet resultsChartDataSet = new T41ResultsChartsDataSet();
+        return resultsChartDataSet.t41PrepareChartsDataSet(mapDataForSheet);
+    }
+
+    // --- Start T44 tool's methods /ATTEST/tool/WP4/T44V3
+
+    @Override
+    public T44ResultsPagesDTO t44V3PagesToShow(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws FileNotFoundException {
+        T44ResultsPagesDTO resultToShowInTable = new T44ResultsPagesDTO();
+        List<T44PageDTO> pages = new ArrayList<T44PageDTO>();
+
+        Map<String, Integer> mapFile = this.t44V3TableResults(networkDto, toolDto, uuid);
+        // mapFile = ["number_of_contingencies" : 50,  "normal" : 1, "number_of_scenarios" : 5]
+        if (mapFile.containsKey(T44V3FileOutputFormat.TABLE_KEY_NORMAL)) {
+            T44PageDTO normalPage = new T44PageDTO();
+            normalPage.setTitle(T44V3FileOutputFormat.PAGE_NAME_NORMAL);
+            pages.add(normalPage);
         }
 
-        Map<String, Integer> nScNContingMap = reader.getNContingNSc(mapAllExcelData);
-        if (nScNContingMap.isEmpty()) {
-            nScNContingMap = new HashMap<String, Integer>();
-        }
+        if (mapFile.containsKey(T44V3FileOutputFormat.TABLE_KEY_NUMBER_OF_CONTIN)) {
+            T44PageDTO postContinPage = new T44PageDTO();
+            postContinPage.setTitle(T44V3FileOutputFormat.PAGE_NAME_POST_CONTING);
+            postContinPage.setNumContingencies(mapFile.get(T44V3FileOutputFormat.TABLE_KEY_NUMBER_OF_CONTIN));
+            postContinPage.setNumScenarios(mapFile.get(T44V3FileOutputFormat.TABLE_KEY_NSC));
 
-        // -- Verify if Network_Normal.xlsx is present in fileSystem
-        String extension = T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(2);
-        if (reader.isFilePresent(outputDir, T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(2))) {
-            nScNContingMap.put(extension, 1);
-        }
+            List<Integer> contingencies = new ArrayList<>();
+            for (int i = 1; i <= mapFile.get(T44V3FileOutputFormat.TABLE_KEY_NUMBER_OF_CONTIN); i++) {
+                contingencies.add(i);
+            }
 
-        // -- Verify if Network_OPF.xlsx is present in filesystem
-        extension = T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(1);
-        if (reader.isFilePresent(outputDir, T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(1))) {
-            nScNContingMap.put(extension, 1);
-        }
+            List<Integer> scenarios = new ArrayList<>();
+            for (int i = 1; i <= mapFile.get(T44V3FileOutputFormat.TABLE_KEY_NSC); i++) {
+                scenarios.add(i);
+            }
 
-        Map<String, Integer> newMap = ConverterUtils.mapReplaceKeyChar(nScNContingMap, " ", "_", true);
-        return newMap;
+            resultToShowInTable.setContingencies(contingencies);
+            resultToShowInTable.setScenarios(scenarios);
+            pages.add(postContinPage);
+        }
+        resultToShowInTable.setPages(pages);
+
+        try {
+            LOGGER.info("t44V3PagesToShow() - Reading launch.json file: {} ", ToolFileFormat.CONFIG_FILE);
+            File launchFile = this.getLaunchFile(toolDto, uuid, ToolFileFormat.CONFIG_FILE);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ToolConfigParameters configParameters = objectMapper.readValue(launchFile, ToolConfigParameters.class);
+            LOGGER.debug("t44V3PagesToShow() - Reading configParameters: {} ", configParameters.toString());
+            resultToShowInTable.setToolConfigParameters(configParameters);
+        } catch (FileNotFoundException fnfex) {
+            LOGGER.warn(fnfex.getMessage());
+        } catch (IOException ioe) {
+            LOGGER.warn("t44V3PagesToShow() - Unable to read configuration's parameters from launch.json file: ", ioe.getMessage());
+        }
+        return resultToShowInTable;
     }
 
     @Override
-    public T44ResultsDTO t44ChartsByNContingAndNsc(NetworkDTO networkDto, ToolDTO toolDto, String uuid, Integer nConting, Integer nSc)
-        throws FileNotFoundException {
+    public Map<String, Integer> t44V3TableResults(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws FileNotFoundException {
+        T44V3ResultsReader reader = new T44V3ResultsReader();
+        Map<String, Integer> tableResults = new HashMap<>();
+
+        try {
+            // -- find file with extension '_post_contin.xlsx'
+            File filePostContinResults =
+                this.getOutputFileFilterByExtension(
+                        networkDto,
+                        toolDto,
+                        uuid,
+                        T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(1).concat(ExcelFileFormat.FILE_EXTENSION)
+                    );
+            // obtain number of contingencies and number of scenarios reading post_contin file Contin_map and Active_Power sheets
+            tableResults = reader.parseContinMapAndActivePowerSheets(filePostContinResults);
+            if (tableResults.isEmpty()) {
+                tableResults = new HashMap<String, Integer>();
+            }
+        } catch (FileNotFoundException | ExcelReaderFileException ext) {
+            LOGGER.info(
+                "t44V3TableResults() - EXIT Results file with extension " +
+                T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(1).concat(ExcelFileFormat.FILE_EXTENSION) +
+                "  not found "
+            );
+        }
+
+        try {
+            // -- find file with extension '_Normal.xlsx'
+            File fileNormalResults =
+                this.getOutputFileFilterByExtension(
+                        networkDto,
+                        toolDto,
+                        uuid,
+                        T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(0).concat(ExcelFileFormat.FILE_EXTENSION)
+                    );
+            tableResults.put(T44V3FileOutputFormat.TABLE_KEY_NORMAL, 1);
+        } catch (FileNotFoundException | ExcelReaderFileException ext) {
+            LOGGER.info(
+                "t44V3TableResults() - " +
+                " Results file with extension " +
+                T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(0).concat(ExcelFileFormat.FILE_EXTENSION) +
+                "  not found "
+            );
+        }
+
+        return ConverterUtils.mapReplaceKeyChar(tableResults, " ", "_", true);
+    }
+
+    @Override
+    public T44ResultsDTO t44V3ChartsByType(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String type) throws FileNotFoundException {
+        String outputDir = this.getOutputDir(networkDto, toolDto, uuid);
+        LOGGER.info("t44V3ChartsByType() - Reading T44V3 output file and prepare JSON response file for charts visualization");
         T44ResultsReader reader = new T44ResultsReader();
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
-
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
-
         Map<String, List<FlexibleOptionWithContin>> mapAllExcelData = new HashMap<String, List<FlexibleOptionWithContin>>();
-        // Read data from <Network>_PContin_*.xlsx
-        int numPConingFileRead = reader.readFileInDirByType(outputDir, mapAllExcelData, T44FileOutputFormat.P_CONTIN_SUB_STR);
-
-        // Reading data from excel file: <Network>_Costs.xlsx (SpreadSheet: Sheet1)
-        int numCostFileRead = reader.readFileInDirByType(outputDir, mapAllExcelData, T44FileOutputFormat.COSTS_SUB_STR);
-
-        if (numPConingFileRead + numCostFileRead == 0) {
+        int numFileRead = reader.readFileInDirByType(outputDir, mapAllExcelData, type);
+        if (numFileRead == 0) {
             // Tool doesn't produce output files
             T44ResultsDTO emptyResult = new T44ResultsDTO();
             emptyResult.setCharts(Collections.EMPTY_LIST);
@@ -137,35 +266,53 @@ public class ToolWp4ShowResultsServiceImpl implements ToolWp4ShowResultsService 
             return emptyResult;
         }
 
-        Map<String, List<FlexibleOptionWithContin>> mapFlexibleOptions = new HashMap<String, List<FlexibleOptionWithContin>>();
+        T44V3ResultsChartsDataSet resultsChartDataSet = new T44V3ResultsChartsDataSet();
+        return resultsChartDataSet.prepareChartsDataSet(mapAllExcelData);
+    }
 
-        List<FlexibleOptionWithContin> costFromExcelCosts = mapAllExcelData.get(T44FileOutputFormat.SHEETS_NAME_COST.get(0));
-        mapFlexibleOptions.put(T44FileOutputFormat.SHEETS_NAME_COST.get(0), costFromExcelCosts);
-
-        Map<String, List<FlexibleOptionWithContin>> dataByNscAndNConting = reader.getDataByNContingAndNsc(nConting, nSc, mapAllExcelData);
-        if (!dataByNscAndNConting.isEmpty()) {
-            mapFlexibleOptions.putAll(dataByNscAndNConting);
+    @Override
+    public T44ResultsDTO t44V3ChartsByNContingAndNsc(
+        NetworkDTO networkDto,
+        ToolDTO toolDto,
+        String uuid,
+        Integer idContin,
+        Integer idScenario
+    ) throws FileNotFoundException {
+        File postContinResults =
+            this.getOutputFileFilterByExtension(
+                    networkDto,
+                    toolDto,
+                    uuid,
+                    T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(1).concat(ExcelFileFormat.FILE_EXTENSION)
+                );
+        if (postContinResults == null) {
+            // Tool doesn't produce output files
+            T44ResultsDTO emptyResult = new T44ResultsDTO();
+            emptyResult.setCharts(Collections.EMPTY_LIST);
+            emptyResult.setFlexCosts(Collections.EMPTY_LIST);
+            return emptyResult;
         }
+        // read  sheets: "Active_power", "Reactive_power", "FL_inc", "FL_dec", "STR", "Load_curtail", "RES_curtail" and Costs
+        T44V3ResultsReader readerV3 = new T44V3ResultsReader();
+        Map<String, List<FlexibleOptionWithContin>> mapFlexibleOptions = readerV3.getPostContinDataByNumContinAndNumScenario(
+            postContinResults,
+            idContin,
+            idScenario
+        );
 
-        T44ResultsChartsDataSet resultsChartDataSet = new T44ResultsChartsDataSet();
+        LOGGER.debug(
+            "t44V3ChartsByNContingAndNsc() - Data to Plot: " + Arrays.deepToString(mapFlexibleOptions.entrySet().stream().toArray())
+        );
+        T44V3ResultsChartsDataSet resultsChartDataSet = new T44V3ResultsChartsDataSet();
         return resultsChartDataSet.prepareChartsDataSet(mapFlexibleOptions);
     }
 
     // @type possible values are Normal or OPF
     @Override
     public T44ResultsDTO t44ChartsByType(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String type) throws FileNotFoundException {
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
+        String outputDir = this.getOutputDir(networkDto, toolDto, uuid);
 
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-
-        // eg: /ATSIM/WP4/T44/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
-
-        log.info("Reading T44 output files and prepare JSON file for charts visualization");
+        LOGGER.debug("t44ChartsByType() - Reading  output files, prepare JSON response file for charts visualization");
         T44ResultsReader reader = new T44ResultsReader();
         Map<String, List<FlexibleOptionWithContin>> mapAllExcelData = new HashMap<String, List<FlexibleOptionWithContin>>();
         int numFileRead = reader.readFileInDirByType(outputDir, mapAllExcelData, type);
@@ -181,108 +328,185 @@ public class ToolWp4ShowResultsServiceImpl implements ToolWp4ShowResultsService 
         return resultsChartDataSet.prepareChartsDataSet(mapAllExcelData);
     }
 
+    //-- T45
     @Override
-    public T41ResultsDTO t41Charts(NetworkDTO networkDto, ToolDTO toolDto, String uuid)
-        throws FileNotFoundException, ExcelReaderFileException {
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
+    //20230508
+    public ToolResultsPagesDTO t42T45PagesToShow(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws Exception {
+        LOGGER.debug("t42T45PagesToShow() - Network: {}, Tool:{}, uuid: {} ", networkDto, toolDto, uuid);
+        File outputFileResult =
+            this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T42T45FileOutputFormat.OUTPUT_FILES_EXTENSION);
+        if (!T42T45ResultsReader.isT42T45Results(outputFileResult)) {
+            throw new FileNotFoundException("File with extension: " + T42T45FileOutputFormat.OUTPUT_FILES_EXTENSION + " not Found!");
+        }
+        LOGGER.debug("t42T45PagesToShow() - Reading file: {} ", outputFileResult.getName());
+        T42T45ResultsReader reader = new T42T45ResultsReader();
+        ToolResultsPagesDTO resultToShowInTable = reader.getPagesToShow(outputFileResult);
 
-        log.info("Reading T41 output file and prepare JSON file for charts visualization");
-        T41ResultsReader reader = new T41ResultsReader();
+        try {
+            LOGGER.info("t42T45PagesToShow() - Reading file: {} ", ToolFileFormat.CONFIG_FILE);
+            File launchFile = this.getLaunchFile(toolDto, uuid, ToolFileFormat.CONFIG_FILE);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ToolConfigParameters configParameters = objectMapper.readValue(launchFile, ToolConfigParameters.class);
+            LOGGER.debug("t42T45PagesToShow() - Reading configParameters: {} ", configParameters.toString());
+            resultToShowInTable.setToolConfigParameters(configParameters);
+        } catch (FileNotFoundException fnfex) {
+            LOGGER.warn(fnfex.getMessage());
+        } catch (IOException ioe) {
+            LOGGER.warn("t42T45PagesToShow() - Unable to read configuration's parameters from launch.json file: ", ioe.getMessage());
+        }
+        return resultToShowInTable;
+    }
+
+    @Override
+    public T42T45FlexResultsDTO t42T45Charts(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String timePeriod)
+        throws FileNotFoundException, ExcelReaderFileException {
+        LOGGER.debug("t42T45Charts() - Network: {}, Tool:{}, uuid: {}, timePeriod: {}", networkDto, toolDto, uuid, timePeriod);
+        File outputFileResult =
+            this.getOutputFileFilterByExtension(networkDto, toolDto, uuid, T42T45FileOutputFormat.OUTPUT_FILES_EXTENSION);
+        if (!T42T45ResultsReader.isT42T45Results(outputFileResult)) {
+            throw new FileNotFoundException("File with extension: " + T42T45FileOutputFormat.OUTPUT_FILES_EXTENSION + " not Found!");
+        }
         Map<String, List<FlexibleOption>> mapDataForSheet = new HashMap<String, List<FlexibleOption>>();
-        mapDataForSheet = reader.readFileInDir(outputDir);
+        T42T45ResultsReader reader = new T42T45ResultsReader();
+        mapDataForSheet = reader.parseFlexDataSheets(outputFileResult);
 
         // outputDir doesn't contain file
         if (mapDataForSheet.isEmpty()) {
             // Tool doesn't produce output files
-            T41ResultsDTO emptyResult = new T41ResultsDTO();
+            T42T45FlexResultsDTO emptyResult = new T42T45FlexResultsDTO();
             emptyResult.setCharts(Collections.EMPTY_LIST);
-            return emptyResult;
         }
 
-        T41ResultsChartsDataSet resultsChartDataSet = new T41ResultsChartsDataSet();
-        return resultsChartDataSet.t41PrepareChartsDataSet(mapDataForSheet);
+        T42T45ResultsChartsDataSet resultsChartDataSet = new T42T45ResultsChartsDataSet(timePeriod);
+        T42T45FlexResultsDTO flexResultsDTO = resultsChartDataSet.prepareFlexChartsDataSet(mapDataForSheet);
+
+        // Request Activation flexibility services for DSO
+        List<T42T45ActivationDTO> requestForDSOActivations = reader.parseSheetRequestActivation(outputFileResult);
+        flexResultsDTO.setActivations(requestForDSOActivations);
+        LOGGER.info("t42T45Charts() - END Reading output file, return: {}", flexResultsDTO);
+        return flexResultsDTO;
     }
 
     @Override
-    public TSGResultsDTO windAndPVCharts(NetworkDTO networkDto, ToolDTO toolDto, String uuid)
-        throws FileNotFoundException, OdsReaderFileException {
+    public String getOutputDir(NetworkDTO networkDto, ToolDTO toolDto, String uuid) {
         String toolWorkPackage = toolDto.getWorkPackage();
         String toolNum = toolDto.getNum();
-
         // eg: /ATSIM
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-
-        // eg: /ATSIM/WP4/TSG/1bebbcae-8157-4842-9b0b-1303dbc48f2c
+        // eg: /ATSIM/WP4/<TNUM>/<uuid>
         String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-
-        // eg: /ATSIM/WP4/TSG/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
-
-        log.info("Reading WindPVScenarioGenTool's output file and prepare JSON file for charts visualization");
-        OdsTSGResultsReader reader = new OdsTSGResultsReader();
-        Map<String, List<ScenarioValues>> mapDataForSheet = new HashMap<String, List<ScenarioValues>>();
-        mapDataForSheet = reader.readFileInDir(outputDir);
-
-        TSGResultsChartsDataSet resultsChartDataSet = new TSGResultsChartsDataSet();
-        return resultsChartDataSet.tsgPrepareChartsDataSet(mapDataForSheet);
+        // eg: /ATSIM/WP4/<TNUM>/<uuid>/output_data
+        String ouputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
+        LOGGER.debug("getOutputDir() - Return Dir: {}  ", ouputDir);
+        return ouputDir;
     }
-
-    /** @Override
-    public File getOutputFileOld(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws FileNotFoundException {
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
-
-        File dir = new File(outputDir);
-        if (!dir.isDirectory()) {
-            throw new FileNotFoundException("Directory: " + outputDir + " not found");
-        }
-        File[] files = dir.listFiles();
-
-        //tool doesn't produce any file
-        if (files.length == 0) {
-            return null;
-        }
-
-        if (files.length == 1) {
-            return files[0];
-        } else {
-            //ZIP  all output files
-            String archiveName = toolDto.getNum() + "_" + uuid + ".zip";
-            List<File> fileList = Arrays.asList(files);
-            return FileUtils.zip(fileList, archiveName);
-        }
-    }*/
 
     @Override
     public File[] getOutputFile(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws FileNotFoundException {
-        String toolWorkPackage = toolDto.getWorkPackage();
-        String toolNum = toolDto.getNum();
-        // eg: /ATSIM
-        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c
-        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
-        // eg: /ATSIM/WP4/T41/1bebbcae-8157-4842-9b0b-1303dbc48f2c/output_data
-        String outputDir = simulationWorkingDir.concat(File.separator).concat(toolSimulationRef.getOutputData());
+        String outputDir = this.getOutputDir(networkDto, toolDto, uuid);
 
+        File dir = new File(outputDir);
+        if (!dir.isDirectory()) {
+            throw new FileNotFoundException("Directory: " + outputDir + " not found!");
+        }
+        File[] files = dir.listFiles();
+        if (files.length == 0) {
+            throw new FileNotFoundException("Directory: " + outputDir + " is empty!");
+        }
+        return files;
+    }
+
+    @Override
+    public byte[] zipFilesFromOutputDir(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws IOException {
+        File[] filesToZip = getOutputFile(networkDto, toolDto, uuid);
+        return FileUtils.zipFiles(filesToZip).toByteArray();
+    }
+
+    @Override
+    public byte[] zipOutputDir(NetworkDTO networkDto, ToolDTO toolDto, String uuid) throws IOException {
+        String outputDir = this.getOutputDir(networkDto, toolDto, uuid);
+        File dirToZip = new File(outputDir);
+        if (!dirToZip.isDirectory()) {
+            throw new FileNotFoundException("Directory: " + outputDir + " not found!");
+        }
+        return FileUtils.zipDir(dirToZip).toByteArray();
+    }
+
+    public File getOutputFileFilterByExtension(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String extension)
+        throws FileNotFoundException {
+        String outputDir = this.getOutputDir(networkDto, toolDto, uuid);
+
+        LOGGER.info("getOutputFileFilterByExtension() - Search output file in dir: {}, with extension: {}", outputDir, extension);
         File dir = new File(outputDir);
         if (!dir.isDirectory()) {
             throw new FileNotFoundException("Directory: " + outputDir + " not found");
         }
-        File[] files = dir.listFiles();
 
-        return files;
+        FilenameFilter filterByExtension = new FilenameFilter() {
+            @Override
+            public boolean accept(File directory, String fileName) {
+                // LOGGER.debug("FileName: {} - Filter for extension {}, fileNameEndWithExtension: {}", fileName, extension, fileName.endsWith(extension));
+                return ((fileName.endsWith(extension) || fileName.equals(extension)) && !fileName.startsWith("~$"));
+            }
+        };
+
+        File[] files = dir.listFiles(filterByExtension);
+        //tool doesn't produce any file
+        if (files.length == 0) {
+            throw new FileNotFoundException("Directory: " + outputDir + ", doesn't contain file with extension: " + extension);
+        }
+
+        if (files.length > 1) {
+            throw new FileNotFoundException("Directory: " + outputDir + ", contains more files than expected!");
+        }
+
+        File excelFile = files[0];
+
+        LOGGER.info("getOutputFileFilterByExtension() - EXIT  Return  file: {} ", excelFile.getName());
+        return excelFile;
+    }
+
+    /**
+     * @param toolDto DTO of the entity Tool
+     * @param uuid simulation unique identifier
+     * @param launchFileName file used for running the tool (usually 'launch.json')
+     * @return file used for storing all configuration's parameters used by the tool
+     * @throws FileNotFoundException if file or directory containing the file is not present on file system
+     */
+    public File getLaunchFile(ToolDTO toolDto, String uuid, String launchFileName) throws FileNotFoundException {
+        LOGGER.info("getLaunchFile() -  Tool: {}, uuid: {}, launchFileName: {} ", toolDto.getNum(), uuid, launchFileName);
+        String toolWorkPackage = toolDto.getWorkPackage();
+        String toolNum = toolDto.getNum();
+        // eg: /ATSIM
+        ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
+        // eg: /ATSIM/WP4/<TNUM>/<uuid>
+        String simulationWorkingDir = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
+        LOGGER.info("getLaunchFile() -  simulationWorkingDir: {}", simulationWorkingDir);
+
+        File dir = new File(simulationWorkingDir);
+        if (!dir.isDirectory()) {
+            throw new FileNotFoundException("Directory: " + simulationWorkingDir + " not found!");
+        }
+
+        FilenameFilter filterByName = new FilenameFilter() {
+            @Override
+            public boolean accept(File directory, String fileName) {
+                LOGGER.debug("getLaunchFile() -  Filter for fileName {} is equals: {}", fileName, fileName.equals(launchFileName));
+                return (fileName.equals(launchFileName));
+            }
+        };
+
+        File[] files = dir.listFiles(filterByName);
+        //tool doesn't produce any file
+        if (files != null && files.length == 0) {
+            throw new FileNotFoundException("Directory: " + simulationWorkingDir + ", doesn't contain file: " + launchFileName);
+        }
+        if (files != null && files.length > 1) {
+            throw new FileNotFoundException("Directory: " + simulationWorkingDir + ", contains more files than expected!");
+        }
+
+        File launchFile = files[0];
+        LOGGER.info("getLaunchFile() - EXIT Return file: {} ", launchFile.getName());
+        return launchFile;
     }
 }

@@ -2,6 +2,8 @@ package com.attest.ict.service.impl;
 
 import com.attest.ict.constants.AttestConstants;
 import com.attest.ict.custom.exception.FileStorageException;
+import com.attest.ict.custom.utils.FileUtils;
+import com.attest.ict.custom.utils.MimeUtils;
 import com.attest.ict.domain.BranchProfile;
 import com.attest.ict.domain.FlexProfile;
 import com.attest.ict.domain.GenProfile;
@@ -202,12 +204,6 @@ public class InputFileServiceImpl implements InputFileService {
         return inputFileRepository.findById(id).map(inputFileMapper::toDto);
     }
 
-    /*@Override
-    public void delete(Long id) {
-        log.debug("Request to delete InputFile : {}", id);
-        inputFileRepository.deleteById(id);
-    }*/
-
     //Start Custom Methods
 
     @Override
@@ -262,7 +258,6 @@ public class InputFileServiceImpl implements InputFileService {
                 inputFileRepository.deleteById(id);
                 return true;
             } else {
-                //TODO it's necessary to review how to manage the relationship between tool and input file: the same input file tools could be used by several tools....
                 // inputFile is used by one Tool
                 log.debug("InputFile : {} will not be removed, it is using by the tool {} ", id, tool.getName());
                 return false;
@@ -297,7 +292,7 @@ public class InputFileServiceImpl implements InputFileService {
     /**
      * @param networkId
      * @param fileName
-     * @param descr
+     * @param description
      */
     @Override
     public List<InputFile> findByNetworkIdAndFileNameAndDescription(Long networkId, String fileName, String description) {
@@ -309,10 +304,9 @@ public class InputFileServiceImpl implements InputFileService {
      * toolDTO is null for matpower network's file
      */
     @Override
-    public InputFileDTO saveFileForNetwork(MultipartFile file, NetworkDTO networkDto, ToolDTO toolDto) {
-        log.debug("Request to save file file: {}, for networkName: {}", file.getOriginalFilename(), networkDto.getName());
-        // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+    public InputFileDTO saveFileForNetworkAndTool(MultipartFile mpFile, NetworkDTO networkDto, ToolDTO toolDto) {
+        String fileName = StringUtils.cleanPath(mpFile.getOriginalFilename());
+        String contentType = MimeUtils.detect(mpFile);
         try {
             //   Check if the file's name contains invalid characters
             if (fileName.contains("..")) {
@@ -321,28 +315,32 @@ public class InputFileServiceImpl implements InputFileService {
 
             InputFile inputFile = new InputFile();
             inputFile.setFileName(fileName);
-            inputFile.setDataContentType(file.getContentType());
+            // inputFile.setDataContentType(file.getContentType());
+            inputFile.setDataContentType(contentType);
             inputFile.setNetwork(networkMapper.toEntity(networkDto));
-            inputFile.setData(file.getBytes());
+            inputFile.setData(mpFile.getBytes());
             inputFile.setUploadTime(Instant.now());
-            if (toolDto != null) inputFile.setTool(toolMapper.toEntity(toolDto));
+            if (toolDto != null) {
+                inputFile.setTool(toolMapper.toEntity(toolDto));
+            }
             InputFile inputFileSaved = inputFileRepository.save(inputFile);
             return inputFileMapper.toDto(inputFileSaved);
         } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+            throw new FileStorageException("Error saving the file: " + fileName, ex);
         }
     }
 
     @Override
-    public InputFileDTO saveFileForNetworkWithDescr(MultipartFile file, NetworkDTO networkDto, String description) {
-        log.debug(
-            "Request to save file file: {}, for networkName: {} ,description: {}",
-            file.getOriginalFilename(),
-            networkDto.getName(),
-            description
-        );
+    public InputFileDTO saveFileForNetworkWithDescr(MultipartFile mpFile, NetworkDTO networkDto, String description) {
         // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(mpFile.getOriginalFilename());
+        log.info("saveFileForNetworkWithDescr() - FileName: {}, NetworkDTO: {}, Description:{} ", fileName, networkDto, description);
+        String fileExtension = FileUtils.getFileExtension(fileName);
+        //20231012 Since MimeUtils returns different content types for .m files (e.g., text/x-matlab, text/x-objcsrc), we have opted to set a generic content type to 'application/octet-stream'."
+        String contentType = (AttestConstants.INPUT_FILE_NETWORK_DESCR.equals(description) && fileExtension.equals("m"))
+            ? FileUtils.CONTENT_TYPE.get("m")
+            : MimeUtils.detect(mpFile);
+        log.info("saveFileForNetworkWithDescr() - contentType:{} ", contentType);
         try {
             //   Check if the file's name contains invalid characters
             if (fileName.contains("..")) {
@@ -351,15 +349,15 @@ public class InputFileServiceImpl implements InputFileService {
 
             InputFile inputFile = new InputFile();
             inputFile.setFileName(fileName);
-            inputFile.setDataContentType(file.getContentType());
+            inputFile.setDataContentType(contentType);
             inputFile.setNetwork(networkMapper.toEntity(networkDto));
             inputFile.setDescription(description);
-            inputFile.setData(file.getBytes());
+            inputFile.setData(mpFile.getBytes());
             inputFile.setUploadTime(Instant.now());
             InputFile inputFileSaved = inputFileRepository.save(inputFile);
             return inputFileMapper.toDto(inputFileSaved);
         } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+            throw new FileStorageException("Error saving the file: " + fileName, ex);
         }
     }
 
@@ -402,5 +400,29 @@ public class InputFileServiceImpl implements InputFileService {
         } else {
             return inputFiles.get(0);
         }
+    }
+
+    /**
+     * toolDTO is null for matpower network's file
+     */
+    @Override
+    public InputFileDTO saveFileForNetworkAndTool(
+        byte[] byteArray,
+        String fileName,
+        String dataContentType,
+        NetworkDTO networkDto,
+        ToolDTO toolDto
+    ) {
+        InputFile inputFile = new InputFile();
+        inputFile.setFileName(fileName);
+        inputFile.setDataContentType(dataContentType);
+        inputFile.setNetwork(networkMapper.toEntity(networkDto));
+        inputFile.setData(byteArray);
+        inputFile.setUploadTime(Instant.now());
+        if (toolDto != null) {
+            inputFile.setTool(toolMapper.toEntity(toolDto));
+        }
+        InputFile inputFileSaved = inputFileRepository.save(inputFile);
+        return inputFileMapper.toDto(inputFileSaved);
     }
 }

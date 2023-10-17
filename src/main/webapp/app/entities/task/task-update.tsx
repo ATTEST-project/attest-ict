@@ -20,7 +20,6 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const dispatch = useAppDispatch();
-
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
   const toolLogFiles = useAppSelector(state => state.toolLogFile.entities);
@@ -31,6 +30,7 @@ export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const loading = useAppSelector(state => state.task.loading);
   const updating = useAppSelector(state => state.task.updating);
   const updateSuccess = useAppSelector(state => state.task.updateSuccess);
+
   const handleClose = () => {
     props.history.push('/task' + props.location.search);
   };
@@ -41,11 +41,6 @@ export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
     } else {
       dispatch(getEntity(props.match.params.id));
     }
-
-    dispatch(getToolLogFiles({}));
-    dispatch(getSimulations({}));
-    dispatch(getTools({}));
-    dispatch(getUsers({}));
   }, []);
 
   useEffect(() => {
@@ -61,10 +56,6 @@ export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
     const entity = {
       ...taskEntity,
       ...values,
-      toolLogFile: toolLogFiles.find(it => it.id.toString() === values.toolLogFile.toString()),
-      simulation: simulations.find(it => it.id.toString() === values.simulation.toString()),
-      tool: tools.find(it => it.id.toString() === values.tool.toString()),
-      user: users.find(it => it.id.toString() === values.user.toString()),
     };
 
     if (isNew) {
@@ -84,10 +75,6 @@ export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
           ...taskEntity,
           dateTimeStart: convertDateTimeFromServer(taskEntity.dateTimeStart),
           dateTimeEnd: convertDateTimeFromServer(taskEntity.dateTimeEnd),
-          // toolLogFileId: taskEntity?.toolLogFileId,
-          // simulationUuid: taskEntity?.simulation?.id,
-          // tool: taskEntity?.tool?.id,
-          // user: taskEntity?.user?.id,
         };
 
   return (
@@ -124,48 +111,14 @@ export const TaskUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 type="datetime-local"
                 placeholder="YYYY-MM-DD HH:mm"
               />
-              {/*
-              <ValidatedField id="task-toolLogFile" name="toolLogFile" data-cy="toolLogFile" label="Tool Log File" type="select">
-                <option value="" key="0" />
-                {toolLogFiles
-                  ? toolLogFiles.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField id="task-simulation" name="simulation" data-cy="simulation" label="Simulation" type="select">
-                <option value="" key="0" />
-                {simulations
-                  ? simulations.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.uuid}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField id="task-tool" name="tool" data-cy="tool" label="Tool" type="select">
-                <option value="" key="0" />
-                {tools
-                  ? tools.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField id="task-user" name="user" data-cy="user" label="User" type="select">
-                <option value="" key="0" />
-                {users
-                  ? users.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-*/}
+              <dt>Tool Log File</dt>
+              <dd>{taskEntity.toolLogFileId ? taskEntity.toolLogFileId : ''}</dd>
+              <dt>Simulation</dt>
+              <dd>{taskEntity.simulationUuid ? taskEntity.simulationUuid : ''}</dd>
+              <dt>Tool</dt>
+              <dd>{taskEntity.tool ? taskEntity.tool.num : ''}</dd>
+              <dt>User</dt>
+              <dd>{taskEntity.user ? taskEntity.user.login : ''}</dd>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/task" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

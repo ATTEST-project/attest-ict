@@ -5,6 +5,7 @@ import com.attest.ict.repository.BaseMVARepository;
 import com.attest.ict.service.BaseMVAService;
 import com.attest.ict.service.dto.BaseMVADTO;
 import com.attest.ict.service.mapper.BaseMVAMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -77,17 +78,26 @@ public class BaseMVAServiceImpl implements BaseMVAService {
 
     //Start Custom Methods
     @Override
+    @Transactional(readOnly = true)
     public List<BaseMVA> getAllBaseMVA() {
         return baseMVARepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BaseMVA getBaseMVAByNetworkId(Long networkId) {
         return baseMVARepository.findByNetworkId(networkId);
     }
 
     @Override
     public List<BaseMVA> saveAll(List<BaseMVA> list) {
-        return baseMVARepository.saveAll(list);
+        List<BaseMVA> allSaved = new ArrayList<BaseMVA>();
+
+        for (BaseMVA baseMva : list) {
+            BaseMVA baseMVASaved = baseMVARepository.save(baseMva);
+            allSaved.add(baseMVASaved);
+        }
+        log.debug("BasMVA Saved num: {}  on db", allSaved.size());
+        return allSaved;
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Interface for managing {@link com.attest.ict.domain.Task}.
@@ -54,4 +55,7 @@ public interface TaskService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    @Transactional(readOnly = true)
+    Optional<TaskDTO> findBySimulationId(Long simulationId);
 }

@@ -1,6 +1,7 @@
 package com.attest.ict.service.impl;
 
 import com.attest.ict.custom.exception.FileStorageException;
+import com.attest.ict.custom.utils.MimeUtils;
 import com.attest.ict.domain.Task;
 import com.attest.ict.domain.ToolLogFile;
 import com.attest.ict.repository.ToolLogFileRepository;
@@ -105,9 +106,12 @@ public class ToolLogFileServiceImpl implements ToolLogFileService {
 
     //======  Start Custom Methods
     @Override
-    public ToolLogFileDTO saveFileByTask(MultipartFile file, TaskDTO taskDto) {
+    public ToolLogFileDTO saveFileByTask(MultipartFile mpFile, TaskDTO taskDto) {
         // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        if (mpFile.getOriginalFilename() == null) throw new FileStorageException("Sorry! Filename is null");
+
+        String fileName = StringUtils.cleanPath(mpFile.getOriginalFilename());
+        String contentType = MimeUtils.detect(mpFile);
         try {
             //   Check if the file's name contains invalid characters
             if (fileName.contains("..")) {
@@ -116,10 +120,36 @@ public class ToolLogFileServiceImpl implements ToolLogFileService {
 
             ToolLogFile toolLogFile = new ToolLogFile();
             toolLogFile.setFileName(fileName);
-            toolLogFile.setDataContentType(file.getContentType());
+            toolLogFile.setDataContentType(contentType);
             Task task = this.taskMapper.toEntity(taskDto);
             toolLogFile.setTask(task);
-            toolLogFile.setData(file.getBytes());
+            toolLogFile.setData(mpFile.getBytes());
+            toolLogFile.setUploadTime(Instant.now());
+            ToolLogFile logFileSaved = toolLogFileRepository.save(toolLogFile);
+            return toolLogFileMapper.toDto(logFileSaved);
+        } catch (IOException ex) {
+            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
+        }
+    }
+
+    @Override
+    public ToolLogFileDTO saveFile(MultipartFile mpFile) {
+        if (mpFile.getOriginalFilename() == null) throw new FileStorageException("Sorry! Filename is null");
+
+        // Normalize file name
+        String fileName = StringUtils.cleanPath(mpFile.getOriginalFilename());
+
+        String contentType = MimeUtils.detect(mpFile);
+        try {
+            //   Check if the file's name contains invalid characters
+            if (fileName.contains("..")) {
+                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
+            }
+
+            ToolLogFile toolLogFile = new ToolLogFile();
+            toolLogFile.setFileName(fileName);
+            toolLogFile.setDataContentType(contentType);
+            toolLogFile.setData(mpFile.getBytes());
             toolLogFile.setUploadTime(Instant.now());
             ToolLogFile logFileSaved = toolLogFileRepository.save(toolLogFile);
             return toolLogFileMapper.toDto(logFileSaved);

@@ -128,6 +128,14 @@ public class TaskQueryService extends QueryService<Task> {
                 specification =
                     specification.and(buildSpecification(criteria.getUserId(), root -> root.join(Task_.user, JoinType.LEFT).get(User_.id)));
             }
+
+            //20231003 add custom criteria for filtering by toolNum
+            if (criteria.getToolNum() != null) {
+                specification =
+                    specification.and(
+                        buildSpecification(criteria.getToolNum(), root -> root.join(Task_.tool, JoinType.LEFT).get(Tool_.num))
+                    );
+            }
         }
         return specification;
     }

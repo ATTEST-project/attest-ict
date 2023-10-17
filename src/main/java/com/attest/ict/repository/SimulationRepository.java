@@ -3,6 +3,7 @@ package com.attest.ict.repository;
 import com.attest.ict.domain.Simulation;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -25,4 +26,6 @@ public interface SimulationRepository extends JpaRepository<Simulation, Long>, J
 
     @Query("select simulation from Simulation simulation left join fetch simulation.inputFiles where simulation.id =:id")
     Optional<Simulation> findOneWithEagerRelationships(@Param("id") Long id);
+
+    Optional<Simulation> findByUuid(UUID uuid);
 }

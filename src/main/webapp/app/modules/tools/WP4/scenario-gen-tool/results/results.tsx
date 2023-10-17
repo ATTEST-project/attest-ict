@@ -20,15 +20,19 @@ const SGTResults = ({ match, location }) => {
 
   const taskEntity = useAppSelector(state => state.task.entity);
 
-  const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
-
-  const response = useAppSelector(state => state.toolsExecution.entity) || {
+  // const response = useAppSelector(state => state.toolsExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
     },
     simulationId: taskEntity?.simulationUuid,
   };
+
+  const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
+
+  /* eslint-disable-next-line no-console */
+  console.log('TSG Response: ', response);
 
   // const chartsResponse = useAppSelector(state => state.toolsResults.entity);
 

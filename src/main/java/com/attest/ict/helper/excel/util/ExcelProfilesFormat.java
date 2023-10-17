@@ -46,7 +46,7 @@ public class ExcelProfilesFormat {
 
     public static final String[] TX_BRANCH_TRANSF_COMMON_HEADER = { "Fbus", "Tbus", "Un (kV)", "ID" };
 
-    public static final String[] TX_BUS_GEN_COMMON_HEADER = { "Bus Number", "Un (kV)", "ID" };
+    public static final String[] TX_BUS_GEN_COMMON_HEADER = { "Bus Number", "Un (kV)", "ID", "Type" };
 
     public static final Double TX_TIME_INTERVAL = 1.0; //1 hour
 
@@ -71,6 +71,7 @@ public class ExcelProfilesFormat {
         "Load Q (Mvar)",
         "Gen Status",
         "Gen P (MW)",
+        "Gen Q (Mvar)", // add on 2023/03 e.g:
         "Gen Vg (p.u.)",
         "Transformer Tap Ratio",
         "Transformer Status",

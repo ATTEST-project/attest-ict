@@ -8,7 +8,7 @@ const T44 = (props: any) => {
   return (
     <>
       <T4144Config
-        title={'T4.4 Tool'}
+        title={TOOLS_INFO.T44_AS_DAY_HEAD_TX.description}
         toolName={TOOLS_INFO.T44_AS_DAY_HEAD_TX.name}
         resultsPath={TOOLS_INFO.T44_AS_DAY_HEAD_TX.path + '/results'}
         additionalNetwork={<AdditionalNetwork />}

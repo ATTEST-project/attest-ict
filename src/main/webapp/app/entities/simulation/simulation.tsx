@@ -9,6 +9,7 @@ import { ISimulation } from 'app/shared/model/simulation.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
+import { hasAuthorityForUpdateSimulation } from 'app/shared/util/authorizationUtils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 export const Simulation = (props: RouteComponentProps<{ url: string }>) => {
@@ -17,6 +18,9 @@ export const Simulation = (props: RouteComponentProps<{ url: string }>) => {
   const [paginationState, setPaginationState] = useState(
     overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search)
   );
+
+  const userEntity = useAppSelector(state => state.authentication.account);
+  const hasAuthorityForUpdate = hasAuthorityForUpdateSimulation(userEntity.authorities);
 
   const simulationList = useAppSelector(state => state.simulation.entities);
   const loading = useAppSelector(state => state.simulation.loading);
@@ -87,10 +91,12 @@ export const Simulation = (props: RouteComponentProps<{ url: string }>) => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh List
           </Button>
-          <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp; Create new Simulation
-          </Link>
+          {hasAuthorityForUpdate && (
+            <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+              <FontAwesomeIcon icon="plus" />
+              &nbsp; Create new Simulation
+            </Link>
+          )}
         </div>
       </h2>
       <div className="table-responsive">
@@ -138,13 +144,14 @@ export const Simulation = (props: RouteComponentProps<{ url: string }>) => {
                       </div>
                     ) : null}
                   </td>
-                  <td>{simulation.network ? <Link to={`network/${simulation.network.id}`}>{simulation.network.id}</Link> : ''}</td>
+                  <td>{simulation.network ? <Link to={`network/${simulation.network.id}`}>{simulation.network.name} </Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${simulation.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
                       </Button>
                       <Button
+                        hidden={!hasAuthorityForUpdate}
                         tag={Link}
                         to={`${match.url}/${simulation.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
@@ -154,6 +161,7 @@ export const Simulation = (props: RouteComponentProps<{ url: string }>) => {
                         <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
                       <Button
+                        hidden={!hasAuthorityForUpdate}
                         tag={Link}
                         to={`${match.url}/${simulation.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="danger"

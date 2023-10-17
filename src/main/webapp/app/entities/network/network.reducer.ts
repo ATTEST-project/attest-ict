@@ -4,6 +4,7 @@ import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/t
 import { cleanEntity } from 'app/shared/util/entity-utils';
 import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { INetwork, defaultValue } from 'app/shared/model/network.model';
+import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 
 const initialState: EntityState<INetwork> = {
   loading: false,
@@ -18,7 +19,6 @@ const initialState: EntityState<INetwork> = {
 const apiUrl = 'api/networks';
 
 // Actions
-
 export const getEntities = createAsyncThunk('network/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
   const requestUrl = `${apiUrl}${sort ? `?page=${page}&size=${size}&sort=${sort}&` : '?'}cacheBuster=${new Date().getTime()}`;
   return axios.get<INetwork[]>(requestUrl);
@@ -68,7 +68,8 @@ export const deleteEntity = createAsyncThunk(
   async (id: string | number, thunkAPI) => {
     const requestUrl = `${apiUrl}/${id}`;
     const result = await axios.delete<INetwork>(requestUrl);
-    thunkAPI.dispatch(getEntities({}));
+    const params = { page: 0, size: ITEMS_PER_PAGE, sort: 'id,desc' };
+    thunkAPI.dispatch(getEntities(params));
     return result;
   },
   { serializeError: serializeAxiosError }

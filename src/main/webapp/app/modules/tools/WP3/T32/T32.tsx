@@ -1,36 +1,67 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+
+import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
+import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, Offcanvas, OffcanvasBody, OffcanvasHeader } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toast } from 'react-toastify';
+
 import { pathButton } from 'app/shared/reducers/back-button-path';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
-import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
-import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import carouselImage1 from '../../../../../content/images/carousel_img_1.png';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
+
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
 import Parameters from 'app/modules/tools/WP3/T32/parameters/parameters';
-import { Link } from 'react-router-dom';
+
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
 import { runT32Tool } from 'app/modules/tools/WP3/T32/reducer/tool-execution.reducer';
 import { downloadResults, reset as retry } from 'app/modules/tools/WP3/T32/reducer/tool-results.reducer';
 import { SELECTION_TYPE } from 'app/shared/components/network-search/constants/constants';
 
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
+
 const T32 = (props: any) => {
+  const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
   const divRef = React.useRef<HTMLDivElement>();
-
-  const methods = useForm();
-  const { handleSubmit, reset } = methods;
-
   const dispatch = useAppDispatch();
-
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
+  const country = network.country;
+  const toolDescription = TOOLS_INFO.T32_OPT_TOOL_TX.description;
+
+  const defaultParamsValues = () => {
+    switch (country) {
+      case 'UK':
+        return { parameters: { use_load_data_update: false, add_load_data_case_name: 'UK_Tx_' } };
+      case 'HR':
+        return { parameters: { use_load_data_update: false, add_load_data_case_name: 'HR_Tx_01_' } };
+      case 'PT':
+        return { parameters: { use_load_data_update: false, add_load_data_case_name: 'PT_Tx_01_' } };
+      default:
+        return { parameters: { use_load_data_update: false } };
+    }
+  };
+
+  const methods = useForm({ defaultValues: defaultParamsValues() });
+  const { handleSubmit, reset } = methods;
 
   if (!network) {
     props.history?.goBack();
     return;
   }
+
+  const convertBooleanToNumber = React.useCallback((parameter, value) => {
+    const listKeys = ['use_load_data_update'];
+    if (listKeys.includes(parameter) && typeof value === 'boolean') {
+      return value ? 1 : 0;
+    } else {
+      return value;
+    }
+  }, []);
 
   const isRunning = useAppSelector(state => state.t32ToolExecution.loading);
   const response = useAppSelector(state => state.t32ToolExecution.entity);
@@ -38,16 +69,19 @@ const T32 = (props: any) => {
 
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [form, setForm] = React.useState(null);
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
 
   const parametersToSend = (parameters: any) => {
     const { scenario_gen, ...rest } = parameters;
     const xlsxFileName = rest.xlsx_file_name?.[0]?.name;
     const odsFileName = rest.ods_file_name?.[0]?.name;
+    const evDataFileName = rest.EV_data_file_name?.[0]?.name;
     const finalParameters = {
       ...rest,
       test_case: network.name,
       xlsx_file_name: xlsxFileName?.substring(0, xlsxFileName?.indexOf('.')) || '',
       ods_file_name: odsFileName?.substring(0, odsFileName?.indexOf('.')),
+      EV_data_file_name: evDataFileName,
       country: network.country,
       peak_hour: Number(rest.peak_hour),
       no_year: Number(rest.no_year),
@@ -57,8 +91,9 @@ const T32 = (props: any) => {
 
   const submitMethod = data => {
     /* eslint-disable-next-line no-console */
-    console.log('Form data: ', data);
+    // console.log('T32 Form data: ', data);
     const parameters = { ...data.parameters };
+    Object.keys(parameters).forEach(key => (parameters[key] = convertBooleanToNumber(key, parameters[key])));
     const finalForm = {
       networkId: network.id,
       toolName: TOOLS_INFO.T32_OPT_TOOL_TX.name,
@@ -67,22 +102,35 @@ const T32 = (props: any) => {
       jsonConfig: JSON.stringify({ ...parametersToSend(parameters) }),
     };
     parameters.xlsx_file_name?.[0] && finalForm.files.unshift(parameters.xlsx_file_name?.[0]);
-    /* eslint-disable-next-line no-console */
-    console.log('Final Form data: ', finalForm);
+    parameters.EV_data_file_name?.[0] && finalForm.files.push(parameters.EV_data_file_name?.[0]);
     setForm({ ...finalForm });
     setOpenModal(true);
   };
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log(' T32 RUN!');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
         runT32Tool({
           ...form,
         })
-      );
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('Tool execution failure, check log file for more details...');
+            setShowBtnGoToTask(false);
+          } else {
+            toast.success('T32 is running!');
+            setShowBtnGoToTask(true);
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+        });
     }, 500);
   };
 
@@ -111,11 +159,9 @@ const T32 = (props: any) => {
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button color="dark">{<FontAwesomeIcon icon="bars" />}</Button>
-        <img alt="wp3" src={carouselImage1} width={100} height={70} />
-        <h4 style={{ marginLeft: 20 }}>{'T3.2 Optimisation Tool for transmission network planning'}</h4>
-      </div>
+
+      <ToolTitle imageAlt={WP_IMAGE.WP3.alt} title={toolDescription} imageSrc={WP_IMAGE.WP3.src} />
+
       <Divider />
       {network && (
         <>
@@ -128,7 +174,7 @@ const T32 = (props: any) => {
               <Parameters />
               <Divider />
               <div style={{ float: 'right' }}>
-                {!checkCompleted() ? (
+                {!showBtnGoToTask ? (
                   <>
                     <Button color="primary" onClick={() => reset()}>
                       <FontAwesomeIcon icon="redo" />
@@ -141,31 +187,10 @@ const T32 = (props: any) => {
                   </>
                 ) : (
                   <>
-                    <Button color="primary" onClick={retryToolRun}>
-                      <FontAwesomeIcon icon="redo" />
-                      {' Retry'}
+                    <Button tag={Link} to={'/task'} color="success">
+                      <FontAwesomeIcon icon="poll" />
+                      {' Go to Tasks '}
                     </Button>{' '}
-                    {checkCompletedWithError() ? (
-                      <Button disabled className="rounded-circle" color="danger" type="button">
-                        <FontAwesomeIcon icon="exclamation" />
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          tag={Link}
-                          to={{ pathname: '/tools/t32/results', state: { response, fromConfigPage: true } }}
-                          color="success"
-                          type="button"
-                        >
-                          <FontAwesomeIcon icon="poll" />
-                          {' Show Results'}
-                        </Button>{' '}
-                        <Button color="success" type="button" onClick={download}>
-                          <FontAwesomeIcon icon="file-download" />
-                          {' Download Results'}
-                        </Button>
-                      </>
-                    )}
                   </>
                 )}
               </div>
@@ -181,19 +206,13 @@ const T32 = (props: any) => {
         </Button>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form, files: form.files.map((file: File) => file.name) }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

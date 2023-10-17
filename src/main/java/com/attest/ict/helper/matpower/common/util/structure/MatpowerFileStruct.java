@@ -35,6 +35,7 @@ public class MatpowerFileStruct {
 
     @Override
     public String toString() {
-        return "function = " + functionName + "\n\n" + getMpcElementsFormatted();
+        //2023/03 fix add mpc (was missing...)
+        return "function mpc =" + functionName + "\n\n" + getMpcElementsFormatted();
     }
 }

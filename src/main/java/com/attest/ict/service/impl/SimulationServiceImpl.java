@@ -8,6 +8,7 @@ import com.attest.ict.service.mapper.SimulationMapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
@@ -94,5 +95,13 @@ public class SimulationServiceImpl implements SimulationService {
     public void delete(Long id) {
         log.debug("Request to delete Simulation : {}", id);
         simulationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SimulationDTO> findByUuid(String uuidString) {
+        log.debug("Request to get simulations by uuid");
+        UUID uuid = UUID.fromString(uuidString);
+        return simulationRepository.findByUuid(uuid).map(simulationMapper::toDto);
     }
 }

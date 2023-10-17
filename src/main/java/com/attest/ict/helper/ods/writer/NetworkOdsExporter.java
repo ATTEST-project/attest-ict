@@ -34,13 +34,14 @@ public class NetworkOdsExporter {
         // -- add spreadsheet: Lines (Branch)
         writeSheet(branches, T41FileInputFormat.networkSheetHeaders.get(1));
 
-        // -- add spreadsheet: Loads
-        writeSheet(loads, T41FileInputFormat.networkSheetHeaders.get(2));
+        // -- add spreadsheet: BaseMVA
+        writeSheet(baseMVA, T41FileInputFormat.networkSheetHeaders.get(4));
 
         // -- add spreadsheet: Generators
         writeSheet(generators, T41FileInputFormat.networkSheetHeaders.get(3));
 
-        writeSheet(baseMVA, T41FileInputFormat.networkSheetHeaders.get(4));
+        // -- add spreadsheet: Loads
+        writeSheet(loads, T41FileInputFormat.networkSheetHeaders.get(2));
 
         spreadSheet.save(out);
         return out;
@@ -69,37 +70,6 @@ public class NetworkOdsExporter {
     }
 
     public static void main(String args[]) {
-        //        SpreadSheet spreadSheet = new SpreadSheet();
-        //        Object[][] header = new Object[1][3];
-        //        header[0] = new Object[] { "x1", "x2", "x3" };
-        //        int numRows = 1;
-        //        int numCols = header[0].length;
-        //        Sheet sheet = new Sheet("wind", numRows, numCols);
-        //        Range range = sheet.getDataRange();
-        //        range.setValues(header);
-        //        spreadSheet.appendSheet(sheet);
-        //
-        //        Object[][] wind = new Object[3][3];
-        //        wind[0] = new Object[] { "a1", "a2", "a3" };
-        //        wind[1] = new Object[] { "b1", "b2", "b3" };
-        //        wind[2] = new Object[] { "c1", "c2", "c3" };
-        //
-        //        // sheet = spreadSheet.getSheet("wind");
-        //        sheet.appendRows(3);
-        //
-        //        System.out.println(sheet.getLastColumn());
-        //        System.out.println(sheet.getLastRow());
-        //
-        //        range = sheet.getRange(0,0, 3);
-        //
-        //        range.setValues(wind);
-        //        spreadSheet.appendSheet(sheet);
-        //        try {
-        //            spreadSheet.save(new File("fileToGenerate.ods"));
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        }
-
         try {
             int rows = 3;
             int columns = 3;

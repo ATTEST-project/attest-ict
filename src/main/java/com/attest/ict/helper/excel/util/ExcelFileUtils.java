@@ -1,12 +1,13 @@
 package com.attest.ict.helper.excel.util;
 
 import com.attest.ict.custom.utils.FileUtils;
+import com.attest.ict.custom.utils.MimeUtils;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public class ExcelFileUtils {
         try {
             mimeType = FileUtils.probeContentType(filePath);
             // mimeType = Files.probeContentType(filePath);
-            isExcelFormat = ExcelFileFormat.CONTENT_TYPE.equals(mimeType);
+            isExcelFormat = FileUtils.CONTENT_TYPE.get("xlsx").equals(mimeType);
         } catch (IOException e) {
             String errMsg = "Error parsing Excel: " + filePath + " " + e.getMessage();
             log.error(errMsg);
@@ -31,57 +32,35 @@ public class ExcelFileUtils {
         return isExcelFormat;
     }
 
-    public static boolean hasExcelFormat(MultipartFile file) {
-        return ExcelFileFormat.CONTENT_TYPE.equals(file.getContentType());
+    public static boolean hasExcelFormat(MultipartFile mpFile) {
+        String contentType = MimeUtils.detect(mpFile);
+        //return ExcelFileFormat.CONTENT_TYPE.equals(file.getContentType());
+        return FileUtils.CONTENT_TYPE.get("xlsx").equals(contentType);
     }
 
     public static boolean isHeaderToSkip(int rowNum) {
         boolean skip = false;
         if (rowNum == 0) {
-            log.debug("Skip header");
+            // log.debug("Skip header");
             skip = true;
         }
         return skip;
     }
 
-    //    public static File transferMultiPartFileToFile(MultipartFile multipartFile) throws IOException {
-    //        // save tempFile
-    //        File convFile = File.createTempFile(multipartFile.getOriginalFilename(), ExcelFileFormat.FILE_EXTENSION);
-    //        multipartFile.transferTo(convFile);
-    //        log.debug(
-    //                "Save temp File: {},  Path: {}, contentType: {} ",
-    //                convFile.getName(),
-    //                convFile.getPath(),
-    //                Files.probeContentType(convFile.toPath()));
-    //        return convFile;
-    //    }
-
-    // Some test cases for instance 'PT_Dx_05_2020\\Flexibility\\Network5_Su_Bd -
-    // Flex.xlsx contain' many empty rows
-    // TODO rivedere
+    /**
+     * @param row excelFile's row
+     * @return true if row doesn't contain any values
+     */
     public static boolean isEmptyRow(Row row) {
-        int minColIx = row.getFirstCellNum();
-        if (minColIx < 0) return true;
-        int maxColIx = row.getLastCellNum();
-        int numEmptyCell = 0;
-
-        for (int colIx = minColIx; colIx <= maxColIx; colIx++) {
-            Cell cell = row.getCell(colIx);
-            if (cell == null || cell.getCellType() == CellType.BLANK) {
-                numEmptyCell++;
+        boolean isEmptyRow = true;
+        for (Cell cell : row) {
+            // log.debug("isEmptyRow cellType: "+ cell.getCellType());
+            if (cell.getCellType() != CellType.BLANK) {
+                isEmptyRow = false;
+                break;
             }
         }
-        return (numEmptyCell > 0 && numEmptyCell == maxColIx - 1);
-    }
-
-    public static Object getObjectCellValue(Cell cell) {
-        if (cell.getCellType().equals(CellType.STRING)) return cell.getStringCellValue();
-
-        if (cell.getCellType().equals(CellType.BOOLEAN)) return cell.getBooleanCellValue();
-
-        if (cell.getCellType().equals(CellType.NUMERIC)) return cell.getNumericCellValue();
-
-        return "";
+        return isEmptyRow;
     }
 
     public static String getStringCellValue(Cell cell) {
@@ -113,29 +92,55 @@ public class ExcelFileUtils {
     }
 
     public static Double getDoubleCellValue(Cell cell) {
+        // log.debug("--- Cell Type: {} ", cell.getCellType());
         Double val = null;
-
-        switch (cell.getCellType()) {
-            case NUMERIC:
-                val = Double.valueOf(cell.getNumericCellValue());
-                break;
-            case STRING:
-                val = Double.valueOf(cell.getStringCellValue());
-                break;
-            case BLANK:
-                break;
-            case BOOLEAN:
-                break;
-            case ERROR:
-                break;
-            case FORMULA:
-                break;
-            case _NONE:
-                break;
-            default:
-                break;
+        try {
+            switch (cell.getCellType()) {
+                case NUMERIC:
+                    val = Double.valueOf(cell.getNumericCellValue());
+                    break;
+                case STRING:
+                    val = Double.valueOf(cell.getStringCellValue());
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            log.error("Error converting cell: {} into Double format. Return null value. Error: {}", cell, e.getMessage());
         }
-
         return val;
+    }
+
+    public static String getCellData(Cell cell) {
+        try {
+            String cellValue = null;
+            switch (cell.getCellType()) {
+                case STRING:
+                    cellValue = cell.getRichStringCellValue().getString();
+                    break;
+                case NUMERIC:
+                    if (cell.getCellStyle().getDataFormatString().contains("%")) {
+                        // Detect Percent Values
+                        cellValue = String.valueOf(cell.getNumericCellValue() * 100) + "%";
+                        //log.debug("Percent value found = " + cellValue.toString() +"%");
+                    } else if (DateUtil.isCellDateFormatted(cell)) {
+                        cellValue = cell.getDateCellValue() + "";
+                    } else {
+                        cellValue = String.valueOf(cell.getNumericCellValue());
+                    }
+                    break;
+                case BOOLEAN:
+                    cellValue = cell.getBooleanCellValue() + "";
+                    break;
+                default:
+                    cellValue = "";
+                    break;
+            }
+            // log.debug(" Cell Type: {} , value: {}", cell.getCellType(), cellValue);
+            return cellValue;
+        } catch (Exception e) {
+            log.error("Error return  cell: {} value, from excel file. Error: {}", cell, e.getMessage());
+            return "";
+        }
     }
 }

@@ -65,7 +65,7 @@
 	<!-- 20221025 add new entities: Simulation and ToolParameter  -->
     <include file="config/liquibase/changelog/20221025153844_added_entity_Simulation.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20221025153845_added_entity_ToolParameter.xml" relativeToChangelogFile="false"/>
-	
+
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20211222095018_added_entity_constraints_BaseMVA.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20211222095019_added_entity_constraints_Bus.xml" relativeToChangelogFile="false"/>
@@ -104,7 +104,7 @@
     <include file="config/liquibase/changelog/20211222095052_added_entity_constraints_Topology.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220117180813_added_entity_constraints_InputFile.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220118135914_added_entity_constraints_DsoTsoConnection.xml" relativeToChangelogFile="false"/>
-	<!-- 2022/07/18 add new tables BranchElVal, Brancn Profile --> 
+	<!-- 2022/07/18 add new tables BranchElVal, Brancn Profile -->
 	<include file="config/liquibase/changelog/20220718093729_added_entity_constraints_BranchElVal.xml" relativeToChangelogFile="false"/>
 	<include file="config/liquibase/changelog/20220718093730_added_entity_constraints_BranchProfile.xml" relativeToChangelogFile="false"/>
 	<!-- 2022/10/26 add constraint for new tables: Simulation and Tool Parameter -->
@@ -112,33 +112,47 @@
 	<include file="config/liquibase/changelog/20221025153845_added_entity_constraints_ToolParameter.xml" relativeToChangelogFile="false"/>
 	<!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
-	
+
 	<!-- drop columns:x0, ro from table: Branch -->
 	<include file="config/liquibase/changelog/20220221095841_drop_column_Branch.xml" relativeToChangelogFile="false"/>
 	<!-- add unique constraint to Nework.name -->
 	<include file="config/liquibase/changelog/202206091758_added_constr_network.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- ADD onoToOne relationship  BETWEEN LoadProfile, TransfProfile, GenProfile, FlexProfile and InputFile -->
 	<include file="config/liquibase/changelog/20220701092202_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 20220705 ADD oneToMany relationship  BETWEEN Generator and GenElVal, drop column busNum in genElVal,  change Network country length -->
 	<include file="config/liquibase/changelog/20220705144201_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 20220705 ADD not null constraint for country field of network table -->
 	<include file="config/liquibase/changelog/20220706095515_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 2022/07/18 add mrid on busExtension. branchExtension, add relationship between branch and transf_el_val, branch and branch_el_val, load_el_val e bus  -->
 	<include file="config/liquibase/changelog/20220718124522_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 2022/10/26 ADD new fields: Description and isDeleted on Network entity, ADD new fk between task-simulation, tool-tool_parameter, output_file-simulation -->
 	<include file="config/liquibase/changelog/20221026100358_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 2022/11/03 ADD new fk  from simulation and network_id, add unique constraint on simulation UUID attribute -->
 	<include file="config/liquibase/changelog/20221103163947_changelog.xml" relativeToChangelogFile="false"/>
-	
+
 	<!-- 2022/11/29 Drop Duplicate Constraint fk_tool_parameter__tool_id -->
 	<include file="config/liquibase/changelog/202211291849_drop_constraints_ToolParameter.xml" relativeToChangelogFile="false"/>
-	
+
+	<!-- 2023/05/04 Update path in tool's table  -->
+	<include file="config/liquibase/changelog/202305041605_update_tools_path.xml" relativeToChangelogFile="false"/>
+	<!-- 2023/05/29 Update name for T45 in tool's table  -->
+	<include file="config/liquibase/changelog/202305291727_update_tool_t45Name.xml" relativeToChangelogFile="false"/>
+
+    <!-- 2023/08/07 Replace '/' with '\' in Tool.Path attribute -->
+    <include file="config/liquibase/changelog/202308071435_update_tools_path.xml" relativeToChangelogFile="false"/>
+
+	<!-- 2023/08/23 Replace Tool.Path compliant with tools released -->
+    <include file="config/liquibase/changelog/202308231540_update_tools_path.xml" relativeToChangelogFile="false"/>
+
+    <!-- 2023/09/06 Replace Tool45 'Path' compliant with tool last released -->
+    <include file="config/liquibase/changelog/202309061449_update_tool_t45Path.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
 
 

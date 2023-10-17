@@ -93,7 +93,7 @@ const NetworkSearchResults = props => {
           suppressRowClickSelection={true}
           onSelectionChanged={getSelectedRowData}
           pagination={true}
-          paginationPageSize={10}
+          paginationPageSize={15}
           onGridReady={event => event.api.sizeColumnsToFit()}
           onGridSizeChanged={event => event.api.sizeColumnsToFit()}
           context={{ setNetworkCallback }}

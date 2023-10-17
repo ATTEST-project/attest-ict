@@ -18,7 +18,6 @@ const initialState: EntityState<ITool> = {
 const apiUrl = 'api/tools';
 
 // Actions
-
 export const getEntities = createAsyncThunk('tool/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
   const requestUrl = `${apiUrl}${sort ? `?page=${page}&size=${size}&sort=${sort}&` : '?'}cacheBuster=${new Date().getTime()}`;
   return axios.get<ITool[]>(requestUrl);

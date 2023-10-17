@@ -1,0 +1,30 @@
+{
+  "title": "Convergence bla bla bla",
+  "rowData": [
+    {
+      "Iteration": 0,
+      "Lower Bound": -1000.0,
+      "Upper Bound": 1000.0
+    },
+    {
+      "Iteration": 1,
+      "Lower Bound": -1000.0,
+      "Upper Bound": -4.3225144485322065e-7
+    }
+  ],
+  "columnDefs": [
+    {
+      "field": "Iteration",
+      "filter": true
+    },
+    {
+      "headerName": "Lower Bound [NPV Mm.u]",
+      "field": "Lower Bound",
+      "filter": true
+    },
+    {
+      "field": "Upper Bound",
+      "filter": true
+    }
+  ]
+}

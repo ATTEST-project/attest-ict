@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
+import { Switch, Redirect } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
 import LoginRedirect from 'app/modules/login/login-redirect';
@@ -25,14 +25,21 @@ const Routes = () => {
     <div className="view-routes">
       <Switch>
         <ErrorBoundaryRoute path="/logout" component={Logout} />
+
         <PrivateRoute path="/admin" component={Admin} hasAnyAuthorities={[AUTHORITIES.ADMIN]} />
+
         <ErrorBoundaryRoute path="/" exact component={Home} />
-        <PrivateRoute path="/tools" component={Tools} hasAnyAuthorities={[AUTHORITIES.USER]} />
+
+        <PrivateRoute path="/tools" component={Tools} hasAnyAuthorities={[AUTHORITIES.DSO, AUTHORITIES.TSO, AUTHORITIES.ADMIN]} />
+
         <ErrorBoundaryRoute exact path="/userinfo" component={UserInfo} />
-        <PrivateRoute path="/tasks" component={Task} hasAnyAuthorities={[AUTHORITIES.USER]} />
+
         <ErrorBoundaryRoute path="/wip" exact component={WorkInProgress} />
+
         <ErrorBoundaryRoute path="/oauth2/authorization/oidc" component={LoginRedirect} />
-        <PrivateRoute path="/" component={Entities} hasAnyAuthorities={[AUTHORITIES.USER]} />
+
+        <PrivateRoute path="/" component={Entities} hasAnyAuthorities={[AUTHORITIES.DSO, AUTHORITIES.TSO, AUTHORITIES.ADMIN]} />
+
         <ErrorBoundaryRoute component={PageNotFound} />
       </Switch>
     </div>

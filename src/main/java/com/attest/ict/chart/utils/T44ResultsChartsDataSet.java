@@ -14,17 +14,22 @@ import com.attest.ict.service.dto.custom.YAxisDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class T44ResultsChartsDataSet {
+
+    public final Logger LOGGER = LoggerFactory.getLogger(T44ResultsChartsDataSet.class);
 
     public ChartDataAggregators resultsActivePower(Map<String, List<FlexibleOptionWithContin>> mapSheetExcel) {
         String section = "ARP";
         String group = "Active and Reactive Power";
         String title = "Active Power";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(0); // active_power
+        LOGGER.debug(" --- Prepare Active Power data set from sheet {}", sheetName);
 
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "Gen_";
 
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
@@ -39,8 +44,10 @@ public class T44ResultsChartsDataSet {
         String group = "Active And Reactive Power";
         String title = "Reactive Power";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(1); // reactive_power
-        String yTitle = sheetName;
+        String yTitle = "Reactive Power,[MVar]";
         String legendPrefix = "Gen_";
+
+        LOGGER.debug(" --- Prepare Reactive Power data set from sheet {}", sheetName);
 
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
@@ -56,8 +63,10 @@ public class T44ResultsChartsDataSet {
         String group = "Flexible Loads (FLs)";
         String title = "Flexible Loads Inc";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(2); // Fl inc
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "Flex_";
+
+        LOGGER.debug(" --- Prepare Flexible Loads Inc data set from sheet {}", sheetName);
 
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
@@ -72,8 +81,9 @@ public class T44ResultsChartsDataSet {
         String group = "Flexible Loads (FLs)";
         String title = "Flexible Loads Dec";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(3); // FL dec
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "Flex_";
+        LOGGER.debug(" --- Prepare Flexible Loads data set from sheet {}", sheetName);
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
             return chartResults(flexibleOptions, section, group, title, sheetName, yTitle, legendPrefix);
@@ -88,8 +98,9 @@ public class T44ResultsChartsDataSet {
         String group = "STR";
         String title = "Storage";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(4);
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "STR_";
+        LOGGER.debug(" --- Prepare Storage data set from sheet {}", sheetName);
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
             return chartResults(flexibleOptions, section, group, title, sheetName, yTitle, legendPrefix);
@@ -105,8 +116,9 @@ public class T44ResultsChartsDataSet {
         String title = "Load Curtailment";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(5);
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "Load_";
+        LOGGER.debug(" --- Prepare Load Curtailment data set from sheet {}", sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
             return chartResults(flexibleOptions, section, group, title, sheetName, yTitle, legendPrefix);
         } else {
@@ -120,8 +132,9 @@ public class T44ResultsChartsDataSet {
         String group = "Load and RES";
         String title = "RES Curtailment";
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(6);
-        String yTitle = sheetName;
+        String yTitle = "Active Power,[MW]";
         String legendPrefix = "RES_";
+        LOGGER.debug(" --- Prepare RES Curtailment data set from sheet {}", sheetName);
         List<FlexibleOptionWithContin> flexibleOptions = mapSheetExcel.get(sheetName);
         if (flexibleOptions != null && !flexibleOptions.isEmpty()) {
             return chartResults(flexibleOptions, section, group, title, sheetName, yTitle, legendPrefix);
@@ -132,23 +145,18 @@ public class T44ResultsChartsDataSet {
 
     // -- Cost
     public List<FlexibleCost> resultsCOST(Map<String, List<FlexibleOptionWithContin>> mapSheetExcel) {
-        // Normal or OPF contains COSTS
         String sheetName = T44FileOutputFormat.SHEETS_NAME.get(7);
         List<FlexibleOptionWithContin> flexibleOptions = new ArrayList<FlexibleOptionWithContin>();
         flexibleOptions = mapSheetExcel.get(sheetName);
-
+        LOGGER.debug("--- Prepare COST data set from sheet {}", sheetName);
         if (flexibleOptions == null || flexibleOptions.isEmpty()) {
-            // in case of post contingencies cost info are stored in Sheet1 (file
-            // _cost.xlsx)
-            sheetName = T44FileOutputFormat.SHEETS_NAME_COST.get(0); // Sheet1
+            // in case of post contingencies cost info are stored in Sheet1 (file// _cost.xlsx)
+            sheetName = T44FileOutputFormat.SHEETS_NAME_COST.get(0).toLowerCase(); // Sheet1
             flexibleOptions = mapSheetExcel.get(sheetName);
-        }
-
-        if (!flexibleOptions.isEmpty() && flexibleOptions.size() == 1) {
+        } else if (!flexibleOptions.isEmpty() && flexibleOptions.size() == 1) {
             return flexibleOptions.get(0).getFlexCosts();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public ChartDataAggregators chartResults(
@@ -164,7 +172,7 @@ public class T44ResultsChartsDataSet {
         yAxis.setTitle(yTitle);
 
         XAxisDTO xAxis = new XAxisDTO();
-        xAxis.setTitle(ToolsResultsChartConstants.X_TITLE_TIME);
+        xAxis.setTitle(ToolsResultsChartConstants.X_TITLE_TIME_HH);
 
         xAxis.setLabels(getXAxisLabel(flexibleOptions.get(0)));
 
@@ -182,7 +190,8 @@ public class T44ResultsChartsDataSet {
 
         for (FlexibleOption flexOpt : flexibleOptions) {
             Long busNum = flexOpt.getBusNum();
-            String bus = legendPrefix.concat(String.valueOf(busNum));
+            String busNumStr = (busNum != null) ? String.valueOf(busNum) : "NA";
+            String bus = legendPrefix.concat(busNumStr);
             legend.add(bus);
             // -- prepare time series
             DataDTO data = new DataDTO();
@@ -198,19 +207,32 @@ public class T44ResultsChartsDataSet {
         return results;
     }
 
-    private List<String> getXAxisLabel(FlexibleOption flexOpt) {
+    private List<String> getXAxisLabelHourMin(FlexibleOption flexOpt) {
         List<String> xlabels = new ArrayList<String>();
         List<Double> values = flexOpt.getValues();
-        String label = "";
-        int size = 0;
+        String label;
         if (values != null) {
-            size = values.size();
+            int size = values.size();
             for (int i = 0; i < size; i++) {
                 if (i < 10) {
                     label = "0" + i + ":00";
                 } else {
                     label = i + ":00";
                 }
+                xlabels.add(label);
+            }
+        }
+        return xlabels;
+    }
+
+    private List<String> getXAxisLabel(FlexibleOption flexOpt) {
+        List<String> xlabels = new ArrayList<String>();
+        List<Double> values = flexOpt.getValues();
+        String label;
+        if (values != null) {
+            int size = values.size();
+            for (int i = 0; i < size; i++) {
+                label = "" + i;
                 xlabels.add(label);
             }
         }
@@ -242,7 +264,7 @@ public class T44ResultsChartsDataSet {
         ChartDataAggregators resultsLoadCurt = this.resultsLoadCurt(mapDataForSheet);
         if (resultsLoadCurt != null) resultsCharts.add(resultsLoadCurt);
 
-        ChartDataAggregators resultsRESCurt = this.resultsLoadCurt(mapDataForSheet);
+        ChartDataAggregators resultsRESCurt = this.resultsResCurt(mapDataForSheet);
         if (resultsRESCurt != null) resultsCharts.add(resultsRESCurt);
         results.setCharts(resultsCharts);
 

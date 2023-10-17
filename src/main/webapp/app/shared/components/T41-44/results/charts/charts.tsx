@@ -5,7 +5,7 @@ import { RouteProps } from 'react-router-dom';
 import { useAppSelector } from 'app/config/store';
 
 interface ChartsParams {
-  location: any;
+  location?: any;
   section: string;
   type: string;
   sampleResponse?: any;
@@ -20,8 +20,6 @@ const Charts = (props: ChartsParams) => {
   const { location, section, type, sampleResponse } = props;
 
   const chartsResponse = useAppSelector(state => state.toolsResults.entity);
-
-  // const chartsResponse = location.state?.chartsResponse || response;
 
   const [pageTitle, setPageTitle] = React.useState<string>('');
 
@@ -72,7 +70,7 @@ const Charts = (props: ChartsParams) => {
 
   React.useEffect(() => {
     getChartData();
-  }, [chartsResponse]);
+  }, [chartsResponse, section]);
 
   const config = {
     showLink: false,
@@ -81,19 +79,32 @@ const Charts = (props: ChartsParams) => {
     responsive: true,
   };
 
-  return (
-    <div className="section-with-border">
-      <div>{pageTitle}</div>
-      <Divider />
-      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-        {charts.map((chart, index) => (
-          <div key={index} style={{ width: 700, height: 500 }}>
-            <Plot data={chart.data} layout={chart.layout} config={config} />
+  const renderCharts = charts => {
+    if (charts.length === 0) {
+      return (
+        <div className="section-with-border">
+          <div>{section}</div>
+          <div> No Data To Display</div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="section-with-border">
+          <div>{pageTitle}</div>
+          <Divider />
+          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            {charts.map((chart, index) => (
+              <div key={index} style={{ width: 700, height: 500 }}>
+                <Plot data={chart.data} layout={chart.layout} config={config} />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
+        </div>
+      );
+    }
+  };
+
+  return <>{renderCharts(charts)}</>;
 };
 
 export default Charts;

@@ -2,10 +2,11 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import carouselImage1 from '../../../../../content/images/carousel_img_1.png';
+
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
@@ -14,16 +15,22 @@ import { Link } from 'react-router-dom';
 import Config from 'app/modules/tools/WP2/T26/config/config';
 import { runT26Tool, reset as retry } from 'app/modules/tools/WP2/T26/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP2/T26/reducer/tool-results.reducer';
+import { toast } from 'react-toastify';
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T26 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
 
-  const methods = useForm();
+  const methods = useForm({ reValidateMode: 'onChange' });
+
   const { handleSubmit, reset } = methods;
 
   const dispatch = useAppDispatch();
 
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
+
+  const toolDescription = TOOLS_INFO.T26_MARKET_SIMUL.description;
 
   if (!network) {
     props.history?.goBack();
@@ -35,49 +42,96 @@ const T26 = (props: any) => {
   const completed = useAppSelector(state => state.t26ToolExecution.updateSuccess);
 
   const [openModal, setOpenModal] = React.useState<boolean>(false);
+
   const [form, setForm] = React.useState(null);
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
+
+  const renameFile = (f: any, prefix: string) => {
+    return new File([f], prefix + f.name, { type: f.type });
+  };
 
   const filesToSend = (data: any) => {
-    const networkFiles = Object.entries(data.network).map(([k, v]) => v[0]);
-    const energyFiles = Object.entries(data.energy).map(([k, v]) => v[0]);
-    // const secondaryFiles = Object.entries(data.secondary).map(([k,v]) => (v[0]));
-    // const tertiaryFiles = Object.entries(data.tertiary).map(([k,v]) => (v[0]));
-    return [
-      ...networkFiles,
-      ...energyFiles,
-      // ...(secondaryFiles && [...secondaryFiles]),
-      // ...(tertiaryFiles && [...tertiaryFiles])
-    ];
+    const networkFiles = Object.entries(data.network)
+      .map(([k, v]) => v[0])
+      .map(f => renameFile(f, 'network_'));
+    const energyFiles = Object.entries(data.energy)
+      .filter(a => getLength(a[1]) > 0)
+      .map(([k, v]) => v[0])
+      .map(f => renameFile(f, 'energy_'));
+    const secondaryFiles = Object.entries(data.secondary)
+      .filter(a => getLength(a[1]) > 0)
+      .map(([k, v]) => v[0])
+      .map(f => renameFile(f, 'secondary_'));
+    const tertiaryFiles = Object.entries(data.tertiary)
+      .filter(a => getLength(a[1]) > 0)
+      .map(([k, v]) => v[0])
+      .map(f => renameFile(f, 'tertiary_'));
+    return [...networkFiles, ...energyFiles, ...(secondaryFiles && [...secondaryFiles]), ...(tertiaryFiles && [...tertiaryFiles])];
+  };
+
+  const getLength = (data: any) => {
+    /* eslint-disable-next-line no-console */
+    // console.log(data.length);
+    return data.length;
   };
 
   const configToSend = (data: any) => {
     const { network, energy, secondary, tertiary, ...rest } = data;
     const networkFileNames = Object.entries(network).map(([k, v]) => ({ [k]: v[0].name }));
-    const energyFileNames = Object.entries(energy).map(([k, v]) => ({ [k]: v[0].name }));
-    // const secondaryFileNames = Object.entries(secondary).map(([k,v]) => ({[k]: v[0].name}));
-    // const tertiaryFileNames = Object.entries(tertiary).map(([k,v]) => ({[k]: v[0].name}));
-    return {
+    const energyFileNames = Object.entries(energy)
+      .filter(a => getLength(a[1]) > 0)
+      .map(([k, v]) => ({ [k]: v[0].name }));
+    // debugger; // eslint-disable-line no-debugger
+    const secondaryFileNames = secondary
+      ? Object.entries(secondary)
+          .filter(a => getLength(a[1]) > 0)
+          .map(([k, v]) => ({ [k]: v[0].name }))
+      : [];
+    const tertiaryFileNames = tertiary
+      ? Object.entries(tertiary)
+          .filter(a => getLength(a[1]) > 0)
+          .map(([k, v]) => ({ [k]: v[0].name }))
+      : [];
+
+    const retT26 = {
       ...rest,
       networkFileNames,
       energyFileNames,
-      // ...(secondaryFileNames && [...secondaryFileNames]),
-      // ...(tertiaryFileNames && [...tertiaryFileNames])
+      secondaryFileNames,
+      tertiaryFileNames,
     };
+    return retT26;
+  };
+
+  const [marketNotSelected, setMarketNotSelected] = React.useState<boolean>(false);
+
+  const isMarketSelected = (data: any) => {
+    const { parameters } = data;
+    setMarketNotSelected(!parameters.run_energy && !parameters.run_secondary && !parameters.run_tertiary);
+    // debugger; // eslint-disable-line no-debugger
+    /* eslint-disable-next-line no-console */
+    console.log('T26:  ' + marketNotSelected);
   };
 
   const submitMethod = data => {
-    /* eslint-disable-next-line no-console */
-    console.log('Form data: ', data);
-    const finalForm = {
-      networkId: network.id,
-      toolName: TOOLS_INFO.T26_MARKET_SIMUL.name,
-      files: filesToSend(data),
-      jsonConfig: JSON.stringify({ ...configToSend(data) }),
-    };
-    /* eslint-disable-next-line no-console */
-    console.log('Final Form data: ', finalForm);
-    setForm({ ...finalForm });
-    setOpenModal(true);
+    isMarketSelected(data);
+    const { parameters } = data;
+    if (parameters.run_energy || parameters.run_secondary || parameters.run_tertiary) {
+      // debugger; // eslint-disable-line no-debugger
+      /* eslint-disable-next-line no-console */
+      console.log('submit:  ' + marketNotSelected);
+
+      const finalForm = {
+        networkId: network.id,
+        toolName: TOOLS_INFO.T26_MARKET_SIMUL.name,
+        files: filesToSend(data),
+        jsonConfig: JSON.stringify({ ...configToSend(data) }),
+      };
+      /* eslint-disable-next-line no-console */
+      console.log('Final Form data: ', finalForm);
+      setForm({ ...finalForm });
+      setOpenModal(true);
+    }
   };
 
   const checkAndRun = () => {
@@ -89,7 +143,20 @@ const T26 = (props: any) => {
         runT26Tool({
           ...form,
         })
-      );
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('Tool execution failure, check log file for more details...');
+          } else {
+            toast.success('T26 is running!');
+            setShowBtnGoToTask(true);
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+        });
     }, 500);
   };
 
@@ -118,22 +185,20 @@ const T26 = (props: any) => {
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button color="dark">{<FontAwesomeIcon icon="bars" />}</Button>
-        <img alt="wp2" src={carouselImage1} width={100} height={70} />
-        <h4 style={{ marginLeft: 20 }}>{'T2.5 Real Time Optimisation Tool'}</h4>
-      </div>
+
+      <ToolTitle imageAlt={WP_IMAGE.WP2.alt} title={toolDescription} imageSrc={WP_IMAGE.WP2.src} />
       <Divider />
+
       {network && (
         <>
           <NetworkInfo network={network} />
           <Divider />
           <FormProvider {...methods}>
             <Form onSubmit={handleSubmit(submitMethod)}>
-              <Config />
+              <Config marketNotSelected={marketNotSelected} />
               <Divider />
               <div style={{ float: 'right' }}>
-                {!checkCompleted() ? (
+                {!showBtnGoToTask ? (
                   <>
                     <Button color="primary" onClick={() => reset()}>
                       <FontAwesomeIcon icon="redo" />
@@ -146,31 +211,10 @@ const T26 = (props: any) => {
                   </>
                 ) : (
                   <>
-                    <Button color="primary" onClick={retryToolRun}>
-                      <FontAwesomeIcon icon="redo" />
-                      {' Retry'}
+                    <Button tag={Link} to={'/task'} color="success">
+                      <FontAwesomeIcon icon="poll" />
+                      {' Go to Tasks '}
                     </Button>{' '}
-                    {checkCompletedWithError() ? (
-                      <Button disabled className="rounded-circle" color="danger" type="button">
-                        <FontAwesomeIcon icon="exclamation" />
-                      </Button>
-                    ) : (
-                      <>
-                        {/* <Button
-                          tag={Link}
-                          to={{ pathname: '/tools/t32/results', state: { response, fromConfigPage: true } }}
-                          color="success"
-                          type="button"
-                        >
-                          <FontAwesomeIcon icon="poll" />
-                          {' Show Results'}
-                        </Button> */}{' '}
-                        <Button color="success" type="button" onClick={download}>
-                          <FontAwesomeIcon icon="file-download" />
-                          {' Download Results'}
-                        </Button>
-                      </>
-                    )}
                   </>
                 )}
               </div>
@@ -186,19 +230,13 @@ const T26 = (props: any) => {
         </Button>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form, files: form.files.map((file: File) => file.name) }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

@@ -1,9 +1,11 @@
 package com.attest.ict.repository;
 
+import com.attest.ict.custom.query.ToolResultsCustomQuery;
 import com.attest.ict.domain.OutputFile;
-import com.attest.ict.service.dto.OutputFileDTO;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -45,7 +47,15 @@ public interface OutputFileRepository extends JpaRepository<OutputFile, Long>, J
     )
     OutputFile getVPlotOfNetworkBySc(@Param("networkId") Long networkId, @Param("scenario") String scenario);
 
-    Optional<OutputFile> findTopByNetworkIdAndFileNameAndToolNameOrderByUploadTimeDesc(Long networId, String fileName, String toolName);
+    Optional<OutputFile> findTopByNetworkIdAndFileNameAndToolNameOrderByUploadTimeDesc(Long networkId, String fileName, String toolName);
 
     List<OutputFile> findBySimulationId(Long simulationId);
+
+    @Query(value = ToolResultsCustomQuery.TOOL_RESULTS, nativeQuery = true)
+    List<Tuple> findToolResults(
+        @Param("networkId") Long networkId,
+        @Param("toolId") Long toolId,
+        @Param("fileName") String fileName,
+        @Param("dateTimeEnd") Instant dateTimeEnd
+    );
 }

@@ -7,8 +7,18 @@ import Divider from 'app/shared/components/divider/divider';
 const EnergySection = () => {
   const {
     register,
+    getValues,
     formState: { errors },
   } = useFormContext();
+
+  const run_energy = getValues('parameters.run_energy');
+
+  const isRequired = () => {
+    const required = { required: run_energy };
+    /* eslint-disable-next-line no-console */
+    console.log(' Energy-Section: run_energy:  ' + run_energy + ' Required: ' + JSON.stringify(required));
+    return required;
+  };
 
   return (
     <div className="section-with-border">
@@ -23,7 +33,7 @@ const EnergySection = () => {
             label="Gen Bid Prices File"
             type="file"
             accept=".csv"
-            validate={{ required: true }}
+            validate={isRequired()}
           />
         </Col>
         <Col>
@@ -34,7 +44,7 @@ const EnergySection = () => {
             label="Gen Bid Quantity File"
             type="file"
             accept=".csv"
-            validate={{ required: true }}
+            validate={isRequired()}
           />
         </Col>
         <Col>
@@ -45,7 +55,7 @@ const EnergySection = () => {
             label="Load Bid Prices File"
             type="file"
             accept=".csv"
-            validate={{ required: true }}
+            validate={isRequired()}
           />
         </Col>
         <Col>
@@ -56,7 +66,7 @@ const EnergySection = () => {
             label="Loads Bid Quantity File"
             type="file"
             accept=".csv"
-            validate={{ required: true }}
+            validate={isRequired()}
           />
         </Col>
       </Row>

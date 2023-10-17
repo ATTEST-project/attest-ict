@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -28,15 +27,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
@@ -80,6 +71,18 @@ public class NetworkResource {
         log.debug("REST request to save Network : {}", networkDTO);
         if (networkDTO.getId() != null) {
             throw new BadRequestAlertException("A new network cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+
+        if (networkDTO.getNetworkDate() == null) {
+            networkDTO.setNetworkDate(Instant.now());
+        }
+
+        if (networkDTO.getCreationDateTime() == null) {
+            networkDTO.setCreationDateTime(Instant.now());
+        }
+
+        if (networkDTO.getUpdateDateTime() == null) {
+            networkDTO.setUpdateDateTime(Instant.now());
         }
         NetworkDTO result = networkService.save(networkDTO);
         return ResponseEntity
@@ -167,9 +170,12 @@ public class NetworkResource {
      */
     @GetMapping("/networks")
     public ResponseEntity<List<NetworkDTO>> getAllNetworks(NetworkCriteria criteria, Pageable pageable) {
+        //public ResponseEntity<List<NetworkDTO>> getAllNetworks(NetworkCriteria criteria,@PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC, size =10000) Pageable pageable) {
+
         log.debug("REST request to get Networks by criteria: {}", criteria);
         Page<NetworkDTO> page = networkQueryService.findByCriteria(criteria, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -363,4 +369,30 @@ public class NetworkResource {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Exception handler for handling ConstraintViolationException from Hibernate.
+     * @param e The ConstraintViolationException that was thrown.
+     * @return A ResponseEntity containing an error message and HTTP status code.
+     */
+    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
+    public ResponseEntity<String> handleConstraintViolationException(org.hibernate.exception.ConstraintViolationException e) {
+        String constraintName = e.getConstraintName();
+        String errorMessage = "Constraint '" + constraintName + "' violation: ";
+        if (constraintName.contains("network.UC_NETWORKNAME_COL")) {
+            errorMessage = "A network with the same name already exists!";
+        }
+        log.debug("handleConstraintViolationException() return message: {}", errorMessage);
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    /*
+    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
+    public ResponseEntity<String> duplicateNetworkNameException(
+        HttpServletRequest req,
+        org.hibernate.exception.ConstraintViolationException e
+    ) {
+        return new ResponseEntity<>("A network with the same name already exists! ", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    */
+
 }

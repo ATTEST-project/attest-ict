@@ -1,10 +1,8 @@
 package com.attest.ict.custom.diagrams.converter;
 
 import com.attest.ict.custom.diagrams.util.ContainersMapping;
-import com.attest.ict.domain.Branch;
-import com.attest.ict.domain.Bus;
-import com.attest.ict.domain.Generator;
-import com.attest.ict.domain.Network;
+import com.attest.ict.domain.*;
+import com.attest.ict.repository.BaseMVARepository;
 import com.attest.ict.repository.BranchRepository;
 import com.attest.ict.repository.BusRepository;
 import com.attest.ict.repository.GeneratorRepository;
@@ -63,6 +61,16 @@ public class DataConverter {
     @PostConstruct
     private void initBranchRepository() {
         branchRepository = this.branchRepository1;
+    }
+
+    @Autowired
+    BaseMVARepository baseMVARepository1;
+
+    static BaseMVARepository baseMVARepository;
+
+    @PostConstruct
+    private void initbaseMVARepository() {
+        baseMVARepository = this.baseMVARepository1;
     }
 
     // PowSyBl network
@@ -127,8 +135,7 @@ public class DataConverter {
             // generators
             createGenerators(network, bus, voltageLevel);
         }
-
-        System.out.println(network1);
+        // System.out.println(network1);
     }
 
     // create shunt compensator for buses
@@ -357,10 +364,14 @@ public class DataConverter {
             substationNum -> getId(SUBSTATION_PREFIX, substationNum)
         );
 
-        Double baseMva = (network.getBaseMVA().getBaseMva().doubleValue() > 0.0) ? network.getBaseMVA().getBaseMva() : 1.0;
-        boolean ignoreBaseMva = baseMva.doubleValue() == 1.0;
+        // Double baseMvaValue = (network.getBaseMVA().getBaseMva().doubleValue() > 0.0) ? network.getBaseMVA().getBaseMva() : 1.0;
 
-        PerUnitContext perUnitContext = new PerUnitContext(baseMva, ignoreBaseMva);
+        BaseMVA baseMVA = baseMVARepository.findByNetworkId(network.getId());
+        Double baseMvaValue = (baseMVA.getBaseMva().doubleValue() > 0.0) ? baseMVA.getBaseMva() : 1.0;
+
+        boolean ignoreBaseMva = baseMvaValue.doubleValue() == 1.0;
+
+        PerUnitContext perUnitContext = new PerUnitContext(baseMvaValue, ignoreBaseMva);
 
         createBuses(network, containersMapping, perUnitContext);
 

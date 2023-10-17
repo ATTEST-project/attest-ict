@@ -8,18 +8,30 @@ import Divider from 'app/shared/components/divider/divider';
 const SecondarySection = () => {
   const {
     register,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
-  const [showSecondarySection, setSecondarySection] = React.useState<boolean>(false);
+  const [showSecondarySection, setSecondarySection] = React.useState<boolean>(true);
+
+  const run_energy = getValues('parameters.run_energy');
+  const run_secondary = getValues('parameters.run_secondary');
+  const run_tertiary = getValues('parameters.run_tertiary');
+
+  /* eslint-disable-next-line no-console */
+  console.log(' Secondary-Section: run_energy:  ' + run_energy);
+  /* eslint-disable-next-line no-console */
+  console.log('Secondary-Section: run_secondary:  ' + run_secondary);
+  /* eslint-disable-next-line no-console */
+  console.log('Secondary-Section: run_tertiary:  ' + run_tertiary);
 
   return (
     <div className="section-with-border">
+      <h6>{'Secondary (optional)'}</h6>
       <div
         style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}
         onClick={() => setSecondarySection(!showSecondarySection)}
       >
-        <h6>{'Secondary (optional)'}</h6>
         <div style={{ marginRight: 10 }}>
           <FontAwesomeIcon icon="angle-down" style={showSecondarySection && { transform: 'rotate(180deg)' }} />
         </div>
@@ -34,6 +46,7 @@ const SecondarySection = () => {
               label="Gen Bid Prices File"
               type="file"
               accept=".csv"
+              validate={{ required: !run_energy && run_secondary }}
             />
           </Col>
           <Col>
@@ -44,6 +57,7 @@ const SecondarySection = () => {
               label="Gen Bid Quantity File"
               type="file"
               accept=".csv"
+              validate={{ required: !run_energy && run_secondary }}
             />
           </Col>
           <Col>
@@ -54,6 +68,7 @@ const SecondarySection = () => {
               label="Secondary Req File"
               type="file"
               accept=".csv"
+              validate={{ required: run_secondary }}
             />
           </Col>
         </Row>

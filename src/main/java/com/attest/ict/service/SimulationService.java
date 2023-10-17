@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Interface for managing {@link com.attest.ict.domain.Simulation}.
@@ -62,4 +63,8 @@ public interface SimulationService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    //Custom Implementation
+    @Transactional(readOnly = true)
+    Optional<SimulationDTO> findByUuid(String uuidString);
 }

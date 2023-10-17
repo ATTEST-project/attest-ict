@@ -25,7 +25,7 @@ public class MatpowerModel {
     @JsonProperty("caseName")
     private String caseName;
 
-    private double baseMva;
+    private Double baseMva;
     private String version;
 
     private final List<Bus> buses = new ArrayList<>();
@@ -75,11 +75,11 @@ public class MatpowerModel {
         return caseName;
     }
 
-    public double getBaseMva() {
+    public Double getBaseMva() {
         return baseMva;
     }
 
-    public void setBaseMva(double baseMva) {
+    public void setBaseMva(Double baseMva) {
         this.baseMva = baseMva;
     }
 

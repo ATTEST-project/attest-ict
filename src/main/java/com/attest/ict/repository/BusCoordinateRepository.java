@@ -12,6 +12,12 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface BusCoordinateRepository extends JpaRepository<BusCoordinate, Long>, JpaSpecificationExecutor<BusCoordinate> {
-    @Query(value = "select bc.* from bus_coordinate bc join bus b on b.id = bc.bus_id where b.network_id=:networkId", nativeQuery = true)
+    @Query(
+        value = " SELECT bc.* FROM bus_coordinate bc " +
+        " JOIN bus b ON b.id = bc.bus_id  " +
+        " JOIN network net ON net.id = b.network_id " +
+        " WHERE b.network_id = :networkId",
+        nativeQuery = true
+    )
     List<BusCoordinate> findByNetworkId(@Param("networkId") Long networkId);
 }

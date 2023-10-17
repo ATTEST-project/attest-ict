@@ -158,11 +158,4 @@ public class BranchAnnotated extends Branch {
     public void setAngmax(Integer angmax) {
         super.setAngmax(angmax);
     }
-    /*public double getLength() {
-        return super.getLength();
-    }
-
-    public void setLength(double length) {
-        super.setLength(length);
-    }*/
 }

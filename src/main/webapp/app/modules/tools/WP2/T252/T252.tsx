@@ -2,10 +2,11 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import carouselImage1 from '../../../../../content/images/carousel_img_1.png';
+
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
@@ -14,9 +15,14 @@ import { Link } from 'react-router-dom';
 import Config from 'app/modules/tools/WP2/T252/config/config';
 import { runT252Tool, reset as retry } from 'app/modules/tools/WP2/T252/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP2/T252/reducer/tool-results.reducer';
+import { toast } from 'react-toastify';
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T252 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
+  const toolDescription = TOOLS_INFO.T25_REAL_TIME_TOOL.description;
+  const toolName = TOOLS_INFO.T25_REAL_TIME_TOOL.name;
 
   const methods = useForm();
   const { handleSubmit, reset } = methods;
@@ -36,6 +42,7 @@ const T252 = (props: any) => {
 
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [form, setForm] = React.useState(null);
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
 
   const parametersToSend = (parameters: any) => {
     const { input_network_path, input_resources_path, input_other_path, input_da_bids, input_agc_signal } = parameters;
@@ -73,7 +80,20 @@ const T252 = (props: any) => {
         runT252Tool({
           ...form,
         })
-      );
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('Tool execution failure, check log file for more details...');
+          } else {
+            toast.success('T252 is running!');
+            setShowBtnGoToTask(true);
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+        });
     }, 500);
   };
 
@@ -102,11 +122,8 @@ const T252 = (props: any) => {
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button color="dark">{<FontAwesomeIcon icon="bars" />}</Button>
-        <img alt="wp2" src={carouselImage1} width={100} height={70} />
-        <h4 style={{ marginLeft: 20 }}>{'T2.5 Real Time Optimisation Tool'}</h4>
-      </div>
+      <ToolTitle imageAlt={WP_IMAGE.WP2.alt} title={toolDescription} imageSrc={WP_IMAGE.WP2.src} />
+
       <Divider />
       {network && (
         <>
@@ -117,7 +134,7 @@ const T252 = (props: any) => {
               <Config />
               <Divider />
               <div style={{ float: 'right' }}>
-                {!checkCompleted() ? (
+                {!showBtnGoToTask ? (
                   <>
                     <Button color="primary" onClick={() => reset()}>
                       <FontAwesomeIcon icon="redo" />
@@ -130,31 +147,10 @@ const T252 = (props: any) => {
                   </>
                 ) : (
                   <>
-                    <Button color="primary" onClick={retryToolRun}>
-                      <FontAwesomeIcon icon="redo" />
-                      {' Retry'}
+                    <Button tag={Link} to={'/task'} color="success">
+                      <FontAwesomeIcon icon="poll" />
+                      {' Go to Tasks '}
                     </Button>{' '}
-                    {checkCompletedWithError() ? (
-                      <Button disabled className="rounded-circle" color="danger" type="button">
-                        <FontAwesomeIcon icon="exclamation" />
-                      </Button>
-                    ) : (
-                      <>
-                        {/* <Button
-                          tag={Link}
-                          to={{ pathname: '/tools/t32/results', state: { response, fromConfigPage: true } }}
-                          color="success"
-                          type="button"
-                        >
-                          <FontAwesomeIcon icon="poll" />
-                          {' Show Results'}
-                        </Button> */}{' '}
-                        <Button color="success" type="button" onClick={download}>
-                          <FontAwesomeIcon icon="file-download" />
-                          {' Download Results'}
-                        </Button>
-                      </>
-                    )}
                   </>
                 )}
               </div>
@@ -170,19 +166,13 @@ const T252 = (props: any) => {
         </Button>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form, files: form.files.map((file: File) => file.name) }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

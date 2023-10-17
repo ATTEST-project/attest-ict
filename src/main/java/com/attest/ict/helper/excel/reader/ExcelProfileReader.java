@@ -155,7 +155,7 @@ public class ExcelProfileReader {
                                 }
                             case 1:
                                 String powerType = currentCell.getStringCellValue().trim();
-                                log.debug(" PowerType:{}*** ", powerType);
+                                log.debug(" PowerType:{} ", powerType);
                                 if (!ExcelProfilesFormat.POWER_TYPE.contains(powerType)) {
                                     throw new ExcelnvalidDataException(
                                         "fail to parse Excel File, check data at at sheetName: " +

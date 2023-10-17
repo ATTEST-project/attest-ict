@@ -85,4 +85,6 @@ public interface GeneratorService {
     List<Generator> findByBusNumAndNetworkId(Long busNum, Long networkId);
 
     Optional<Generator> findByIdAndNetworkId(Long genId, Long networkId);
+
+    List<Generator> findByNetworkIdAndPg(Long networkId, Double pg);
 }

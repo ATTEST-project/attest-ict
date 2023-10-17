@@ -1,23 +1,30 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, Offcanvas, OffcanvasBody, OffcanvasHeader } from 'reactstrap';
-import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
+import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import carouselImage1 from '../../../../../content/images/carousel_img_1.png';
+import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+
+import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
-import { Link } from 'react-router-dom';
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+
 import Config from 'app/modules/tools/WP5/T52/config/config';
 import Coordinates from 'app/modules/tools/WP5/T52/coordinates/coordinates';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+
 import { runT52Tool, reset as retry } from 'app/modules/tools/WP5/T52/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP5/T52/reducer/tool-table.reducer';
 
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
+
 const T52 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
-
   const dispatch = useAppDispatch();
+  const toolDescription = TOOLS_INFO.T52_INDICATOR.description;
 
   const methods = useForm();
   const { handleSubmit, reset } = methods;
@@ -36,6 +43,9 @@ const T52 = (props: any) => {
   const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [form, setForm] = React.useState(null);
+  // 2023 08 25 start
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
+  // 2023 08 25 end
 
   const cleanDataForm = (form: any) => {
     const mainConfig = [...form.mainConfig];
@@ -80,14 +90,27 @@ const T52 = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log('T52 RUN!');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
         runT52Tool({
           ...form,
         })
-      );
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('T52 execution failure, check log file for more details...');
+          } else {
+            toast.success('T52 is running!');
+            setShowBtnGoToTask(true);
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+        });
     }, 500);
   };
 
@@ -116,17 +139,8 @@ const T52 = (props: any) => {
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-      <Offcanvas isOpen={openOffCanvas} toggle={() => setOpenOffCanvas(false)}>
-        <OffcanvasHeader toggle={() => setOpenOffCanvas(false)}>{'WP5 Tools'}</OffcanvasHeader>
-        <OffcanvasBody>{'Tool_x'}</OffcanvasBody>
-      </Offcanvas>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button color="dark" onClick={() => setOpenOffCanvas(true)}>
-          {<FontAwesomeIcon icon="bars" />}
-        </Button>
-        <img alt="wp5" src={carouselImage1} width={100} height={70} />
-        <h4 style={{ marginLeft: 20 }}>{'T5.2 Definition of condition indicators'}</h4>
-      </div>
+
+      <ToolTitle imageAlt={WP_IMAGE.WP5.alt} title={toolDescription} imageSrc={WP_IMAGE.WP5.src} />
       <Divider />
       {network && (
         <>
@@ -139,7 +153,7 @@ const T52 = (props: any) => {
               <Coordinates />
               <Divider />
               <div style={{ float: 'right' }}>
-                {!checkCompleted() ? (
+                {!showBtnGoToTask ? (
                   <>
                     <Button color="primary" onClick={() => reset()}>
                       <FontAwesomeIcon icon="redo" />
@@ -152,31 +166,10 @@ const T52 = (props: any) => {
                   </>
                 ) : (
                   <>
-                    <Button color="primary" onClick={retryToolRun}>
-                      <FontAwesomeIcon icon="redo" />
-                      {' Retry'}
+                    <Button tag={Link} to={'/task'} color="success">
+                      <FontAwesomeIcon icon="poll" />
+                      {' Go to Tasks '}
                     </Button>{' '}
-                    {checkCompletedWithError() ? (
-                      <Button disabled className="rounded-circle" color="danger" type="button">
-                        <FontAwesomeIcon icon="exclamation" />
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          tag={Link}
-                          to={{ pathname: '/tools/t52/results', state: { response, fromConfigPage: true } }}
-                          color="success"
-                          type="button"
-                        >
-                          <FontAwesomeIcon icon="poll" />
-                          {' Show Results'}
-                        </Button>{' '}
-                        <Button color="success" type="button" onClick={download}>
-                          <FontAwesomeIcon icon="file-download" />
-                          {' Download Results'}
-                        </Button>
-                      </>
-                    )}
                   </>
                 )}
               </div>
@@ -192,19 +185,13 @@ const T52 = (props: any) => {
         </Button>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form, files: form.files.map((v: File) => v.name) }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

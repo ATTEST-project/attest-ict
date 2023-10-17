@@ -1,33 +1,38 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Button, Col, Input, Row } from 'reactstrap';
+
 import Divider from 'app/shared/components/divider/divider';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { showTable } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-table.reducer';
-import { showCharts } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-charts.reducer';
+import { showTable, reset as resetTable } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-table.reducer';
+import { showCharts, reset as resetCharts } from 'app/modules/tools/WP5/T51/characterization-tool/reducer/tool-charts.reducer';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T51CharacterizationResults = (props: any) => {
   const dispatch = useAppDispatch();
-
+  const toolDescription = TOOLS_INFO.T51_CHARACTERIZATION.description;
   const divRef = React.useRef<HTMLDivElement>();
   const iframeRef = React.useRef<HTMLIFrameElement>();
-
   const taskEntity = useAppSelector(state => state.task.entity);
+  const tableEntity = useAppSelector(state => state.t511ToolTable.entity);
+  const pageListLoading = useAppSelector(state => state.t511ToolTable.loading);
+  const pageEntity = useAppSelector(state => state.t511ToolCharts.entity);
+  const loadingPage = useAppSelector(state => state.t511ToolCharts.loading);
 
-  const response = useAppSelector(state => state.t511ToolExecution.entity) || {
+  const [pageSelected, setPageSelected] = React.useState<string>(null);
+
+  //  const response = useAppSelector(state => state.t511ToolExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
     },
     simulationId: taskEntity?.simulationUuid,
   };
-  const tableEntity = useAppSelector(state => state.t511ToolTable.entity);
-  const pageEntity = useAppSelector(state => state.t511ToolCharts.entity);
-  const loadingPage = useAppSelector(state => state.t511ToolCharts.loading);
-
-  const [pageSelected, setPageSelected] = React.useState<string>(null);
 
   React.useEffect(() => {
     dispatch(
@@ -37,6 +42,11 @@ const T51CharacterizationResults = (props: any) => {
         simulationId: response.simulationId,
       })
     );
+    return () => {
+      // -- call  reset,  when unmount component (-> page exit)
+      dispatch(resetTable());
+      dispatch(resetCharts());
+    };
   }, []);
 
   const changePageValue = React.useCallback((page: string) => {
@@ -88,6 +98,7 @@ const T51CharacterizationResults = (props: any) => {
     });
 
     const imagesToRemove = ['logo.png', 'logo_white.png', 'return_icon.png'];
+    // const imagesToRemove = ['logo.png', 'logo_white.png'];
     const allImages = iframe.contentWindow.document.querySelectorAll<HTMLImageElement>('img');
     allImages.forEach(img => {
       imagesToRemove.forEach(x => {
@@ -127,27 +138,34 @@ const T51CharacterizationResults = (props: any) => {
         <div>No results to display. First, run the tool!</div>
       ) : (
         <>
-          <div>T5.1 Characterization Tool Results</div>
+          <ToolTitle imageAlt={WP_IMAGE.WP5.alt} title={toolDescription} imageSrc={WP_IMAGE.WP5.src} />
           <Divider />
-          <Row>
-            <Col md="3">
-              <Input id="input-pages" type="select" onChange={event => setPageSelected(event.target.value)}>
-                <option key={0} value="" hidden>
-                  Page...
-                </option>
-                {tableEntity?.map((page, index) => (
-                  <option key={index} value={page}>
-                    {changePageValue(page)}
-                  </option>
-                ))}
-              </Input>
-            </Col>
-            <Col style={{ alignSelf: 'end' }}>
-              <Button color="primary" onClick={onButtonClick}>
-                View
-              </Button>
-            </Col>
-          </Row>
+          <h4>Results: </h4>
+
+          {pageListLoading && <LoadingOverlay ref={divRef} />}
+          {!pageListLoading && (
+            <>
+              <Row>
+                <Col md="3">
+                  <Input id="input-pages" type="select" onChange={event => setPageSelected(event.target.value)}>
+                    <option key={0} value="" hidden>
+                      Page...
+                    </option>
+                    {tableEntity?.map((page, index) => (
+                      <option key={index} value={page}>
+                        {changePageValue(page)}
+                      </option>
+                    ))}
+                  </Input>
+                </Col>
+                <Col style={{ alignSelf: 'end' }}>
+                  <Button color="primary" onClick={onButtonClick}>
+                    View
+                  </Button>
+                </Col>
+              </Row>
+            </>
+          )}
           <Divider />
           <div ref={divRef}>
             {loadingPage && <LoadingOverlay ref={divRef} />}

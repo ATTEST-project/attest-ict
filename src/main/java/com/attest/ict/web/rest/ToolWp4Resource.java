@@ -3,7 +3,8 @@ package com.attest.ict.web.rest;
 import com.attest.ict.custom.message.ResponseMessage;
 import com.attest.ict.custom.tools.utils.ToolVarName;
 import com.attest.ict.custom.utils.FileUtils;
-import com.attest.ict.helper.excel.reader.T44FileOutputFormat;
+import com.attest.ict.helper.excel.reader.T41FileOutputFormat;
+import com.attest.ict.helper.excel.reader.T44V3FileOutputFormat;
 import com.attest.ict.repository.ToolRepository;
 import com.attest.ict.service.InputFileService;
 import com.attest.ict.service.NetworkService;
@@ -14,23 +15,18 @@ import com.attest.ict.service.ToolWp4ShowResultsService;
 import com.attest.ict.service.UserService;
 import com.attest.ict.service.dto.NetworkDTO;
 import com.attest.ict.service.dto.ToolDTO;
-import com.attest.ict.service.dto.custom.T41ResultsDTO;
-import com.attest.ict.service.dto.custom.T44ResultsDTO;
-import com.attest.ict.service.dto.custom.TSGResultsDTO;
-import com.attest.ict.service.dto.custom.ToolExecutionResponseDTO;
+import com.attest.ict.service.dto.custom.*;
 import com.attest.ict.service.impl.ToolWp4ExecutionServiceImpl;
+import com.attest.ict.tools.constants.T45FileFormat;
+import com.attest.ict.tools.constants.TSGFileFormat;
 import com.attest.ict.tools.constants.ToolFileFormat;
 import com.attest.ict.tools.exception.RunningToolException;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +36,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -86,7 +81,6 @@ public class ToolWp4Resource {
     ToolRepository toolRepository;
 
     /**
-     *
      * @param networkId
      * @param toolName
      * @param filesDesc
@@ -94,22 +88,24 @@ public class ToolWp4Resource {
      * @param parameterNames
      * @param parameterValues
      * @param profilesId
+     * @param otherToolOutputFileIds
      * @return
      */
     @PostMapping("/tools/wp4/run")
     public ResponseEntity<?> run(
         @RequestParam("networkId") Long networkId, // test case id selected by the user before running the tool
         @RequestParam("toolName") String toolName,
-        @RequestParam("filesDesc") String[] filesDesc,
-        // @RequestParam("files") MultipartFile[] files, // input files
+        @RequestParam(name = "filesDesc", required = false) String[] filesDesc,
         @RequestParam(name = "files", required = false) MultipartFile[] files,
         @RequestParam(name = "parameterNames", required = false) String[] parameterNames,
         @RequestParam(name = "parameterValues", required = false) String[] parameterValues,
-        @RequestParam(name = "profilesId", required = false) String[] profilesId
+        @RequestParam(name = "profilesId", required = false) String[] profilesId,
+        @RequestParam(name = "otherToolOutputFileIds", required = false) Long[] otherToolOutputFileIds // t44OutputFileIds
     ) {
-        log.debug("REST Request to run tool: {}", toolName);
+        log.info("REST Request to run tool: {}", toolName);
 
         final String SUCCESS = "ok";
+        //final String SUCCESS = "Tool's is running";
         final String FAILURE = "ko";
         String uuid = "";
 
@@ -135,48 +131,116 @@ public class ToolWp4Resource {
             if (
                 !toolName.equals(ToolVarName.T41_WIND_AND_PV) &&
                 !toolName.equals(ToolVarName.T41_TRACTABILITY) &&
-                !toolName.equals(ToolVarName.T44_AS_DAY_HEAD_TX)
+                !toolName.equals(ToolVarName.T44_AS_DAY_HEAD_TX) &&
+                !toolName.equals(ToolVarName.T42_AS_REAL_TIME_DX) &&
+                !toolName.equals(ToolVarName.T45_AS_REAL_TIME_TX)
             ) {
                 return new ResponseEntity<>("Tool: " + toolName + " is not part of WP4!", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             if (toolName.equals(ToolVarName.T41_WIND_AND_PV)) {
-                uuid =
-                    toolWp4ExecutionServiceImpl.windAndPV(
-                        networkDtoOpt.get(),
-                        toolDtoOpt.get(),
-                        filesDesc,
-                        files,
-                        parameterNames,
-                        parameterValues
-                    );
-                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                Map<String, String> configMap = toolWp4ExecutionServiceImpl.prepareTSGWorkingDir(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    filesDesc,
+                    files,
+                    parameterNames,
+                    parameterValues
+                );
+                CompletableFuture tsgRunAsync = toolExecutionServiceImpl.asyncRun(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    configMap,
+                    TSGFileFormat.OUTPUT_SUFFIX
+                );
+                log.info("END T41 WIND PV asyncRun: {}", tsgRunAsync);
+                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                 return new ResponseEntity<>(runResponse, HttpStatus.OK);
             }
 
             if (toolName.equals(ToolVarName.T41_TRACTABILITY)) {
-                uuid =
-                    toolWp4ExecutionServiceImpl.tractability(
-                        networkDtoOpt.get(),
-                        toolDtoOpt.get(),
-                        filesDesc,
-                        files,
-                        parameterNames,
-                        parameterValues
-                    );
-                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                Map<String, String> configMap = toolWp4ExecutionServiceImpl.prepareT41WorkingDir(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    filesDesc,
+                    files,
+                    parameterNames,
+                    parameterValues
+                );
+                CompletableFuture t41RunAsync = toolExecutionServiceImpl.asyncRun(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    configMap,
+                    T41FileOutputFormat.OUTPUT_FILES_EXTENSION_LIST
+                );
+                log.info("END T41 asyncRun(): {}", t41RunAsync);
+                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                 return new ResponseEntity<>(runResponse, HttpStatus.OK);
-            } else {
-                uuid =
-                    toolWp4ExecutionServiceImpl.t44AsDayheadTx(
-                        networkDtoOpt.get(),
-                        toolDtoOpt.get(),
-                        filesDesc,
-                        files,
-                        parameterNames,
-                        parameterValues
-                    );
-                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+            }
+
+            if (toolName.equals(ToolVarName.T44_AS_DAY_HEAD_TX)) {
+                Map<String, String> configMap = toolWp4ExecutionServiceImpl.prepareT44V3WorkingDir(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    filesDesc,
+                    files,
+                    parameterNames,
+                    parameterValues
+                );
+                CompletableFuture t44RunAsync = toolExecutionServiceImpl.asyncRun(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    configMap,
+                    T44V3FileOutputFormat.OUTPUT_FILE_EXTENSION
+                );
+                log.info("END T44 V3 asyncRun: {}", t44RunAsync);
+
+                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
+                return new ResponseEntity<>(runResponse, HttpStatus.OK);
+            }
+            // -- T42
+            if (toolName.equals(ToolVarName.T42_AS_REAL_TIME_DX)) {
+                Map<String, String> configMap = toolWp4ExecutionServiceImpl.prepareT42WorkingDir(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    filesDesc,
+                    files,
+                    parameterNames,
+                    parameterValues,
+                    otherToolOutputFileIds
+                );
+
+                CompletableFuture t45RunAsync = toolExecutionServiceImpl.asyncRun(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    configMap,
+                    T45FileFormat.OUTPUT_SUFFIX
+                );
+                log.info("END T42 asyncRun: {}", t45RunAsync);
+
+                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
+                return new ResponseEntity<>(runResponse, HttpStatus.OK);
+            }
+            // t45
+            else {
+                Map<String, String> configMap = toolWp4ExecutionServiceImpl.prepareT45WorkingDir(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    filesDesc,
+                    files,
+                    parameterNames,
+                    parameterValues,
+                    otherToolOutputFileIds
+                );
+                CompletableFuture t45RunAsync = toolExecutionServiceImpl.asyncRun(
+                    networkDtoOpt.get(),
+                    toolDtoOpt.get(),
+                    configMap,
+                    T45FileFormat.OUTPUT_SUFFIX
+                );
+                log.info("END T45 asyncRun: {}", t45RunAsync);
+
+                ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                 return new ResponseEntity<>(runResponse, HttpStatus.OK);
             }
         } catch (RunningToolException rte) {
@@ -188,7 +252,6 @@ public class ToolWp4Resource {
     }
 
     /**
-     *
      * @param networkId
      * @param toolName
      * @param uuid
@@ -201,7 +264,7 @@ public class ToolWp4Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to show table results for tool: {}", toolName);
+            log.info("Request to show table results for tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -216,15 +279,16 @@ public class ToolWp4Resource {
                 HttpStatus.NOT_FOUND
             );
 
-            Map<String, Integer> countMap = new HashMap<String, Integer>();
-            if (toolName.equals(ToolVarName.T44_AS_DAY_HEAD_TX)) {
-                countMap = toolWp4ShowResultsImpl.t44TableResults(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
+            switch (toolName) {
+                case ToolVarName.T41_TRACTABILITY:
+                    return t41PagesToShow(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
+                case ToolVarName.T44_AS_DAY_HEAD_TX:
+                    return t44PagesToShow(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
+                case ToolVarName.T42_AS_REAL_TIME_DX:
+                case ToolVarName.T45_AS_REAL_TIME_TX:
+                    return t42T45PagesToShow(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
             }
-            if (countMap == null) {
-                return new ResponseEntity<>("Tool ends without generate output file ", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(countMap, HttpStatus.OK);
-            }
+            return new ResponseEntity<>("Tool doesn't allow this action ", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -237,10 +301,19 @@ public class ToolWp4Resource {
         @RequestParam("uuid") String uuid,
         @RequestParam(name = "nConting", required = false) Integer nConting,
         @RequestParam(name = "nSc", required = false) Integer nSc,
-        @RequestParam(name = "type", required = false) String type
+        @RequestParam(name = "type", required = false) String type,
+        @RequestParam(name = "title", required = false) String title, //used by T41 to identify which sheet's name visualize,
+        @RequestParam(name = "timePeriod", required = false) String timePeriod // used by T45 in chart visualization
     ) {
         try {
-            log.debug("Request to show chart results for tool: {}, Contingency: {}, Scenario {}, type: {}", toolName, nConting, nSc, type);
+            log.info(
+                "Request to show chart results for tool: {}, Contingency: {}, Scenario {}, type: {}, timePeriod: {}",
+                toolName,
+                nConting,
+                nSc,
+                type,
+                timePeriod
+            );
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -255,11 +328,11 @@ public class ToolWp4Resource {
                 HttpStatus.NOT_FOUND
             );
 
-            // Normal/OPF are valid
+            // Normal and _postConting is valid
             if (
                 type != null &&
-                !type.equals(T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(1)) &&
-                !type.equals(T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(2))
+                !type.equals(T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(0)) &&
+                !type.equals(T44V3FileOutputFormat.OUTPUT_FILES_SUFFIX.get(1))
             ) {
                 String msgErr = "Type: " + type + " is not valid for tool: " + toolName;
                 log.warn(msgErr);
@@ -289,24 +362,54 @@ public class ToolWp4Resource {
                 T44ResultsDTO chart = null;
                 // Chart request for particular Contingency and Scenario
                 if (nConting != null && nSc != null) {
-                    chart = toolWp4ShowResultsImpl.t44ChartsByNContingAndNsc(networkDtoOpt.get(), toolDtoOpt.get(), uuid, nConting, nSc);
+                    chart = toolWp4ShowResultsImpl.t44V3ChartsByNContingAndNsc(networkDtoOpt.get(), toolDtoOpt.get(), uuid, nConting, nSc);
                 }
-                // Chart request for particular Normal or OPF output results
+                // Chart request for particular Normal or OPF output results. NB: OPF doesn't exist anymore in t44v3
                 if (type != null) {
-                    chart = toolWp4ShowResultsImpl.t44ChartsByType(networkDtoOpt.get(), toolDtoOpt.get(), uuid, type);
+                    chart = toolWp4ShowResultsImpl.t44V3ChartsByType(networkDtoOpt.get(), toolDtoOpt.get(), uuid, type);
                 }
                 return new ResponseEntity<>(chart, HttpStatus.OK);
             }
 
             if (toolName.equals(ToolVarName.T41_TRACTABILITY)) {
-                T41ResultsDTO chart = toolWp4ShowResultsImpl.t41Charts(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
-                return new ResponseEntity<>(chart, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("ToolName is not valid ", HttpStatus.BAD_REQUEST);
+                return this.t41showTableAndCharts(networkDtoOpt.get(), toolDtoOpt.get(), uuid, title, nSc);
             }
+
+            if (toolName.equals(ToolVarName.T42_AS_REAL_TIME_DX) || toolName.equals(ToolVarName.T45_AS_REAL_TIME_TX)) {
+                return this.t42T45showCharts(networkDtoOpt.get(), toolDtoOpt.get(), uuid, timePeriod);
+            }
+
+            return new ResponseEntity<>("ToolName is not valid ", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // 2023/05 new service to show table and charts in T41
+
+    public ResponseEntity<?> t41showTableAndCharts(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String title, Integer nSc)
+        throws Exception {
+        log.info(
+            "Request to show  results for tool: {}, networkId: {},  uuid: {},  title: {}, nSc: {}, isFlexData: {}",
+            toolDto.getName(),
+            networkDto.getId(),
+            uuid,
+            title,
+            nSc,
+            T41FileOutputFormat.FLEX_SHEETS_NAME.contains(title)
+        );
+        if (title != null && T41FileOutputFormat.SHEETS_NAME.contains(title)) {
+            T41TableDataDTO resultsTableAndCharts = toolWp4ShowResultsImpl.t41TablesData(networkDto, toolDto, uuid, title, nSc);
+            return new ResponseEntity<>(resultsTableAndCharts, HttpStatus.OK);
+        } else {
+            T41FlexResultsDTO chart = toolWp4ShowResultsImpl.t41Charts(networkDto, toolDto, uuid);
+            return new ResponseEntity<>(chart, HttpStatus.OK);
+        }
+    }
+
+    public ResponseEntity<?> t42T45showCharts(NetworkDTO networkDto, ToolDTO toolDto, String uuid, String timePeriod) throws Exception {
+        T42T45FlexResultsDTO chart = toolWp4ShowResultsImpl.t42T45Charts(networkDto, toolDto, uuid, timePeriod);
+        return new ResponseEntity<>(chart, HttpStatus.OK);
     }
 
     @GetMapping(value = "/tools/wp4/download")
@@ -316,7 +419,7 @@ public class ToolWp4Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to download output file for tool: {}", toolName);
+            log.debug("Request output results file for tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -324,7 +427,7 @@ public class ToolWp4Resource {
                 return new ResponseEntity<>("Tool: " + toolName + " not found!", HttpStatus.NOT_FOUND);
             }
 
-            // -- check if netwrok exists
+            // -- check if network exists
             Optional<NetworkDTO> networkDtoOpt = networkService.findOne(networkId);
             if (!networkDtoOpt.isPresent()) return new ResponseEntity<>(
                 "Network with id: " + networkId + " not found!",
@@ -333,13 +436,8 @@ public class ToolWp4Resource {
 
             File[] filesOutputResults = toolWp4ShowResultsImpl.getOutputFile(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
 
-            if (filesOutputResults == null) {
-                return new ResponseEntity<>("output results for tool:  " + toolName + " not found!", HttpStatus.NOT_FOUND);
-            }
-
             if (filesOutputResults.length == 1) {
                 Path fileToDownloadPath = filesOutputResults[0].toPath();
-                //String mimeType = Files.probeContentType(fileToDownloadPath);
                 String mimeType = FileUtils.probeContentType(fileToDownloadPath);
                 ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(fileToDownloadPath));
                 return ResponseEntity
@@ -350,26 +448,42 @@ public class ToolWp4Resource {
             } else {
                 // build zip file
                 String archiveFileName = uuid.concat(ToolFileFormat.ZIP_EXTENSION);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ZipOutputStream zipOutputStream = new ZipOutputStream(bos);
-                for (File file : filesOutputResults) {
-                    ZipEntry zipEntry = new ZipEntry(file.getName());
-                    zipEntry.setSize(file.length());
-                    zipOutputStream.putNextEntry(zipEntry);
-                    StreamUtils.copy(new FileInputStream(file), zipOutputStream);
-                    zipOutputStream.closeEntry();
-                }
-                zipOutputStream.finish();
-                zipOutputStream.close();
-
-                ByteArrayResource resource = new ByteArrayResource(bos.toByteArray());
-
+                //ByteArrayOutputStream bos = FileUtils.zipFiles(filesOutputResults);
+                byte[] zipByteArray = toolWp4ShowResultsImpl.zipOutputDir(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
+                ByteArrayResource resource = new ByteArrayResource(zipByteArray);
                 return ResponseEntity
                     .ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + archiveFileName)
-                    .contentType(MediaType.parseMediaType(ToolFileFormat.ZIP_CONTENT_MEDIA_TYPE))
+                    .contentType(MediaType.parseMediaType(FileUtils.CONTENT_TYPE.get("zip")))
                     .body(resource);
             }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ResponseEntity<?> t41PagesToShow(NetworkDTO networkDTO, ToolDTO toolDTO, String uuid) {
+        try {
+            T41ResultsPagesDTO t41PagesToShow = toolWp4ShowResultsImpl.t41PagesToShow(networkDTO, toolDTO, uuid);
+            return new ResponseEntity<>(t41PagesToShow, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ResponseEntity<?> t44PagesToShow(NetworkDTO networkDTO, ToolDTO toolDTO, String uuid) {
+        try {
+            T44ResultsPagesDTO pagesToShow = toolWp4ShowResultsImpl.t44V3PagesToShow(networkDTO, toolDTO, uuid);
+            return new ResponseEntity<>(pagesToShow, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ResponseEntity<?> t42T45PagesToShow(NetworkDTO networkDTO, ToolDTO toolDTO, String uuid) {
+        try {
+            ToolResultsPagesDTO t45PagesToShow = toolWp4ShowResultsImpl.t42T45PagesToShow(networkDTO, toolDTO, uuid);
+            return new ResponseEntity<>(t45PagesToShow, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

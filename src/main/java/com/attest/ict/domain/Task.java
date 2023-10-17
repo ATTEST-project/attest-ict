@@ -6,6 +6,7 @@ import java.time.Instant;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.DynamicUpdate;
 
 /**
  * A Task.
@@ -13,6 +14,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "task")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@DynamicUpdate // add 29/06/2023
 public class Task implements Serializable {
 
     private static final long serialVersionUID = 1L;

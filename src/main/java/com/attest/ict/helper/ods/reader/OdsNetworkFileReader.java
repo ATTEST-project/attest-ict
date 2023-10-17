@@ -5,32 +5,40 @@ import com.attest.ict.domain.Branch;
 import com.attest.ict.domain.Bus;
 import com.attest.ict.domain.Generator;
 import com.attest.ict.domain.Network;
-import com.attest.ict.domain.Transformer;
+import com.attest.ict.helper.ods.exception.OdsReaderFileException;
 import com.attest.ict.helper.ods.reader.model.Load;
 import com.attest.ict.helper.ods.utils.T41FileInputFormat;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 public class OdsNetworkFileReader extends OdsFileReader {
 
     public final Logger log = LoggerFactory.getLogger(OdsNetworkFileReader.class);
 
-    public List<Sheet> parseFile(File odsFile) throws Exception {
+    public OdsNetworkFileReader(MultipartFile file) {
+        super(file);
+    }
+
+    public OdsNetworkFileReader(String strPath) {
+        super(strPath);
+    }
+
+    public OdsNetworkFileReader(File relativePath) {
+        super(relativePath);
+    }
+
+    public List<Sheet> parseOdsNetworkFile() throws Exception {
         List<Sheet> sheetsForTools = new ArrayList<Sheet>();
-        if (!hasOdsFormat(odsFile)) {
-            throw new Exception(" File format invalid ");
-        }
         try {
-            log.debug("Start reading file: {} ", odsFile.getName());
-            SpreadSheet spread = new SpreadSheet(odsFile);
-            List<Sheet> sheets = spread.getSheets();
+            log.debug("Start reading file: {} ", this.odsFileName);
+            List<Sheet> sheets = this.spreadSheet.getSheets();
             for (Sheet sheet : sheets) {
                 String name = sheet.getName();
                 if (T41FileInputFormat.netwrokSheetMap.containsKey(name)) {
@@ -40,8 +48,8 @@ public class OdsNetworkFileReader extends OdsFileReader {
                 }
             }
             return sheetsForTools;
-        } catch (IOException e) {
-            String errMsg = "Error parsing ODS file: " + odsFile.getName() + " " + e.getMessage();
+        } catch (OdsReaderFileException orfe) {
+            String errMsg = "Error parsing ODS file: " + this.odsFileName + " " + orfe.getMessage();
             log.error(errMsg);
             return new ArrayList<Sheet>();
         }
@@ -385,8 +393,9 @@ public class OdsNetworkFileReader extends OdsFileReader {
     }
 
     /**
-     * @param sheet with generator data
-     * @return list of generator object
+     * @param sheet BaseMVA
+     * @param network
+     * @return list of BaseMVA object
      */
     public List<BaseMVA> parseSheetBaseMVA(Sheet sheet, Network network) {
         List<BaseMVA> baseMVAList = new ArrayList<BaseMVA>();
@@ -417,16 +426,17 @@ public class OdsNetworkFileReader extends OdsFileReader {
     }
 
     public static void main(String args[]) {
-        boolean testNetFile = false;
+        boolean testNetFile = true;
         if (testNetFile) {
-            String ukNetFileName =
-                "C:\\SVILUPPO\\ATTEST\\GIT-LAB\\BR_JHI_BACKEND_NEW\\jhipster-attest\\src\\test\\resources\\ods_file\\uk_dx_01_2020.ods";
+            // String netFileName =                "C:\\SVILUPPO\\ATTEST\\GIT-LAB\\BR_JHI_BACKEND_NEW\\jhipster-attest\\src\\test\\resources\\ods_file\\uk_dx_01_2020.ods";
             // String ptNetFileName =
             // "C:\\SVILUPPO\\ATTEST\\GIT-LAB\\BR_JHI_BACKEND\\jhipster-attest\\src\\test\\resources\\ods_file\\pt_dx_01_2020.ods";
-            OdsNetworkFileReader reader = new OdsNetworkFileReader();
+
+            String netFileName = "C:\\temp\\T41V2_Check\\BaseCase.ods";
+            OdsNetworkFileReader reader = new OdsNetworkFileReader(netFileName);
             try {
-                File fileOds = new File(ukNetFileName);
-                List<Sheet> sheets = reader.parseFile(fileOds);
+                File fileOds = new File(netFileName);
+                List<Sheet> sheets = reader.parseOdsNetworkFile();
                 for (Sheet sheet : sheets) {
                     String name = sheet.getName();
                     System.out.println("Reading... sheet: " + name);
@@ -470,10 +480,11 @@ public class OdsNetworkFileReader extends OdsFileReader {
         } else {
             String fileName = "/SVILUPPO/ATTEST/GIT-LAB/BR_JHI_BACKEND-NEW/jhipster-attest/src/test/resources/ods_file/es_dx_01_2020.ods";
 
-            OdsNetworkFileReader reader = new OdsNetworkFileReader();
+            OdsNetworkFileReader reader = new OdsNetworkFileReader(fileName);
             try {
                 File odsFile = new File(fileName);
-                SpreadSheet spread = new SpreadSheet(odsFile);
+                //SpreadSheet spread = new SpreadSheet(odsFile);
+                SpreadSheet spread = reader.spreadSheet;
                 System.out.println("Sheets Number: " + spread.getNumSheets());
                 List<Sheet> sheets = spread.getSheets();
                 for (Sheet sheet : sheets) {

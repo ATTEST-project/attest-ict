@@ -20,6 +20,8 @@ interface WP4ToolResultsParams {
   type?: string;
   nSc?: number;
   nConting?: number;
+  title?: string;
+  timePeriod?: string;
 }
 
 const apiChartsUrl = 'api/tools/wp4/show-charts';
@@ -27,7 +29,7 @@ const apiDownloadChartsUrl = 'api/tools/wp4/download';
 
 export const showCharts = createAsyncThunk(
   'tools/show_charts',
-  async ({ networkId, toolName, simulationId, type, nSc, nConting }: WP4ToolResultsParams) => {
+  async ({ networkId, toolName, simulationId, type, nSc, nConting, title, timePeriod }: WP4ToolResultsParams) => {
     const params = {
       networkId: networkId.toString(),
       toolName,
@@ -35,6 +37,8 @@ export const showCharts = createAsyncThunk(
       ...(type && { type }),
       ...(nSc && { nSc }),
       ...(nConting && { nConting }),
+      ...(title && { title }),
+      ...(timePeriod && { timePeriod }),
     };
     return await axios.get<any>(apiChartsUrl, { params });
   },

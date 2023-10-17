@@ -15,22 +15,14 @@ interface ChartProps {
 const TotalCost = (props: any) => {
   /* eslint-disable-next-line no-console */
   console.log('T31 Total Cost start ');
-
   const jsonResponse = useAppSelector(state => state.t31ToolResults.entity);
-
-  /* eslint-disable-next-line no-console */
-  console.log('T31 jsonResponse ', jsonResponse);
-
   const [showChart, setShowChart] = React.useState<boolean>(false);
-
   const [chart, setChart] = React.useState<ChartProps>(null);
 
   const getTotalCostData = () => {
     const totalCosts = Object.entries(jsonResponse)
       .filter(([k, v]) => k.startsWith('Scenario '))
       .map(([k, v]) => v);
-    /* eslint-disable-next-line no-console */
-    console.log('Total Costs: ', totalCosts);
     const data = [];
     for (let i = 0; i < totalCosts.length; ++i) {
       const trace = {
@@ -48,6 +40,9 @@ const TotalCost = (props: any) => {
     }
 
     const layout = {
+      autosize: false,
+      width: 800,
+      height: 500,
       showlegend: true,
       title: 'Total Cost (EUR-million)',
       legend: {
@@ -55,6 +50,7 @@ const TotalCost = (props: any) => {
         x: 0.35,
       },
       yaxis: {
+        automargin: true,
         tickfont: {
           size: 10,
         },
@@ -67,7 +63,7 @@ const TotalCost = (props: any) => {
 
   React.useEffect(() => {
     getTotalCostData();
-  }, []);
+  }, [jsonResponse]);
 
   const config = {
     showLink: false,
@@ -84,25 +80,25 @@ const TotalCost = (props: any) => {
         <thead>
           <tr>
             <th>Type</th>
-            <th>Scenario 1</th>
-            <th>Scenario 2</th>
+            <th>Scenario 1 (Active economy)</th>
+            <th>Scenario 2 (Slow economy)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Investment</td>
-            <td>{jsonResponse['Scenario 1']['Total investment cost (EUR-million)']}</td>
-            <td>{jsonResponse['Scenario 2']['Total investment cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 1 (Active economy)']['Total investment cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 2 (Slow economy)']['Total investment cost (EUR-million)']}</td>
           </tr>
           <tr>
             <td>Flex</td>
-            <td>{jsonResponse['Scenario 1']['Flexibility investment cost (EUR-million)']}</td>
-            <td>{jsonResponse['Scenario 2']['Flexibility investment cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 1 (Active economy)']['Flexibility investment cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 2 (Slow economy)']['Flexibility investment cost (EUR-million)']}</td>
           </tr>
           <tr>
             <td>Net Present Op</td>
-            <td>{jsonResponse['Scenario 1']['Net Present Operation Cost (EUR-million)']}</td>
-            <td>{jsonResponse['Scenario 2']['Net Present Operation Cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 1 (Active economy)']['Net Present Operation Cost (EUR-million)']}</td>
+            <td>{jsonResponse['Scenario 2 (Slow economy)']['Net Present Operation Cost (EUR-million)']}</td>
           </tr>
         </tbody>
       </Table>
@@ -114,9 +110,7 @@ const TotalCost = (props: any) => {
       </div>
       <Collapse isOpen={showChart}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ width: 700, height: 500 }}>
-            <Plot data={chart?.data} layout={chart?.layout} config={config} />
-          </div>
+          <Plot data={chart?.data} layout={chart?.layout} config={config} />
         </div>
       </Collapse>
     </div>

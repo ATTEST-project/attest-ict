@@ -14,9 +14,11 @@ import CustomTooltip from 'app/shared/components/tooltip/custom-tooltip';
 export const Network = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
 
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search)
-  );
+  const [paginationState, setPaginationState] = useState({
+    ...overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
+    sort: 'id',
+    order: 'desc',
+  });
 
   const networkList = useAppSelector(state => state.network.entities);
   const loading = useAppSelector(state => state.network.loading);
@@ -46,16 +48,21 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
 
   useEffect(() => {
     const params = new URLSearchParams(props.location.search);
+    /* eslint-disable-next-line no-console */
+    console.log('Enter useEffect to set PaginationState from params  ', params);
+
     const page = params.get('page');
     const sort = params.get(SORT);
     if (page && sort) {
       const sortSplit = sort.split(',');
-      setPaginationState({
-        ...paginationState,
-        activePage: +page,
-        sort: sortSplit[0],
-        order: sortSplit[1],
-      });
+      if (sortSplit[0] !== 'id') {
+        setPaginationState({
+          ...paginationState,
+          activePage: +page,
+          sort: sortSplit[0],
+          order: sortSplit[1],
+        });
+      }
     }
   }, [props.location.search]);
 
@@ -87,6 +94,12 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh List
           </Button>
+
+          <Link to={`${match.url}/import-cim`} className="btn btn-primary jh-import-cim" id="jh-import-cim" data-cy="entityImportCimButton">
+            <FontAwesomeIcon icon="plus" />
+            &nbsp; Import from CIM repo
+          </Link>
+
           <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp; Create new Network
@@ -116,9 +129,12 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('description')}>
                   Description <FontAwesomeIcon icon="sort" />
                 </th>
-                <th className="hand" onClick={sort('isDeleted')}>
-                  Is Deleted <FontAwesomeIcon icon="sort" />
-                </th>
+                {/*  Comment 2023/10/12
+                  The functionality for logical deletion of the network has not been implemented yet
+                  <th className="hand" onClick={sort('isDeleted')}>
+                    Is Deleted <FontAwesomeIcon icon="sort" />
+                  </th>
+                */}
                 <th className="hand" onClick={sort('networkDate')}>
                   Network Date <FontAwesomeIcon icon="sort" />
                 </th>
@@ -147,7 +163,10 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                   <td>{network.country}</td>
                   <td>{network.type}</td>
                   <td>{network.description}</td>
-                  <td>{network.isDeleted ? 'true' : 'false'}</td>
+                  {/* Comment 2023/10/12
+                        The functionality for logical deletion of the network has not been implemented yet
+                        <td>{network.isDeleted ? 'true' : 'false'}</td>
+                   */}
                   <td>{network.networkDate ? <TextFormat type="date" value={network.networkDate} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{network.version}</td>
                   <td>
@@ -158,6 +177,7 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                   </td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
+                      {/* Comment on 2023/09/05: similar  to edit
                       <Button
                         id={'view_button_' + i}
                         tag={Link}
@@ -170,6 +190,8 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                         <FontAwesomeIcon icon="eye" />
                         <CustomTooltip target={'view_button_' + i} tooltip={'View'} />
                       </Button>
+                      */}
+
                       <Button id={'upload_button_' + i} tag={Link} to={`${match.url}/${network.id}/upload`} color="primary" size="sm">
                         {' '}
                         <FontAwesomeIcon icon="file-upload" />
@@ -190,11 +212,14 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                         <FontAwesomeIcon icon="project-diagram" />
                         <CustomTooltip target={'sld_button_' + i} tooltip={'SLD'} />
                       </Button>
+                      {/* Comment on 2023/09/05:we are unable to show the network's map, due to the missing data such as coordinates
+                      <Row md="2">
                       <Button id={'map_button_' + i} tag={Link} to={`${match.url}/${network.id}/map`} color="primary" size="sm">
                         {' '}
                         <FontAwesomeIcon icon="map" />
                         <CustomTooltip target={'map_button_' + i} tooltip={'Map'} />
                       </Button>
+                      */}
                       <Button
                         id={'edit_button_' + i}
                         tag={Link}

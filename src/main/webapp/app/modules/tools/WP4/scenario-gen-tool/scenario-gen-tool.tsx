@@ -11,6 +11,8 @@ import { runTool, reset as retry } from 'app/modules/tools/reducer/tools-executi
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { TOOLS_INFO, TOOLS_NAMES } from 'app/modules/tools/info/tools-names';
 import { downloadResults } from 'app/modules/tools/WP4/reducer/tools-results.reducer';
+import { toast } from 'react-toastify';
+
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 
 const ScenarioGenTool = (props: any) => {
@@ -58,16 +60,31 @@ const ScenarioGenTool = (props: any) => {
     /* eslint-disable-next-line no-console */
     console.log('RUN!');
     setOpenModal(false);
-    dispatch(
-      runTool({
-        networkId: form.networkId,
-        toolName: form.toolName,
-        filesDesc: form.filesDesc,
-        files: form.files,
-        parameterNames: form.parameterNames,
-        parameterValues: form.parameterValues,
-      })
-    );
+    setTimeout(() => {
+      dispatch(
+        runTool({
+          networkId: form.networkId,
+          toolName: form.toolName,
+          filesDesc: form.filesDesc,
+          files: form.files,
+          parameterNames: form.parameterNames,
+          parameterValues: form.parameterValues,
+        })
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('Tool execution failure, check log file for more details...');
+          } else {
+            toast.success('Tool is running!');
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+        });
+    }, 500);
+
     /* .unwrap()
       .then(res => {
         setCompleted(true);
@@ -77,7 +94,7 @@ const ScenarioGenTool = (props: any) => {
         /!* eslint-disable-next-line no-console *!/
         console.error(err);
         setCompleted(false);
-      }); */
+    */
   };
 
   const retryToolRun = () => {
@@ -142,18 +159,10 @@ const ScenarioGenTool = (props: any) => {
                 </>
               ) : (
                 <>
-                  <Button color="primary" onClick={retryToolRun}>
-                    <FontAwesomeIcon icon="redo" />
-                    {' Retry'}
-                  </Button>{' '}
-                  <Button tag={Link} to={{ pathname: '/tools/sgt/results', state: { fromConfigPage: true } }} color="success">
+                  <Button tag={Link} to={'/task'} color="success">
                     <FontAwesomeIcon icon="poll" />
-                    {' Show Results'}
+                    {' Go to Tasks '}
                   </Button>{' '}
-                  <Button color="success" type="button" onClick={download}>
-                    <FontAwesomeIcon icon="file-download" />
-                    {' Download Results'}
-                  </Button>
                 </>
               )}
             </div>

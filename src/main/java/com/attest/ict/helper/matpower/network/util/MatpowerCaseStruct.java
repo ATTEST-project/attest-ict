@@ -9,9 +9,13 @@ public class MatpowerCaseStruct {
     private List<String> attributes;
     private List<String> matrix;
 
+    //2023/03 Fix Attribute extension
+    private List<String> origFileAttributes;
+
     public MatpowerCaseStruct() {
         attributes = new ArrayList<>();
         matrix = new ArrayList<>();
+        origFileAttributes = new ArrayList<>();
     }
 
     public MatpowerCaseStruct(MatpowerNetworkSection type) {
@@ -41,5 +45,14 @@ public class MatpowerCaseStruct {
 
     public void setMatrix(List<String> matrix) {
         this.matrix = matrix;
+    }
+
+    //2023/03 fix
+    public List<String> getOrigFileAttributes() {
+        return origFileAttributes;
+    }
+
+    public void setOrigFileAttributes(List<String> origFileAttributes) {
+        this.origFileAttributes = origFileAttributes;
     }
 }

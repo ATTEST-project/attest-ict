@@ -1,8 +1,6 @@
 import { loadingBarReducer as loadingBar } from 'react-redux-loading-bar';
-
 import authentication from './authentication';
 import applicationProfile from './application-profile';
-
 import administration from 'app/modules/administration/administration.reducer';
 import userManagement from './user-management';
 // prettier-ignore
@@ -187,6 +185,36 @@ import t26ToolExecution from 'app/modules/tools/WP2/T26/reducer/tool-execution.r
 // prettier-ignore
 import t26ToolResults from 'app/modules/tools/WP2/T26/reducer/tool-results.reducer';
 
+// prettier-ignore
+import t33ToolExecution from 'app/modules/tools/WP3/T33/reducer/tool-execution.reducer';
+
+// prettier-ignore
+import t33ResultsSelect from 'app/modules/tools/WP3/T33/reducer/tool-results-select.reducer';
+
+// prettier-ignore
+import t33ResultsTableCharts from 'app/modules/tools/WP3/T33/reducer/tool-results-table-charts.reducer';
+
+// prettier-ignore
+import t33ToolResults from 'app/modules/tools/WP3/T33/reducer/tool-results.reducer';
+
+// prettier-ignore
+import t41ResultsSelect from 'app/modules/tools/WP4/T41/tractability-tool/reducer/tool-results-select.reducer';
+
+// prettier-ignore
+import t41ResultsTableCharts from 'app/modules/tools/WP4/T41/tractability-tool/reducer/tool-results-table-charts.reducer';
+
+// prettier-ignore
+import realTimeToolResultsSelect from 'app/modules/tools/WP4/reducer/tool-results-select.reducer';
+
+// prettier-ignore
+import realTimeToolResultsTableCharts from 'app/modules/tools/WP4/reducer/tool-results-table-charts.reducer';
+
+import t44ResultsSelect from 'app/modules/tools/WP4/T44/reducer/tool-results-select.reducer';
+
+import networkImportFromCimRepo from 'app/shared/reducers/network-import-from-cim-repo';
+
+import toolResultsSearch from 'app/shared/reducers/tool-results-search';
+
 const rootReducer = {
   authentication,
   applicationProfile,
@@ -284,6 +312,17 @@ const rootReducer = {
   t252ToolResults,
   t26ToolExecution,
   t26ToolResults,
+  t33ToolExecution,
+  t33ResultsSelect,
+  t33ResultsTableCharts,
+  t33ToolResults,
+  t41ResultsSelect,
+  t41ResultsTableCharts,
+  realTimeToolResultsSelect,
+  realTimeToolResultsTableCharts,
+  t44ResultsSelect,
+  networkImportFromCimRepo,
+  toolResultsSearch,
 };
 
 export default rootReducer;

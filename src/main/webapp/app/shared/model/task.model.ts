@@ -10,8 +10,8 @@ export interface ITask {
   info?: string | null;
   dateTimeStart?: string | null;
   dateTimeEnd?: string | null;
-  // toolLogFile?: IToolLogFile | null;
-  // simulation?: ISimulation | null;
+  toolLogFile?: IToolLogFile | null;
+  simulation?: ISimulation | null;
   toolLogFileId?: number;
   toolLogFileName?: string | null;
   simulationId?: number;
@@ -20,6 +20,16 @@ export interface ITask {
   networkId?: number;
   tool?: ITool | null;
   user?: IUser | null;
+  simulationDescr?: string;
+  networkName?: string;
+  toolNum?: string;
 }
 
 export const defaultValue: Readonly<ITask> = {};
+
+export enum TaskStatus {
+  ONGOING = 'ONGOING',
+  PASSED = 'PASSED',
+  FAILURE = 'FAILURE',
+  KILLED = 'KILLED',
+}

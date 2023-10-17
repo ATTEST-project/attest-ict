@@ -12,61 +12,35 @@ const initialState = {
   updateSuccess: false,
 };
 
-interface ToolRunParams {
+interface T31ToolRunParams {
   networkId: string | number;
   toolName: string;
-  line_capacities: number[];
-  TRS_capacities: number[];
-  line_costs: number[];
-  TRS_costs: number[];
-  cont_list: number[];
-  line_length: number[];
-  growth: any;
-  DSR: any;
-  oversize: number;
-  Max_clusters: number;
-  scenarios: any[];
-  cluster: any;
+  files: File[];
+  filesDesc: string[];
+  jsonConfig: string;
 }
 
 const apiUrl = 'api/tools/wp3/run';
 
 export const runT31Tool = createAsyncThunk(
   't31_tool/run',
-  async ({
-    networkId,
-    toolName,
-    line_capacities,
-    TRS_capacities,
-    line_costs,
-    TRS_costs,
-    cont_list,
-    line_length,
-    growth,
-    DSR,
-    oversize,
-    Max_clusters,
-    scenarios,
-    cluster,
-  }: ToolRunParams) => {
-    const jsonData = {
-      networkId,
-      toolName,
-      line_capacities,
-      TRS_capacities,
-      line_costs,
-      TRS_costs,
-      cont_list,
-      line_length,
-      growth,
-      DSR,
-      oversize,
-      Max_clusters,
-      scenarios,
-      cluster,
-    };
-    return await axios.post<any>(apiUrl, jsonData, {
-      headers: { 'Content-Type': 'application/json' },
+  async ({ networkId, toolName, files, filesDesc, jsonConfig }: T31ToolRunParams) => {
+    const formData = new FormData();
+    formData.append('networkId', networkId.toString());
+    formData.append('toolName', toolName);
+
+    for (let i = 0; i < files?.length; ++i) {
+      formData.append('files', files[i]);
+    }
+
+    for (let i = 0; i < filesDesc?.length; ++i) {
+      formData.append('filesDesc', filesDesc[i]);
+    }
+
+    formData.append('jsonConfig', jsonConfig);
+
+    return await axios.post<any>(apiUrl, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   { serializeError: serializeAxiosError }
@@ -82,10 +56,11 @@ export const T31ToolExecutionSlice = createEntitySlice({
         state.updating = true;
       })
       .addMatcher(isFulfilled(runT31Tool), (state, action) => {
+        const { files, ...rest } = action.meta.arg;
         state.loading = false;
         state.updateSuccess = true;
         state.entity = {
-          args: { ...action.meta.arg },
+          args: { ...rest },
           status: action.payload.data.status,
           simulationId: action.payload.data.uuid,
         };

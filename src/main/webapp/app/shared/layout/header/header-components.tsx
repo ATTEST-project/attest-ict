@@ -6,14 +6,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const BrandIcon = props => (
   <div {...props} className="brand-icon">
-    <img src="content/images/logo-jhipster.png" alt="Logo" />
+    <img src="content/images/ATTEST-Logo-White.png" alt="Logo" />
   </div>
 );
 
 export const Brand = () => (
-  <NavbarBrand tag={Link} to="/" className="brand-logo">
+  <NavbarBrand tag={Link} to={{ pathname: 'https://attest-project.eu//' }} target="_blank" className="brand-logo">
     <BrandIcon />
-    <span className="brand-title">Attest</span>
+    <span className="brand-title"></span>
     <span className="navbar-version">{VERSION}</span>
   </NavbarBrand>
 );

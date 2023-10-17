@@ -1,0 +1,128 @@
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_PATH="C:\ATTEST\Julia-167\bin\julia.exe" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set CONDA_PATH="C:\ProgramData\miniforge3\condabin\conda" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_DEPOT_PATH=C:\ATTEST\tools\juliaenvs\T41V2\.julia 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set TOOL_PATH="C:\ATTEST\tools\WP4\T41V2" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set CONDA_ENV_PATH="C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>set JULIA_PROJECT_PATH="C:\ATTEST\tools\juliaenvs\T41V2\T41V2_JL_ENV" 
+
+C:\SVILUPPO\ATTEST\GIT-LAB\ATTEST-ICT-PLATFORM\jhipster-attest>call cd "C:\ATTEST\tools\WP4\T41V2" 
+
+C:\ATTEST\tools\WP4\T41V2>call "C:\ProgramData\miniforge3\condabin\conda" activate "C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env" 
+
+(C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env) C:\ATTEST\tools\WP4\T41V2>call "C:\ATTEST\Julia-167\bin\julia.exe" --project="C:\ATTEST\tools\juliaenvs\T41V2\T41V2_JL_ENV" launch.jl -j /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\launch.json   || goto :error 
+Parsed args:
+launcher:  json-file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\launch.json
+Parsed parameters:
+launcher:  flex_str  =>  1
+launcher:  oltc_bin  =>  1
+launcher:  auxiliary_file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_flex.ods
+launcher:  fl_bin  =>  1
+launcher:  scenario  =>  1
+launcher:  scenario_file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\scenario_gen.ods
+launcher:  outlog_file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\output_data\OutLog.xlsx
+launcher:  flex_oltc  =>  1
+launcher:  network_file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods
+launcher:  season  =>  Su
+launcher:  output_file  =>  /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\output_data\UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_output.xlsx
+launcher:  year  =>  2030
+launcher:  with_flex  =>  1
+launcher:  flex_apc  =>  1
+launcher:  ntp  =>  24
+launcher:  str_bin  =>  1
+launcher:  flex_fl  =>  1
+launcher:  case_name  =>  UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_
+launcher:  flex_adpf  =>  1
+C:\ATTEST\tools\WP4\T41V2
+C:\ATTEST\tools\WP4\T41V2
+Case: UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_
+Running the case: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods @2023-05-26T22:56:49.537
+Writing to Excel: Append = true;	Iter#0,	Data : false, false, false, false
+"No OLTC transfomer found in the original data T2.3""An OLTC transfomer is added in the network"WP6 dumping parameters values (parameter name/ julia variable name)
+WP6 case_name/TheKey: UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_
+WP6 filename_mat/network_file: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\UK_Dx_01_2050_Distribution_Network_Urban_UK_W_Without_2_7_WithFlex.ods
+WP6 filename_addt/auxiliary_file: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_flex.ods
+WP6 file_op/output_file: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\output_data\UK_Dx_01_2030_Distribution_Network_Urban_UK_S_Without_2_7_WithFlex_output.xlsx
+WP6 filename/scenario_file: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\scenario_gen.ods
+WP6 OutLog/outlog_file: /ATSIM\WP4\T41\428c01d5-2ba4-49ea-8409-0e0890490949\output_data\OutLog.xlsx
+WP6 nTP/ntp: 24
+WP6 scenario/scenario: 1
+WP6 flex_apc: 1
+WP6 flex_oltc: 1
+WP6 oltc_bin: 1
+WP6 flex_adpf: 1
+WP6 flex_fl: 1
+WP6 fl_bin: 1
+WP6 flex_str: 1
+WP6 str_bin: 1
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.4, running with linear solver MUMPS 5.4.1.
+
+Number of nonzeros in equality constraint Jacobian...:    87120
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:   199920
+
+Total number of variables............................:    15120
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:    15120
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  0.0000000e+00 1.06e-02 3.40e+01  -1.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  1.2055824e+02 1.92e-04 3.40e+00  -1.0 5.27e-02    -  1.00e+00 1.00e+00h  1
+   2  1.2267207e+02 1.24e-07 1.75e-01  -1.0 1.02e-03    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 2
+
+                                   (scaled)                 (unscaled)
+Objective...............:   1.2267206646213270e+02    1.2267206646213270e+02
+Dual infeasibility......:   6.3989062937253038e-09    6.3989062937253038e-09
+Constraint violation....:   8.2521587606645963e-08    1.2438045219470562e-07
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   8.2521587606645963e-08    1.2438045219470562e-07
+
+
+Number of objective function evaluations             = 3
+Number of objective gradient evaluations             = 3
+Number of equality constraint evaluations            = 3
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 3
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 2
+Total seconds in IPOPT                               = 6.932
+
+EXIT: Optimal Solution Found.
+Objective value: 122.6720664621327
+Solver Time: 15.591000080108643
+Writing to Excel: Append = false;	Iter#0,	Data : true, 0, false, false
+ERROR: LoadError: LoadError: No violations. This case is a waste of time
+Stacktrace:
+ [1] error(s::String)
+ [2] top-level scope
+ [3] include
+ [4] main()
+ [5] top-level scope
+in expression starting at C:\ATTEST\tools\WP4\T41V2\main_sc_milp_int.jl:787
+in expression starting at C:\ATTEST\tools\WP4\T41V2\launch.jl:34
+
+(C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env) C:\ATTEST\tools\WP4\T41V2>echo Failed with error #1. 
+Failed with error #1.
+
+(C:\ATTEST\tools\pyenvs\T41V2\py38_conda_env) C:\ATTEST\tools\WP4\T41V2>exit /b 1 

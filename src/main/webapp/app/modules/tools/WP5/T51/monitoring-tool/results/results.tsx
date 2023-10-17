@@ -5,27 +5,32 @@ import Divider from 'app/shared/components/divider/divider';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { showTable } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-table.reducer';
-import { showCharts } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-charts.reducer';
+import { showTable, reset as resetTable } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-table.reducer';
+import { showCharts, reset as resetCharts } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-charts.reducer';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T51MonitoringResults = (props: any) => {
   const dispatch = useAppDispatch();
+  const toolDescription = TOOLS_INFO.T51_MONITORING.description;
 
   const divRef = React.useRef<HTMLDivElement>();
   const iframeRef = React.useRef<HTMLIFrameElement>();
 
   const taskEntity = useAppSelector(state => state.task.entity);
+  const tableEntity = useAppSelector(state => state.t512ToolTable.entity);
+  const pageEntity = useAppSelector(state => state.t512ToolCharts.entity);
+  const loadingPage = useAppSelector(state => state.t512ToolCharts.loading);
 
-  const response = useAppSelector(state => state.t512ToolExecution.entity) || {
+  // const response = useAppSelector(state => state.t512ToolExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
     },
     simulationId: taskEntity?.simulationUuid,
   };
-  const tableEntity = useAppSelector(state => state.t512ToolTable.entity);
-  const pageEntity = useAppSelector(state => state.t512ToolCharts.entity);
-  const loadingPage = useAppSelector(state => state.t512ToolCharts.loading);
 
   const [pageSelected, setPageSelected] = React.useState<string>(null);
 
@@ -37,6 +42,11 @@ const T51MonitoringResults = (props: any) => {
         simulationId: response.simulationId,
       })
     );
+    return () => {
+      // -- call  reset,  when unmount component (-> page exit)
+      dispatch(resetTable());
+      dispatch(resetCharts());
+    };
   }, []);
 
   const changePageValue = React.useCallback((page: string) => {
@@ -86,6 +96,9 @@ const T51MonitoringResults = (props: any) => {
         }
       });
     });
+    // iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+    /* eslint-disable-next-line no-console */
+    console.log('iframe: ', iframe);
   }, []);
 
   const backUrl = () => {
@@ -98,8 +111,10 @@ const T51MonitoringResults = (props: any) => {
         <div>No results to display. First, run the tool!</div>
       ) : (
         <>
-          <div>T5.1 Monitoring Tool Results</div>
+          <ToolTitle imageAlt={WP_IMAGE.WP5.alt} title={toolDescription} imageSrc={WP_IMAGE.WP5.src} />
           <Divider />
+
+          <h4>Results: </h4>
           <Row>
             <Col md="3">
               <Input id="input-pages" type="select" onChange={event => setPageSelected(event.target.value)}>

@@ -4,12 +4,8 @@ import { Switch } from 'react-router-dom';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 import Tools from './tools';
-import T41 from 'app/modules/tools/T41/T41';
-import T41Results from 'app/modules/tools/T41/results/T41-results';
-import T25DayAhead from 'app/modules/tools/T25/dayahead/T25-dayahead';
-import T25RealTime from 'app/modules/tools/T25/realtime/T25-realtime';
+
 import T41TractabilityTool from 'app/modules/tools/WP4/T41/tractability-tool/tractability-tool';
-import T41TractabilityResults from 'app/modules/tools/WP4/T41/tractability-tool/results/results';
 import ScenarioGenTool from 'app/modules/tools/WP4/scenario-gen-tool/scenario-gen-tool';
 import ScenarioGenToolOld from 'app/modules/tools/WP4/scenario-gen-tool/old/scenario-gen-tool';
 import ScenarioGenToolResults from 'app/modules/tools/WP4/scenario-gen-tool/results/results';
@@ -32,6 +28,17 @@ import T32Results from 'app/modules/tools/WP3/T32/results/results';
 import T251 from 'app/modules/tools/WP2/T251/T251';
 import T252 from 'app/modules/tools/WP2/T252/T252';
 import T26 from 'app/modules/tools/WP2/T26/T26';
+import T33 from 'app/modules/tools/WP3/T33/T33';
+
+import T33Results from 'app/modules/tools/WP3/T33/results/results';
+
+import T41Results from 'app/modules/tools/WP4/T41/tractability-tool/results/results';
+
+import T45Results from 'app/modules/tools/WP4/T45/results/results';
+import T45 from 'app/modules/tools/WP4/T45/T45';
+
+import T42 from 'app/modules/tools/WP4/T42/T42';
+import T42Results from 'app/modules/tools/WP4/T42/results/results';
 
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
@@ -52,7 +59,6 @@ const Routes = ({ match }) => (
       <ErrorBoundaryRoute path={match.url + '/sgt/results'} component={ScenarioGenToolResults} />
       <ErrorBoundaryRoute exact path={match.url + '/t41'} component={T41TractabilityTool} />
       <ErrorBoundaryRoute exact path={match.url + '/t41/excel'} component={SpreadSheet} />
-      <ErrorBoundaryRoute path={match.url + '/t41/results'} component={T41TractabilityResults} />
       <ErrorBoundaryRoute exact path={match.url + '/t44'} component={T44} />
       <ErrorBoundaryRoute path={match.url + '/t44/results'} component={T44Results} />
       <ErrorBoundaryRoute exact path={match.url + '/t51'} component={T51} />
@@ -65,6 +71,15 @@ const Routes = ({ match }) => (
       <ErrorBoundaryRoute exact path={match.url + '/t53'} component={T53} />
       <ErrorBoundaryRoute exact path={match.url + '/t53/results'} component={T53Results} />
       <ErrorBoundaryRoute exact path={match.url} component={Tools} />
+      <ErrorBoundaryRoute exact path={match.url + '/t33'} component={T33} />
+      <ErrorBoundaryRoute exact path={match.url + '/t33/charts'} component={T33Results} />
+      <ErrorBoundaryRoute path={match.url + '/t41/results'} component={T41Results} />
+
+      <ErrorBoundaryRoute exact path={match.url + '/t45'} component={T45} />
+      <ErrorBoundaryRoute path={match.url + '/t45/results'} component={T45Results} />
+
+      <ErrorBoundaryRoute exact path={match.url + '/t42'} component={T42} />
+      <ErrorBoundaryRoute path={match.url + '/t42/results'} component={T42Results} />
     </Switch>
   </div>
 );

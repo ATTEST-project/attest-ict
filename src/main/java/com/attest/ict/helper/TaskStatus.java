@@ -2,20 +2,13 @@ package com.attest.ict.helper;
 
 public class TaskStatus {
 
-    // public static final String FAILED = "FAILED";
-
-    // public static final String ONGOING = "ONGOING";
-
-    // public static final String PASSED = "PASSED";
-
-    // private TaskStatus() {}
-
     private Status status;
 
     public enum Status {
         FAILED,
         ONGOING,
         PASSED,
+        KILLED,
     }
 
     public boolean isFailed() {
@@ -34,6 +27,13 @@ public class TaskStatus {
 
     public boolean isOngoing() {
         if (getStatus() == Status.ONGOING) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isKilled() {
+        if (getStatus() == Status.KILLED) {
             return true;
         }
         return false;

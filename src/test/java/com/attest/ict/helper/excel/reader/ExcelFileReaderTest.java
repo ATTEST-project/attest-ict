@@ -3,8 +3,8 @@ package com.attest.ict.helper.excel.reader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.attest.ict.custom.utils.FileUtils;
 import com.attest.ict.helper.excel.model.LoadGeneratorPower;
-import com.attest.ict.helper.excel.util.ExcelFileFormat;
 import com.attest.ict.helper.excel.util.ExcelFileUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +33,7 @@ public class ExcelFileReaderTest {
             MultipartFile multipartFile = new MockMultipartFile(
                 "Network1_A_Bd.xlsx",
                 fileToParse.getName(),
-                ExcelFileFormat.CONTENT_TYPE,
+                FileUtils.CONTENT_TYPE.get("xlsx"),
                 IOUtils.toByteArray(input)
             );
             boolean isExcelFormat = ExcelFileUtils.hasExcelFormat(multipartFile);

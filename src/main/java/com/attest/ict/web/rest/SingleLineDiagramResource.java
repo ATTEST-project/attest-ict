@@ -57,6 +57,7 @@ public class SingleLineDiagramResource {
             }
 
             Network network = optNet.get();
+            log.debug("Network: {}", network);
             Boolean existMatPowerFile = inputFileService.isNetworkFileAvailable(network.getId());
             if (!existMatPowerFile) {
                 // 20220824 L.p
@@ -65,6 +66,9 @@ public class SingleLineDiagramResource {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
 
+            log.debug("Network buses Num: {}", network.getBuses().size());
+            log.debug("Network branches NUM: {}", network.getBranches().size());
+            log.debug("Network generators NUM: {}", network.getGenerators().size());
             if (network.getBuses().isEmpty() || network.getBranches().isEmpty() || network.getGenerators().isEmpty()) {
                 String message = msgEmptyAsset;
                 log.warn(message + " for network: " + networkName);
@@ -147,7 +151,7 @@ public class SingleLineDiagramResource {
     @Transactional
     @GetMapping("/v1/sld-network/id/{networkId}")
     public ResponseEntity<?> generateEntireNetworkMetadataById(@PathVariable("networkId") Long networkId) {
-        log.debug("Request to generate SimpleLineDiagram for Entire Network: {}", networkId);
+        log.debug("Request to generate SimpleLineDiagram for Entire NetworkId: {}", networkId);
         Map<String, Object> svgData = new LinkedHashMap<>();
         try {
             Optional<Network> optNet = networkService.findById(networkId);
@@ -156,6 +160,7 @@ public class SingleLineDiagramResource {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
             Network network = optNet.get();
+            log.debug("Network found: {}", network);
 
             Boolean existMatPowerFile = inputFileService.isNetworkFileAvailable(network.getId());
             if (!existMatPowerFile) {
@@ -164,17 +169,26 @@ public class SingleLineDiagramResource {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
 
+            log.debug("Num buses: {}", network.getBuses().size());
+            log.debug("Num branches: {}", network.getBranches().size());
+            log.debug("Num generators: {}", network.getGenerators().size());
+
             if (network.getBuses().isEmpty() || network.getBranches().isEmpty() || network.getGenerators().isEmpty()) {
                 String message = msgEmptyAsset;
                 log.warn(message + " for network: " + networkId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
 
-            svgData = createSvgMetaData(network);
+            try {
+                svgData = createSvgMetaData(network);
+            } catch (Exception e) {
+                log.error("createSvgMetaData raise an Exception: ", e);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
             return new ResponseEntity<>(svgData, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Exception: ", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -199,13 +213,23 @@ public class SingleLineDiagramResource {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
 
+            log.debug("Num buses: {}", network.getBuses().size());
+            log.debug("Num branches: {}", network.getBranches().size());
+            log.debug("Num generators: {}", network.getGenerators().size());
+
             if (network.getBuses().isEmpty() || network.getBranches().isEmpty() || network.getGenerators().isEmpty()) {
                 String message = msgEmptyAsset;
                 log.warn(message + " for network id: " + networkName);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
-            allSvgData = createSubstationsSvgData(network);
-            return new ResponseEntity<>(allSvgData, HttpStatus.OK);
+
+            try {
+                allSvgData = createSubstationsSvgData(network);
+                return new ResponseEntity<>(allSvgData, HttpStatus.OK);
+            } catch (Exception e) {
+                log.error("createSubstationsSvgData raise an Exception: ", e);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             log.error("Exception: ", e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -238,12 +262,16 @@ public class SingleLineDiagramResource {
                 log.warn(message + " for network id: " + networkId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
             }
-
-            allSvgData = createSubstationsSvgData(network);
-            return new ResponseEntity<>(allSvgData, HttpStatus.OK);
+            try {
+                allSvgData = createSubstationsSvgData(network);
+                return new ResponseEntity<>(allSvgData, HttpStatus.OK);
+            } catch (Exception e) {
+                log.error("createSubstationsSvgData raise an Exception: ", e);
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             log.error("Exception: ", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -280,7 +308,7 @@ public class SingleLineDiagramResource {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Exception: ", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -324,170 +352,4 @@ public class SingleLineDiagramResource {
         }
         return allSvgData;
     }
-    /**
-    @GetMapping("/generateSubstations/{networkName}")
-    public ResponseEntity<List<String>> generateSubstations(@PathVariable("networkName") String networkName) {
-        try {
-            List<String> substations = new ArrayList<>();
-
-            Optional<Network> optNet = networkService.findNetworkByName(networkName);
-            Network network = optNet.get();
-
-            com.powsybl.iidm.network.Network network1 = DataConverter.createNetwork(network);
-
-            for (int i = 0; i < network1.getSubstationCount(); ++i) {
-                String subId = "sub_" + (i + 1);
-                GraphBuilder graphBuilder = new NetworkGraphBuilder(network1);
-                String svgSub = SingleLineDiagramTool.createSubstationDiagram(network1, network1.getSubstation(subId), graphBuilder);
-                /*String svgSub = new BufferedReader(
-                        new InputStreamReader(is, StandardCharsets.UTF_8))
-                        .lines()
-                        .collect(Collectors.joining("\n"));*/
-    /*         substations.add(svgSub);
-            }
-            return new ResponseEntity<>(substations, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Exception: ", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/v1/generateSubstations/{networkName}")
-    public ResponseEntity<Map<String, String>> generateSubstationsV1(@PathVariable("networkName") String networkName) {
-        try {
-            Map<String, String> substations = new LinkedHashMap<>();
-            Optional<Network> optNet = networkService.findNetworkByName(networkName);
-            log.info("optNet: " + optNet);
-            Network network = optNet.get();
-
-            log.info("network: " + network.getName());
-
-            com.powsybl.iidm.network.Network network1 = DataConverter.createNetwork(network);
-
-            for (int i = 0; i < network1.getSubstationCount(); ++i) {
-                String subId = "sub_" + (i + 1);
-                GraphBuilder graphBuilder = new NetworkGraphBuilder(network1);
-                String svgSub = SingleLineDiagramTool.createSubstationDiagram(network1, network1.getSubstation(subId), graphBuilder);
-                /*String svgSub = new BufferedReader(
-                        new InputStreamReader(is, StandardCharsets.UTF_8))
-                        .lines()
-                        .collect(Collectors.joining("\n"));*/
-    /*     substations.put(subId, svgSub);
-            }
-            return new ResponseEntity<>(substations, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Exception: ", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-   */
-    /** TODO REMOVE
-    @GetMapping("/convertData/{networkId}")
-    public ResponseEntity<String> convertData(@PathVariable Long networkId) {
-        String message = "";
-        Optional<Network> netOpt = networkService.findById(networkId);
-        if (!netOpt.isPresent()) {
-            message = "Network by id " + networkId + " not found!";
-            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-        }
-        Network network = netOpt.get();
-        try {
-            Path path = Paths.get(CURRENT_DIR + "/svg/");
-            Files.createDirectory(path);
-
-            String folderPath = path.toString();
-
-            com.powsybl.iidm.network.Network network1 = DataConverter.createNetwork(network);
-
-            SingleLineDiagramTool.draw(network1, folderPath, true);
-
-            // upload svg files in db and delete all files from folder
-            Files
-                .walk(Paths.get(folderPath))
-                .filter(Files::isRegularFile)
-                .forEach(f -> dbFileStorageServiceImpl.uploadSVGFileToDB(f, network.getName()));
-
-            Files.delete(path);
-
-            message = "Converted data successfully!";
-            return new ResponseEntity<>(message, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Exception: ", e);
-            message = "Conversion error!";
-            return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    */
-
-    /** TO REMOVE
-    @GetMapping(value = "/getSubstation/{networkName}/{subId}")
-    public ResponseEntity<?> getSubstationSVG(@PathVariable("networkName") String networkName, @PathVariable("subId") String subId) {
-        Long networkId = networkService.getNetworkIdByName(networkName);
-        // List<DbFile> svgFiles = dbFileStorageServiceImpl.getSubstationsFileList(networkId);
-
-        try {
-            NetworkDisplayFile file = dbFileStorageServiceImpl.getSubstationFile(networkId, subId);
-
-            if (file == null) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            /*for (DbFile svgFile : svgFiles) {
-                String fileName = svgFile.getFileName();
-                if (fileName.substring(fileName.lastIndexOf('_')+1, fileName.indexOf('.')).equals(subId)) {
-                    file = svgFile;
-                }
-            }
-
-            if (file == null) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }*/
-    /*
-            return ResponseEntity
-                .ok()
-                .contentType(MediaType.parseMediaType(file.getFileType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
-                .body(new ByteArrayResource(file.getData()));
-        } catch (Exception e) {
-            log.error("Exception: ", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    */
-
-    /**
-    @GetMapping("/v1/exportData/{networkName}")
-    public ResponseEntity<Resource> exportDataV1(@PathVariable("networkName") String networkName) throws IOException {
-        InputStream is = fileServiceImpl.getNetworkData(networkName);
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[1024];
-        while ((nRead = is.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-        buffer.flush();
-        byte[] byteArray = buffer.toByteArray();
-        return ResponseEntity
-            .ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + networkName + ".m\"")
-            .contentType(MediaType.parseMediaType("application/octet-stream"))
-            .body(new ByteArrayResource(byteArray));
-    }
-
-    @GetMapping("/v2/exportData/{networkName}")
-    public StreamingResponseBody exportDataV2(HttpServletResponse response, @PathVariable("networkName") String networkName)
-        throws IOException {
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + networkName + ".m\"");
-        InputStream inputStream = fileServiceImpl.getNetworkData(networkName);
-        return outputStream -> {
-            int nRead;
-            byte[] data = new byte[1024];
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                outputStream.write(data, 0, nRead);
-            }
-            inputStream.close();
-        };
-    }
-    */
-
 }

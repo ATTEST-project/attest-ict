@@ -11,8 +11,10 @@ public class FlexibleOptionWithContin extends FlexibleOption {
     //Number of Flexible
     //Number of Storages
     private Map<String, Integer> flexibleCountMap = new HashMap<String, Integer>();
-
     private List<FlexibleCost> flexCosts;
+
+    //20230411 T44 V3
+    private Map<Integer, Contingency> contingencyMap = new HashMap<Integer, Contingency>();
 
     public Map<String, Integer> getFlexibleCountMap() {
         return flexibleCountMap;
@@ -28,6 +30,14 @@ public class FlexibleOptionWithContin extends FlexibleOption {
 
     public void setFlexCosts(List<FlexibleCost> flexCosts) {
         this.flexCosts = flexCosts;
+    }
+
+    public Map<Integer, Contingency> getContingencyMap() {
+        return contingencyMap;
+    }
+
+    public void setContingencyMap(Map<Integer, Contingency> contingencyMap) {
+        this.contingencyMap = contingencyMap;
     }
 
     @Override

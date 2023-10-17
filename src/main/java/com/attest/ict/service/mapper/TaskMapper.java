@@ -28,5 +28,10 @@ public interface TaskMapper extends EntityMapper<TaskDTO, Task> {
     @Mapping(target = "simulationId", source = "simulation.id")
     @Mapping(target = "simulationUuid", source = "simulation.uuid")
     @Mapping(target = "simulationConfigFile", source = "simulation.configFile")
+    //2023/05/26 add to visualize information like year, season and flexibility
+    @Mapping(target = "simulationDescr", source = "simulation.description")
+    @Mapping(target = "networkName", source = "simulation.network.name")
+    //2023/10/03 add toolNum
+    @Mapping(target = "toolNum", source = "tool.num")
     TaskDTO toDto(Task s);
 }

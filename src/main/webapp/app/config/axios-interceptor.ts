@@ -16,12 +16,12 @@ const setupAxiosInterceptors = onUnauthenticated => {
     const authentication = store.getState().authentication;
     if (authentication.isAuthenticated && config.method.toLowerCase() === 'get' && config.url.includes('api/networks')) {
       config.params = config.params || {};
-      if ([AUTHORITIES.DSO, AUTHORITIES.TSO].every(role => authentication.account.authorities.includes(role))) {
-        config.params = {};
-      } else if (hasAnyAuthority(authentication.account.authorities, [AUTHORITIES.DSO])) {
-        config.params['type.equals'] = 'DX';
-      } else if (hasAnyAuthority(authentication.account.authorities, [AUTHORITIES.TSO])) {
-        config.params['type.equals'] = 'TX';
+      if (![AUTHORITIES.DSO, AUTHORITIES.TSO].every(role => authentication.account.authorities.includes(role))) {
+        if (hasAnyAuthority(authentication.account.authorities, [AUTHORITIES.DSO])) {
+          config.params['type.equals'] = 'DX';
+        } else if (hasAnyAuthority(authentication.account.authorities, [AUTHORITIES.TSO])) {
+          config.params['type.equals'] = 'TX';
+        }
       }
     }
     config.timeout = setTimeoutForUrls(config);

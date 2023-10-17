@@ -70,6 +70,10 @@ export const AuthenticationSlice = createSlice({
       }))
       .addCase(getAccount.fulfilled, (state, action) => {
         const isAuthenticated = action.payload && action.payload.data && action.payload.data.activated;
+        /* eslint-disable-next-line no-console */
+        // console.log('Autentication: user isAuthenticated ',isAuthenticated);
+        sessionStorage.clear();
+
         return {
           ...state,
           isAuthenticated,

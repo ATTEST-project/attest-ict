@@ -1,37 +1,21 @@
 package com.attest.ict.web.rest;
 
-import com.attest.ict.domain.OutputFile;
 import com.attest.ict.repository.TaskRepository;
-import com.attest.ict.service.OutputFileService;
-import com.attest.ict.service.TaskQueryService;
-import com.attest.ict.service.TaskService;
+import com.attest.ict.service.*;
 import com.attest.ict.service.criteria.TaskCriteria;
-import com.attest.ict.service.dto.SimulationDTO;
 import com.attest.ict.service.dto.TaskDTO;
-import com.attest.ict.tools.constants.ToolFileFormat;
 import com.attest.ict.web.rest.errors.BadRequestAlertException;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,16 +54,24 @@ public class TaskResource {
     // custom
     private final OutputFileService outputFileService;
 
+    private final ToolLogFileService toolLogFileService;
+
+    private final SimulationService simulationService;
+
     public TaskResource(
         TaskService taskService,
         TaskRepository taskRepository,
         TaskQueryService taskQueryService,
-        OutputFileService outputFileService
+        OutputFileService outputFileService,
+        ToolLogFileService toolLogFileService,
+        SimulationService simulationService
     ) {
         this.taskService = taskService;
         this.taskRepository = taskRepository;
         this.taskQueryService = taskQueryService;
         this.outputFileService = outputFileService;
+        this.toolLogFileService = toolLogFileService;
+        this.simulationService = simulationService;
     }
 
     /**
@@ -129,6 +121,15 @@ public class TaskResource {
 
         if (!taskRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        // toolLogFileId=292, toolLogFileName=log.txt, networkId=95, simulationId=300
+        if (taskDTO.getToolLogFileId() != null) {
+            taskDTO.setToolLogFile(toolLogFileService.findOne(taskDTO.getToolLogFileId()).get());
+        }
+
+        if (taskDTO.getSimulationId() != null) {
+            taskDTO.setSimulation(simulationService.findOne(taskDTO.getSimulationId()).get());
         }
 
         TaskDTO result = taskService.save(taskDTO);
@@ -234,58 +235,5 @@ public class TaskResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
-    }
-
-    // Start custom methods
-
-    /**
-     * {@code GET  /tasks/tool-results/:id} : the "id" task.
-     *
-     * @param id the id of the taskDTO
-     * @return File or Zip containing all output file provided during the execution
-     *         of the tool
-     */
-    @GetMapping("/tasks/tool-results/{id}")
-    public ResponseEntity<?> downloadToolResults(@PathVariable Long id) {
-        try {
-            log.debug("Request to download tool's output files for task: {}", id);
-            Optional<TaskDTO> taskDTO = taskService.findOne(id);
-            if (!taskDTO.isPresent()) {
-                throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-            }
-
-            TaskDTO taskDto = taskDTO.get();
-            Long simulationId = taskDto.getSimulationId();
-
-            if (simulationId == null) {
-                return new ResponseEntity<>("Simulation data not present for task " + id, HttpStatus.OK);
-            }
-            List<OutputFile> outputFileList = outputFileService.findFromSimulationId(simulationId);
-
-            if (outputFileList.isEmpty()) {
-                return new ResponseEntity<>("Tools's output file not present for task " + id, HttpStatus.OK);
-            }
-
-            String archiveFileName = taskDto.getSimulationUuid() + ToolFileFormat.ZIP_EXTENSION;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(bos);
-            for (OutputFile outputFile : outputFileList) {
-                byte[] fileData = outputFile.getData();
-                ZipEntry zipEntry = new ZipEntry(outputFile.getFileName());
-                zipOutputStream.putNextEntry(zipEntry);
-                zipOutputStream.write(fileData);
-                zipOutputStream.closeEntry();
-            }
-            zipOutputStream.finish();
-            zipOutputStream.close();
-            ByteArrayResource resource = new ByteArrayResource(bos.toByteArray());
-            return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + archiveFileName)
-                .contentType(MediaType.parseMediaType(ToolFileFormat.ZIP_CONTENT_MEDIA_TYPE))
-                .body(resource);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

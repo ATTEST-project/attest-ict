@@ -16,6 +16,7 @@ import com.attest.ict.domain.TransfElVal;
 import com.attest.ict.domain.TransfProfile;
 import com.attest.ict.helper.excel.exception.ExcelReaderFileException;
 import com.attest.ict.helper.excel.exception.ExcelnvalidDataException;
+import com.attest.ict.helper.excel.util.ExcelFileUtils;
 import com.attest.ict.helper.excel.util.ExcelProfilesFormat;
 import com.attest.ict.repository.BranchElValRepository;
 import com.attest.ict.repository.BranchProfileRepository;
@@ -27,7 +28,6 @@ import com.attest.ict.repository.GeneratorRepository;
 import com.attest.ict.repository.InputFileRepository;
 import com.attest.ict.repository.LoadElValRepository;
 import com.attest.ict.repository.LoadProfileRepository;
-import com.attest.ict.repository.NetworkRepository;
 import com.attest.ict.repository.TransfElValRepository;
 import com.attest.ict.repository.TransfProfileRepository;
 import com.attest.ict.service.ExcelAllProfileService;
@@ -44,7 +44,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -62,16 +61,13 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
-    public final Logger log = LoggerFactory.getLogger(ExcelAllProfileServiceImpl.class);
+    public final Logger LOGGER = LoggerFactory.getLogger(ExcelAllProfileServiceImpl.class);
 
     @Autowired
     NetworkMapper networkMapper;
 
     @Autowired
     InputFileMapper inputFileMapper;
-
-    @Autowired
-    NetworkRepository networkRepository;
 
     @Autowired
     LoadElValRepository loadElValRepository;
@@ -154,7 +150,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 String sheetName = ExcelProfilesFormat.TX_ALL_SHEETS_NAME[i];
                 Sheet sheet = workbook.getSheet(sheetName);
                 if (sheet == null) {
-                    log.debug(" Sheet: {} doesn't exists ", sheetName);
+                    LOGGER.debug(" Sheet: {} doesn't exists ", sheetName);
                 } else {
                     switch (i) {
                         case 0:
@@ -193,7 +189,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                             // Branch Status
                             parseBranch(networkId, sheet, branchElMap, ExcelProfilesFormat.BRANCH_STATUS);
                             break;
-                        // TODO how to manage the following data, using another file and another parser?
+                        // stand by, attenting to understand if this data should be used by someone
                         case 11:
                             // Transf Data
                             break;
@@ -210,10 +206,10 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                             break;
                     }
                 }
-            } // edn for all sheets
+            } // end for all sheets
 
             // clean old value loaded precedentily, if there are.
-            //20221130 LP comment
+            //20221130  comment
             //cleanOldValues(file, mode, season, typicalDay, network, ExcelProfilesFormat.TX_TIME_INTERVAL);
 
             // SavefIle in table: inputFile
@@ -222,7 +218,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 networkMapper.toDto(network),
                 AttestConstants.INPUT_FILE_ALL_PROFILE_DESCR
             );
-            log.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+            LOGGER.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
 
             // Save Data on DB
             if (!genElMap.isEmpty()) {
@@ -241,7 +237,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 saveBranchProfile(inputFileDto, network, mode, season, typicalDay, ExcelProfilesFormat.TX_TIME_INTERVAL, branchElMap);
             }
         } catch (ExcelReaderFileException ex) {
-            log.error("Exception reading file: {}", ex.getMessage());
+            LOGGER.error("Exception reading file: {}", ex.getMessage());
         } catch (IOException e) {
             throw new ExcelReaderFileException("fail to parse Excel File:  " + file.getOriginalFilename());
         } finally {
@@ -249,14 +245,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 try {
                     workbook.close();
                 } catch (IOException e) {
-                    log.error("Error closing workbook: " + e.getMessage());
+                    LOGGER.error("Error closing workbook: " + e.getMessage());
                 }
             }
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    log.error("Error closing inputStream " + e.getMessage());
+                    LOGGER.error("Error closing inputStream " + e.getMessage());
                 }
             }
         }
@@ -264,7 +260,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
     private void parseTransf(Long networkId, Sheet sheet, Map<String, TransfElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        log.debug("Reading sheet {}: ", sheetName);
+        LOGGER.debug("Reading sheet {}: ", sheetName);
 
         Iterator<Row> rows = sheet.iterator();
 
@@ -289,6 +285,11 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
         while (rows.hasNext()) {
             Row currentRow = rows.next();
+            // Skip empty row
+            if (ExcelFileUtils.isEmptyRow(currentRow)) {
+                LOGGER.debug("RowNum: {}  is empty.Skip ", currentRow.getRowNum());
+                continue; // skips empty row
+            }
 
             // Reading Header
             if (currentRow.getRowNum() == 0) {
@@ -308,9 +309,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 int columnsToSkip = 0;
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
-                    // log.debug(" Row: {}, Col: {}, fbusToBusPrec: {}, branchOrder:{},
-                    // columnsToSkip {} ", currentRow.getRowNum(),headers.get(cellIdx),
-                    // fbusToBusPrec, branchOrder, columnsToSkip);
+                    // LOGGER.debug(" Row: {}, Col: {}, fbusToBusPrec: {}, branchOrder:{} ", currentRow.getRowNum(),headers.get(cellIdx),  fbusToBusPrec, branchOrder, columnsToSkip);
                     hour = cellIdx;
                     if (cellIdx <= 3) {
                         columnTitle = ExcelProfilesFormat.TX_BRANCH_TRANSF_COMMON_HEADER[cellIdx];
@@ -323,15 +322,16 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 double cellval = currentCell.getNumericCellValue();
                                 fromBusNum = Double.valueOf(cellval).longValue();
                                 columnsToSkip++;
+                                LOGGER.debug("Case 0 - Read FBus: {}", fromBusNum);
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                             break;
                         // -- col 1 = TBus
@@ -341,6 +341,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 toBusNum = Double.valueOf(cellval).longValue();
                                 fbusToBus = fromBusNum + "_" + toBusNum;
                                 columnsToSkip++;
+                                LOGGER.debug("Case 1 - Read TBus: {}", toBusNum);
                                 if (fbusToBusPrec != null && fbusToBusPrec.equals(fbusToBus)) {
                                     branchOrder++; // more transformer on the same branch
                                 } else {
@@ -365,14 +366,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 }
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                         // -- transformer value (tap ratio or status ) at 00:00 or nominal Voltage in
                         // case of HR test cases file
@@ -386,8 +387,23 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                     voltage = currentCell.getStringCellValue();
                                 }
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[{}], columnTitle: {} Reading Nominal Voltage {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    voltage
+                                );
                             } else {
-                                value = currentCell.getNumericCellValue();
+                                //value = currentCell.getNumericCellValue();
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[{}]  Transf hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 setTransfElVal(branch, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
@@ -399,15 +415,39 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 double cellval = currentCell.getNumericCellValue();
                                 transfIdOnSubstation = Double.valueOf(cellval).longValue();
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 3 - Reading column [{}], columnTitle: {} Reading ID {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    transfIdOnSubstation
+                                );
                             } else {
-                                value = currentCell.getNumericCellValue();
+                                //value = currentCell.getNumericCellValue();
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case 3 - Reading column[{}]  Transf hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 setTransfElVal(branch, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
                             break;
                         default: // -- transformer value (tap ratio or status ) for hour >= '02:00'
                             try {
-                                value = currentCell.getNumericCellValue();
+                                // value = currentCell.getNumericCellValue();
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case Default - Reading column[{}]  Transf hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 if (voltage != null && transfIdOnSubstation != null) {
                                     setTransfElVal(
@@ -426,14 +466,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     " cell:" +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                     }
 
@@ -442,10 +482,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-
-        log.debug("********************* Transformer Profile Start	******************");
-        log.debug(elValMap.toString());
-        log.debug("********************* Transformer Profile End	******************");
+        LOGGER.debug("********************* Transformer Profile End	******************");
     }
 
     private void setTransfElVal(Branch branch, int hour, int min, double value, Map<String, TransfElVal> elValMap, String valueType) {
@@ -480,7 +517,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         Long idOnSubstation,
         int hour,
         int min,
-        double value,
+        Double value,
         Map<String, TransfElVal> elValMap,
         String valueType
     ) {
@@ -499,7 +536,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         switch (valueType) {
             case ExcelProfilesFormat.TRANSF_STATUS:
                 // Transformer Status spreadSheet
-                int status = (int) value;
+                Integer status = (value != null) ? value.intValue() : null;
                 elVal.setStatus(status);
                 break;
             case ExcelProfilesFormat.TRANSF_TAP_RATIO:
@@ -513,7 +550,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
     private void parseBranch(Long networkId, Sheet sheet, Map<String, BranchElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        log.debug("Reading sheet {}: ", sheetName);
+        LOGGER.debug("Reading sheet {}: ", sheetName);
 
         Iterator<Row> rows = sheet.iterator();
 
@@ -538,11 +575,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
         while (rows.hasNext()) {
             Row currentRow = rows.next();
-
+            // Skip empty row
+            if (ExcelFileUtils.isEmptyRow(currentRow)) {
+                LOGGER.debug("RowNum: {}  is empty.Skip ", currentRow.getRowNum());
+                continue;
+            }
             // Reading Header
             if (currentRow.getRowNum() == 0) {
                 int cellIdx = 0;
-
                 Iterator<Cell> cellsInRow = currentRow.iterator();
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
@@ -568,16 +608,17 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                             try {
                                 double cellval = currentCell.getNumericCellValue();
                                 fromBusNum = Double.valueOf(cellval).longValue();
+                                LOGGER.debug("Case 0 - Read FBus: {}", fromBusNum);
                                 columnsToSkip++;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                             break;
                         // -- col 1 = TBus
@@ -587,6 +628,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 toBusNum = Double.valueOf(cellval).longValue();
                                 fbusToBus = fromBusNum + "_" + toBusNum;
                                 columnsToSkip++;
+                                LOGGER.debug("Case 1 - Read TBus: {}", toBusNum);
                                 if (fbusToBusPrec != null && fbusToBusPrec.equals(fbusToBus)) {
                                     branchOrder++; // more transformer on the same branch
                                 } else {
@@ -611,14 +653,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 }
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                         // -- status at 00:00 or Voltage in case of HR test cases
                         case 2:
@@ -633,6 +675,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 columnsToSkip++;
                             } else {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[{}]  Branch hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 setBranchElVal(branch, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
@@ -643,8 +693,22 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 double cellval = currentCell.getNumericCellValue();
                                 idOnSubstation = Double.valueOf(cellval).longValue();
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 3 - Reading column [{}], columnTitle: {} Reading ID {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    idOnSubstation
+                                );
                             } else {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case 3 - Reading column[{}]  Branch hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 setBranchElVal(branch, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
@@ -652,6 +716,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                         default: // timeSeries branch status for hour > 2
                             try {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case Default - Reading column[{}]  Branch hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Branch branch = branchList.get(branchOrder);
                                 if (voltage != null && idOnSubstation != null) {
                                     setBranchElVal(branch, voltage, idOnSubstation, hour - columnsToSkip, min, value, elValMap, valueType);
@@ -661,14 +733,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     " cell:" +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                     }
 
@@ -677,10 +749,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-
-        log.debug("********************* Branch Profile Start	******************");
-        log.debug(elValMap.toString());
-        log.debug("********************* Branch Profile End	******************");
+        LOGGER.debug("********************* Branch Profile End	******************");
     }
 
     private void setBranchElVal(Branch branch, int hour, int min, double value, Map<String, BranchElVal> elValMap, String valueType) {
@@ -740,7 +809,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
     private void parseLoad(Long networkId, Sheet sheet, Map<String, LoadElVal> elValMap, String powerType) {
         String sheetName = sheet.getSheetName();
 
-        log.debug("Reading sheet {}: ", sheetName);
+        LOGGER.debug("Reading sheet {}: ", sheetName);
 
         Iterator<Row> rows = sheet.iterator();
         Long busNum = null;
@@ -757,7 +826,11 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
         while (rows.hasNext()) {
             Row currentRow = rows.next();
-
+            // Skip empty row
+            if (ExcelFileUtils.isEmptyRow(currentRow)) {
+                LOGGER.debug("RowNum: {}  is empty.Skip ", currentRow.getRowNum());
+                continue; // skips empty row
+            }
             // Reading Header
             if (currentRow.getRowNum() == 0) {
                 int cellIdx = 0;
@@ -775,7 +848,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 int columnsToSkip = 0;
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
-                    // log.debug(" Row: {} Col: {} ", currentRow.getRowNum(), cellIdx );
+                    // LOGGER.debug(" Row: {} Col: {} ", currentRow.getRowNum(), cellIdx );
                     hour = cellIdx;
                     if (cellIdx <= 2) {
                         columnTitle = ExcelProfilesFormat.TX_BUS_GEN_COMMON_HEADER[cellIdx];
@@ -787,7 +860,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                             try {
                                 double cellval = currentCell.getNumericCellValue();
                                 busNum = Double.valueOf(cellval).longValue();
-                                // log.debug(" bus num: {} ", busNum);
+                                LOGGER.debug("Case 0 - Read Bus Num: {}", busNum);
                                 columnsToSkip++;
                                 if (!precBusNum.equals(busNum)) {
                                     bus = busRepository.findByBusNumAndNetworkId(busNum, networkId);
@@ -805,17 +878,16 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                     }
                                     precBusNum = busNum;
                                 }
-
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                         // time series 00:00 or Voltage in case of HR test cases
                         case 1:
@@ -828,8 +900,21 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                     voltage = currentCell.getStringCellValue();
                                 }
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 1 - Reading column [{}], columnTitle:{} Reading Nominal Voltage {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    voltage
+                                );
                             } else {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case 1 - Reading column [{}] Load for  hour: {}, columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 setLoadElVal(bus, hour - columnsToSkip, min, value, elValMap, powerType);
                             }
                             break;
@@ -839,6 +924,12 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 double cellval = currentCell.getNumericCellValue();
                                 loadIdOnSubstation = Double.valueOf(cellval).longValue();
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[{}]  ColumnTitle:{},  CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    cellval
+                                );
                             } else {
                                 value = currentCell.getNumericCellValue();
                                 setLoadElVal(bus, hour - columnsToSkip, min, value, elValMap, powerType);
@@ -847,6 +938,16 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                         default: // timeSeries case >=3
                             try {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case Default - Reading column[{}]  Load for  hour: {}  columnsToSkip: {} CellVal: {} Nominal Voltage: {} loadIdOnSubstation: {}",
+                                    headers.get(cellIdx),
+                                    hour,
+                                    columnsToSkip,
+                                    value,
+                                    voltage,
+                                    loadIdOnSubstation
+                                );
+
                                 if (voltage != null && loadIdOnSubstation != null) {
                                     setLoadElVal(bus, voltage, loadIdOnSubstation, hour - columnsToSkip, min, value, elValMap, powerType);
                                 } else {
@@ -854,14 +955,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 }
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     " cell:" +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                     }
 
@@ -869,9 +970,8 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-        log.debug("********************* Load Profile Start ******************");
-        log.debug(elValMap.toString());
-        log.debug("********************* Load Profile End******************");
+
+        LOGGER.debug("********************* Load Profile End******************");
     }
 
     private void setLoadElVal(
@@ -880,7 +980,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         Long loadIdOnSubstation,
         int hour,
         int min,
-        double value,
+        Double value,
         Map<String, LoadElVal> readMap,
         String powerType
     ) {
@@ -907,7 +1007,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         readMap.put(key, loadElVal);
     }
 
-    private void setLoadElVal(Bus bus, int hour, int min, double value, Map<String, LoadElVal> readMap, String powerType) {
+    private void setLoadElVal(Bus bus, int hour, int min, Double value, Map<String, LoadElVal> readMap, String powerType) {
         Long busId = bus.getId();
 
         String key = busId + "_" + hour + "_" + min;
@@ -930,20 +1030,20 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
     }
 
     /**
-     *
      * @param sheet
      * @param elValMap
      * @param valueType possible values are: P, Q; Status, Vg
      */
     private void parseGen(Long networkId, Sheet sheet, Map<String, GenElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        log.debug("Reading sheet {}: ", sheetName);
+        LOGGER.debug("Reading sheet {}: ", sheetName);
 
         String columnTitle = "";
         List<String> headers = new ArrayList<String>();
         Long busNum = null;
         Double value = null;
         String voltage = null; // present only for HR TX profile .xlsx
+        String type = null; // present only for HR TX Su_Bd profile .xlsx
         Long genIdOnSubstation = null; // present only for HR TX profile .xlsx
         int hour = 0;
         Long busNumPrec = null;
@@ -953,6 +1053,11 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         Iterator<Row> rows = sheet.iterator();
         while (rows.hasNext()) {
             Row currentRow = rows.next();
+            // Skip empty row
+            if (ExcelFileUtils.isEmptyRow(currentRow)) {
+                LOGGER.debug("RowNum: {}  is empty.Skip ", currentRow.getRowNum());
+                continue; // skips empty row
+            }
 
             // Reading Header
             if (currentRow.getRowNum() == 0) {
@@ -961,6 +1066,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 Iterator<Cell> cellsInRow = currentRow.iterator();
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
+                    String currentTitle = currentCell.getStringCellValue();
                     headers.add(currentCell.getStringCellValue());
                 }
             }
@@ -975,7 +1081,8 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                     Cell currentCell = cellsInRow.next();
                     hour = cellIdx;
 
-                    if (cellIdx <= 2) {
+                    if (cellIdx <= 3) {
+                        // { "Bus Number", "Un (kV)", "ID", "Type" };
                         columnTitle = ExcelProfilesFormat.TX_BUS_GEN_COMMON_HEADER[cellIdx];
                     }
 
@@ -983,8 +1090,10 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                         // BUS NUM
                         case 0:
                             try {
-                                double cellval = currentCell.getNumericCellValue();
-                                busNum = Double.valueOf(cellval).longValue();
+                                //Double cellval = ExcelFileUtils.getDoubleCellValue(currentCell);
+                                Double cellval = currentCell.getNumericCellValue();
+                                busNum = cellval.longValue();
+                                LOGGER.debug("Case 0 - Read Bus Num: {}", busNum);
                                 columnsToSkip++;
                                 if (busNumPrec != null && busNumPrec.compareTo(busNum) == 0) {
                                     busOrder++; // more generator on the same bus
@@ -1007,14 +1116,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                 }
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     ", cell: " +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                         // time series 00:00 or Voltage in case of HR test cases
                         case 1:
@@ -1027,8 +1136,21 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                                     voltage = currentCell.getStringCellValue();
                                 }
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 1 - Reading column [{}], columnTitle:{} Reading Nominal Voltage {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    voltage
+                                );
                             } else {
                                 value = currentCell.getNumericCellValue();
+                                LOGGER.debug(
+                                    "Case 1 - Reading column [{}] GenVal: hour: {},  columnsToSkip: {},  CellVal: {}",
+                                    headers.get(cellIdx),
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Generator gen = generators.get(busOrder);
                                 setGenElVal(gen, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
@@ -1036,50 +1158,165 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                         // time series value at 01:00 or ID in case of HR test cases
                         case 2:
                             if (headers.get(cellIdx).equalsIgnoreCase(columnTitle)) {
-                                double cellval = currentCell.getNumericCellValue();
-                                genIdOnSubstation = Double.valueOf(cellval).longValue();
+                                Double cellval = currentCell.getNumericCellValue();
+                                genIdOnSubstation = cellval.longValue();
                                 columnsToSkip++;
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[{}]  ColumnTitle:{},  CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    cellval
+                                );
                             } else {
-                                value = currentCell.getNumericCellValue();
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case 2 - Reading column[: {}] ColumnTitle:{}, Gen   hour: {},  columnsToSkip: {}, CellVal: {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
                                 Generator gen = generators.get(busOrder);
                                 setGenElVal(gen, hour - columnsToSkip, min, value, elValMap, valueType);
                             }
                             break;
+                        // time series value at 02:00 or "" in case of HR test cases HOPS data 15_07_2020_Location1_Su_Bd.xlsx
+                        case 3:
+                            if (headers.get(cellIdx).trim().equalsIgnoreCase(columnTitle)) {
+                                if (currentCell.getCellType().equals(CellType.NUMERIC)) {
+                                    int cellVal = (int) currentCell.getNumericCellValue();
+                                    type = "" + cellVal;
+                                } else {
+                                    type = currentCell.getStringCellValue();
+                                }
+                                LOGGER.debug(
+                                    "Case 3 - Reading column:[{}]  columnTitle:[{}]  type: {} ",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    type
+                                );
+                                columnsToSkip++;
+                            } else {
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case 3 - Reading column[{}]  Gen  hour: {}  columnsToSkip: {} CellVal : {}",
+                                    headers.get(cellIdx),
+                                    columnTitle,
+                                    hour,
+                                    columnsToSkip,
+                                    value
+                                );
+                                Generator gen = generators.get(busOrder);
+                                setGenValues(columnsToSkip, gen, voltage, genIdOnSubstation, hour, min, value, elValMap, valueType);
+                            }
+                            break;
                         default: // timeSeries
                             try {
-                                value = currentCell.getNumericCellValue();
+                                value = this.getNumericCellValue(currentCell);
+                                LOGGER.debug(
+                                    "Case Default - Reading column[ {}]  Gen  hour: {}  columnsToSkip: {} CellVal : {} voltage: {} genIdOnSubstation {}",
+                                    headers.get(cellIdx),
+                                    hour,
+                                    columnsToSkip,
+                                    value,
+                                    voltage,
+                                    genIdOnSubstation
+                                );
                                 Generator gen = generators.get(busOrder);
-                                if (voltage != null && genIdOnSubstation != null) {
-                                    setGenElVal(gen, voltage, genIdOnSubstation, hour - columnsToSkip, min, value, elValMap, valueType);
-                                } else {
-                                    setGenElVal(gen, hour - columnsToSkip, min, value, elValMap, valueType);
-                                }
-
+                                setGenValues(columnsToSkip, gen, voltage, genIdOnSubstation, hour, min, value, elValMap, valueType);
                                 break;
                             } catch (NumberFormatException nfe) {
-                                throw new ExcelnvalidDataException(
+                                String msg =
                                     "fail to parse Excel File, check data at sheetName: " +
                                     sheetName +
                                     ", row: " +
                                     currentRow.getRowNum() +
                                     " cell:" +
-                                    cellIdx
-                                );
+                                    cellIdx;
+                                throw new ExcelnvalidDataException(msg, nfe);
                             }
                     }
-
                     cellIdx++;
                     busNumPrec = busNum;
                 }
             }
         }
-
-        log.debug("********************* Generator Profile Start ******************");
-        log.debug(elValMap.toString());
-        log.debug("********************* Generator Profile End ******************");
+        LOGGER.debug("********************* Generator Profile End ******************");
     }
 
-    private void setGenElVal(Generator gen, int hour, int min, double value, Map<String, GenElVal> elValMap, String valueType) {
+    private boolean isNumeric(String valStr) {
+        try {
+            Double doubleVal = Double.parseDouble(valStr);
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+    }
+
+    private Double getNumericCellValue(Cell cell) {
+        Double val = null;
+        String msg = " CellValue {} is not a number. Return null!";
+        try {
+            switch (cell.getCellType()) {
+                case NUMERIC:
+                    // LOGGER.debug(" CellCell type NUMERIC, Value: {} ", cell.getNumericCellValue() );
+                    val = Double.valueOf(cell.getNumericCellValue());
+                    // LOGGER.debug(" CellCell type NUMERIC, Value: {} ", val );
+                    break;
+                case STRING:
+                    // LOGGER.debug(" CellCell type STRING, Value: {} ", cell.getStringCellValue() );
+                    if (isNumeric(cell.getStringCellValue())) {
+                        val = Double.valueOf(cell.getStringCellValue());
+                    } else {
+                        String valStr = cell.getStringCellValue();
+                        // HOPS data 15_07_2020_Location1_Su_Bd.xlsx GEN Q sheet, contains some cells with string value instead of number
+                        if (valStr.contains(",")) {
+                            String newVal = valStr.replace(",", ".");
+                            if (isNumeric(newVal)) {
+                                val = Double.valueOf(newVal);
+                            }
+                        }
+                    }
+                    //LOGGER.debug(" CellCell type STRING, Converted Value: {} ", val );
+                    break;
+                case BLANK:
+                //  LOGGER.debug(" CellCell type BLANK,  Value: {}; -  return null", cell.getStringCellValue() );
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error reading excel file. CellValue {} is not a number. Return null. Error: {}", cell, e.getMessage());
+        }
+        // LOGGER.debug(" Cell Type: {} "+ cell.getCellType()  + " return  " +val);
+        return val;
+    }
+
+    private void setGenValues(
+        int columnsToSkip,
+        Generator gen,
+        String voltage,
+        Long genIdOnSubstation,
+        int hour,
+        int min,
+        Double value,
+        Map<String, GenElVal> elValMap,
+        String valueType
+    ) {
+        if (voltage != null && genIdOnSubstation != null) {
+            LOGGER.debug(
+                "----- Save A Gen for  hour: {}  CellVal : {} voltage: {} genIdOnSubstation {}",
+                hour - columnsToSkip,
+                value,
+                voltage,
+                genIdOnSubstation
+            );
+            setGenElVal(gen, voltage, genIdOnSubstation, hour - columnsToSkip, min, value, elValMap, valueType);
+        } else {
+            LOGGER.debug("----- Save B Gen  for hour: {}  CellVal : {} ", hour - columnsToSkip, value);
+            setGenElVal(gen, hour - columnsToSkip, min, value, elValMap, valueType);
+        }
+    }
+
+    private void setGenElVal(Generator gen, int hour, int min, Double value, Map<String, GenElVal> elValMap, String valueType) {
         String key = gen.getId() + "_" + hour + "_" + min;
 
         GenElVal genElVal = elValMap.get(key);
@@ -1096,8 +1333,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 genElVal.setQ(value);
                 break;
             case ExcelProfilesFormat.GEN_STATUS:
-                // Gen Status spreadSheet
-                int status = (int) value;
+                Integer status = (value != null) ? value.intValue() : null;
                 genElVal.setStatus(status);
                 break;
             case ExcelProfilesFormat.VOLTAGE_MAGNITUDE:
@@ -1118,7 +1354,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         Long genIdOnSubstation,
         int hour,
         int min,
-        double value,
+        Double value,
         Map<String, GenElVal> elValMap,
         String valueType
     ) {
@@ -1141,7 +1377,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 break;
             case ExcelProfilesFormat.GEN_STATUS:
                 // Gen Status spreadSheet
-                int status = (int) value;
+                Integer status = (value != null) ? value.intValue() : null;
                 genElVal.setStatus(status);
                 break;
             case ExcelProfilesFormat.VOLTAGE_MAGNITUDE:
@@ -1154,68 +1390,6 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         }
 
         elValMap.put(key, genElVal);
-    }
-
-    private void cleanOldValues(MultipartFile file, Integer mode, String season, String typicalDay, Network network, Double timeInterval) {
-        String fileName = file.getOriginalFilename();
-        Optional<InputFileDTO> inputFileDto = inputFileServiceImpl.findFileByNetworkIdAndFileName(network.getId(), fileName);
-        if (inputFileDto.isPresent()) {
-            log.info(
-                "The file: {}, for networkId: {} is already present on db;  inputFile, profile and electrical value will be removed! ",
-                fileName,
-                network.getId()
-            );
-
-            /**
-             * // remove all generation profiles and generation electrical values linked to
-             * inputFile Optional<GenProfile> genProfileOpt =
-             * genProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (genProfileOpt.isPresent()) { List<GenElVal>
-             * profileValues =
-             * genElValRepository.findByGenProfileId(genProfileOpt.get().getId()); for
-             * (GenElVal val : profileValues) { genElValRepository.delete(val); }
-             *
-             * genProfileRepository.delete(genProfileOpt.get()); log.debug(" Old GenProfile:
-             * {} deleted succesfully! " + genProfileOpt.get()); }
-             *
-             * // remove all load profiles and load electrical values linked to inputFile
-             * Optional<LoadProfile> loadProfileOpt =
-             * loadProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (loadProfileOpt.isPresent()) {
-             * List<LoadElVal> elValues =
-             * loadElValRepository.findByLoadProfileId(loadProfileOpt.get().getId()); for
-             * (LoadElVal val : elValues) { loadElValRepository.delete(val); }
-             *
-             * loadProfileRepository.delete(loadProfileOpt.get()); log.debug(" Old Load
-             * Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
-             *
-             * // remove all transformer profiles and electrical values linked to inputFile
-             * Optional<TransfProfile> transfProfileOpt =
-             * transfProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (transfProfileOpt.isPresent()) {
-             * List<TransfElVal> elValues =
-             * transfElValRepository.findByTransfProfileId(transfProfileOpt.get().getId());
-             * for (TransfElVal val : elValues) { transfElValRepository.delete(val); }
-             * transfProfileRepository.delete(transfProfileOpt.get()); log.debug(" Old
-             * Transformer Profile: {} deleted succesfully! " + transfProfileOpt.get()); }
-             *
-             * // remove all transformer profiles and electrical values linked to inputFile
-             * Optional<BranchProfile> branchProfileOpt =
-             * branchProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (branchProfileOpt.isPresent()) {
-             * List<BranchElVal> elValues =
-             * branchElValRepository.findByBranchProfileId(branchProfileOpt.get().getId());
-             * for (BranchElVal val : elValues) { branchElValRepository.delete(val); }
-             * branchProfileRepository.delete(branchProfileOpt.get()); log.debug(" Old
-             * branch Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
-             */
-            boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
-            if (isRemoved) {
-                log.info("Input File: {} removed succesfully! " + fileName);
-            } else {
-                log.warn("Input File: {} not removed! " + fileName);
-            }
-        }
     }
 
     private void saveBranchProfile(
@@ -1342,4 +1516,67 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
             values.add(newElVal);
         }
     }
+    /*
+    private void cleanOldValues(MultipartFile file, Integer mode, String season, String typicalDay, Network network, Double timeInterval) {
+        String fileName = file.getOriginalFilename();
+        Optional<InputFileDTO> inputFileDto = inputFileServiceImpl.findFileByNetworkIdAndFileName(network.getId(), fileName);
+        if (inputFileDto.isPresent()) {
+            LOGGER.info(
+                "The file: {}, for networkId: {} is already present on db;  inputFile, profile and electrical value will be removed! ",
+                fileName,
+                network.getId()
+            );
+
+            /**
+             * // remove all generation profiles and generation electrical values linked to
+             * inputFile Optional<GenProfile> genProfileOpt =
+             * genProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
+             * inputFileDto.get().getId() ); if (genProfileOpt.isPresent()) { List<GenElVal>
+             * profileValues =
+             * genElValRepository.findByGenProfileId(genProfileOpt.get().getId()); for
+             * (GenElVal val : profileValues) { genElValRepository.delete(val); }
+             *
+             * genProfileRepository.delete(genProfileOpt.get()); LOGGER.debug(" Old GenProfile:
+             * {} deleted succesfully! " + genProfileOpt.get()); }
+             *
+             * // remove all load profiles and load electrical values linked to inputFile
+             * Optional<LoadProfile> loadProfileOpt =
+             * loadProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
+             * inputFileDto.get().getId() ); if (loadProfileOpt.isPresent()) {
+             * List<LoadElVal> elValues =
+             * loadElValRepository.findByLoadProfileId(loadProfileOpt.get().getId()); for
+             * (LoadElVal val : elValues) { loadElValRepository.delete(val); }
+             *
+             * loadProfileRepository.delete(loadProfileOpt.get()); LOGGER.debug(" Old Load
+             * Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
+             *
+             * // remove all transformer profiles and electrical values linked to inputFile
+             * Optional<TransfProfile> transfProfileOpt =
+             * transfProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
+             * inputFileDto.get().getId() ); if (transfProfileOpt.isPresent()) {
+             * List<TransfElVal> elValues =
+             * transfElValRepository.findByTransfProfileId(transfProfileOpt.get().getId());
+             * for (TransfElVal val : elValues) { transfElValRepository.delete(val); }
+             * transfProfileRepository.delete(transfProfileOpt.get()); LOGGER.debug(" Old
+             * Transformer Profile: {} deleted succesfully! " + transfProfileOpt.get()); }
+             *
+             * // remove all transformer profiles and electrical values linked to inputFile
+             * Optional<BranchProfile> branchProfileOpt =
+             * branchProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
+             * inputFileDto.get().getId() ); if (branchProfileOpt.isPresent()) {
+             * List<BranchElVal> elValues =
+             * branchElValRepository.findByBranchProfileId(branchProfileOpt.get().getId());
+             * for (BranchElVal val : elValues) { branchElValRepository.delete(val); }
+             * branchProfileRepository.delete(branchProfileOpt.get()); LOGGER.debug(" Old
+             * branch Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
+
+            boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
+            if (isRemoved) {
+                LOGGER.info("Input File: {} removed succesfully! " + fileName);
+            } else {
+                LOGGER.warn("Input File: {} not removed! " + fileName);
+            }
+        }
+    }*/
+
 }

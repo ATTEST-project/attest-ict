@@ -95,7 +95,7 @@ public interface InputFileService {
 
     Optional<InputFileDTO> findLastFileByNetworkIdAndFileNameAndToolName(Long networkId, String fileName, String toolName);
 
-    InputFileDTO saveFileForNetwork(MultipartFile file, NetworkDTO networkDto, ToolDTO toolDto);
+    InputFileDTO saveFileForNetworkAndTool(MultipartFile file, NetworkDTO networkDto, ToolDTO toolDto);
 
     Optional<InputFileDTO> findFileByNetworkIdAndFileName(Long networkId, String fileName);
 
@@ -114,4 +114,12 @@ public interface InputFileService {
     List<InputFile> findByNetworkIdAndFileNameAndDescription(Long networkId, String fileName, String description);
 
     InputFile findNetworkFileByNetworkId(Long networkId);
+
+    InputFileDTO saveFileForNetworkAndTool(
+        byte[] byteArray,
+        String fileName,
+        String dataContentType,
+        NetworkDTO networkDto,
+        ToolDTO toolDto
+    );
 }

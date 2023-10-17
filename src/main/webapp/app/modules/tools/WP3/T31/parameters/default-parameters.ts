@@ -7,10 +7,11 @@ export const defaultParameters: Readonly<any> = {
   TRS_costs: [],
   cont_list: [],
   line_length: [],
-  growth: { Active: { '2020': 0, '2030': 1.89, '2040': 3.0 }, Slow: { '2020': 0, '2030': 1.1, '2040': 2.0 } },
-  DSR: { Active: { '2020': 0, '2030': 0.05, '2040': 0.05 }, Slow: { '2020': 0, '2030': 0.02, '2040': 0.02 } },
+  growth: { Active: { '2020': 0, '2030': 1.89, '2040': 3.0, '2050': 3.0 }, Slow: { '2020': 0, '2030': 1.1, '2040': 2.0, '2050': 3.0 } },
+  DSR: { Active: { '2020': 0, '2030': 0.0, '2040': 0.0, '2050': 0.0 }, Slow: { '2020': 0, '2030': 0.0, '2040': 0.0, '2050': 0.0 } },
   cluster: null,
   oversize: 0,
   Max_clusters: 5,
   scenarios: [],
+  use_load_data_update: false,
 };

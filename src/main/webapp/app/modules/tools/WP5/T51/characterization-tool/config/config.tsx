@@ -17,6 +17,7 @@ const Config = (props: any) => {
 
   return (
     <div className="section-with-border">
+      {/* moved into InputRow component
       <Row>
         <Col md="3">
           <ValidatedField
@@ -26,10 +27,10 @@ const Config = (props: any) => {
             label="Assets Type"
             type="text"
             placeholder="Assets type..."
-            validate={{ required: true }}
           />
         </Col>
       </Row>
+      */}
       <Row>
         {[...Array(nRows).keys()].map((e, i) => (
           <div key={i}>

@@ -19,7 +19,7 @@ interface T251ToolResultsParams {
   simulationId: string;
 }
 
-const apiDownloadUrl = 'api/tools/wp3/download';
+const apiDownloadUrl = 'api/tools/wp2/download';
 
 export const downloadResults = createAsyncThunk(
   't251_tool/download-results',

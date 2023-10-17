@@ -1,5 +1,7 @@
 package com.attest.ict.helper.csv.reader;
 
+import com.attest.ict.custom.utils.FileUtils;
+import com.attest.ict.custom.utils.MimeUtils;
 import com.attest.ict.helper.csv.exception.CsvReaderFileException;
 import com.attest.ict.helper.csv.reader.annotation.ToolByFieldName;
 import com.attest.ict.helper.csv.util.CsvConstants;
@@ -30,8 +32,9 @@ public class CsvFileReader {
         settings = new CsvParserSettings();
     }
 
-    public static boolean hasCSVFormat(MultipartFile file) {
-        if (!CsvConstants.CONTENT_TYPE.equals(file.getContentType())) {
+    public static boolean hasCSVFormat(MultipartFile mpFile) {
+        String contentType = MimeUtils.detect(mpFile);
+        if (!FileUtils.CONTENT_TYPE.get("csv").equals(contentType)) {
             return false;
         }
         return true;
@@ -200,7 +203,7 @@ public class CsvFileReader {
     }
 
     /**
-     * @param relativePath
+     * @param inputStream
      * @return List<ToolByFieldName>
      */
     public List<ToolByFieldName> parseToolCsv(InputStream inputStream) throws CsvReaderFileException {

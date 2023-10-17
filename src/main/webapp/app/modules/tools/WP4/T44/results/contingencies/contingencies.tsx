@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Col, Form, Row, Table } from 'reactstrap';
+import { Button, Col, Form, Row, Table, Spinner } from 'reactstrap';
 import { contingenciesData } from 'app/modules/tools/WP4/T44/results/sample-data';
 import Divider from 'app/shared/components/divider/divider';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -19,7 +19,8 @@ const Contingencies = (props: any) => {
 
   const taskEntity = useAppSelector(state => state.task.entity);
 
-  const response = useAppSelector(state => state.toolsExecution.entity) || {
+  // const response = useAppSelector(state => state.toolsExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
@@ -31,6 +32,8 @@ const Contingencies = (props: any) => {
 
   const [scenario, setScenario] = React.useState<any>(null);
   const [contingency, setContingency] = React.useState<any>(null);
+
+  const loading = useAppSelector(state => state.toolsResultsTable.loading);
 
   React.useEffect(() => {
     if (!response) {
@@ -145,6 +148,7 @@ const Contingencies = (props: any) => {
     if (scenario && contingency) {
       /* eslint-disable-next-line no-console */
       console.log('Cont selected: ', { scenario, contingency });
+
       props.history.push({ pathname: props.match.url + '/charts', state: { response, result: { scenario, contingency } } });
     } else {
       props.history.push({ pathname: props.match.url + '/charts', state: { response, type: 'Normal' } });
@@ -161,6 +165,16 @@ const Contingencies = (props: any) => {
 
   return (
     <>
+      {loading ? (
+        <div>
+          <Spinner className="m-5" color="primary">
+            Loading...
+          </Spinner>
+        </div>
+      ) : (
+        ''
+      )}
+
       {isOpf ? (
         <Button color="primary" onClick={opfButtonClicked}>
           OPF
@@ -174,6 +188,7 @@ const Contingencies = (props: any) => {
           {displayContSelect()}
         </>
       )}
+
       <Divider />
       <Row>
         <Col>

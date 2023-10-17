@@ -29,6 +29,7 @@ export const getEntities = createAsyncThunk(
     const params = {
       'country.equals': country,
       'type.equals': type,
+      size: 9999,
       ...(mpcName && { 'mpcName.contains': mpcName }),
       ...(fromNetworkDate && { 'networkDate.greaterThanOrEqual': new Date(fromNetworkDate).toISOString() }),
       ...(toNetworkDate && { 'networkDate.lessThanOrEqual': new Date(toNetworkDate).toISOString() }),

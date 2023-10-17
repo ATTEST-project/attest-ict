@@ -1,5 +1,6 @@
 package com.attest.ict.service.impl;
 
+import com.attest.ict.constants.AttestConstants;
 import com.attest.ict.custom.utils.FileUtils;
 import com.attest.ict.domain.BaseMVA;
 import com.attest.ict.domain.Branch;
@@ -8,7 +9,6 @@ import com.attest.ict.domain.Generator;
 import com.attest.ict.domain.Network;
 import com.attest.ict.helper.ods.exception.OdsReaderFileException;
 import com.attest.ict.helper.ods.exception.OdsWriterFileException;
-import com.attest.ict.helper.ods.reader.OdsFileReader;
 import com.attest.ict.helper.ods.reader.OdsNetworkFileReader;
 import com.attest.ict.helper.ods.reader.model.Load;
 import com.attest.ict.helper.ods.utils.T41FileInputFormat;
@@ -17,12 +17,14 @@ import com.attest.ict.service.BaseMVAService;
 import com.attest.ict.service.BranchService;
 import com.attest.ict.service.BusService;
 import com.attest.ict.service.GeneratorService;
+import com.attest.ict.service.InputFileService;
 import com.attest.ict.service.NetworkService;
 import com.attest.ict.service.OdsNetworkService;
+import com.attest.ict.service.dto.InputFileDTO;
+import com.attest.ict.service.dto.NetworkDTO;
+import com.attest.ict.service.mapper.NetworkMapper;
 import com.github.miachm.sods.Sheet;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -54,28 +57,31 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
     @Autowired
     GeneratorService generatorService;
 
+    @Autowired
+    InputFileService inputFileInputServiceImpl;
+
+    @Autowired
+    NetworkMapper networkMapper;
+
     /**
-     * @param networkId
-     * @param filePath
-     * @return ODS file with network data one componenr for each sheet:
+     * @param networkId network identifier
+     * @return ODS file with network data one component for each sheet:
      *  (buses, branches, loads, generators, baseMVA)
      */
     @Override
     public ByteArrayOutputStream exportNetworkToOdsFile(Long networkId) throws OdsWriterFileException {
         NetworkOdsExporter networkOdsExporter = new NetworkOdsExporter();
         try {
-            ByteArrayOutputStream byteArrayOutputStream = networkOdsExporter.writeData(
+            return networkOdsExporter.writeData(
                 // filePath,
                 this.getBuses(networkId),
                 this.getBranches(networkId), // Lines
                 this.getLoads(networkId),
-                this.getGenerators(networkId),
+                this.getGenerators(networkId), //
                 this.getBaseMVA(networkId)
             );
-
-            return byteArrayOutputStream;
         } catch (Exception e) {
-            String msg = "Error exporting network with id: " + networkId + " to ods file ";
+            String msg = "Error exporting network with id: " + networkId + " into .ods file file format! ";
             log.error(msg);
             throw new OdsWriterFileException(msg + " " + e.getMessage());
         }
@@ -83,12 +89,13 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
 
     /**
      * Import network data from '.ods' file format
-     * @param networkId
+     * @param networkId network unique identifier
      * @param multiPartFile file to upload
      */
     @Override
     public void importNetworkFromOdsFile(Long networkId, MultipartFile multiPartFile) throws OdsReaderFileException {
         log.info("File Ods: {} import start ...", multiPartFile.getOriginalFilename());
+        String origFileName = StringUtils.cleanPath(multiPartFile.getOriginalFilename());
 
         Optional<Network> networkOpt = networkService.findById(networkId);
         if (!networkOpt.isPresent()) {
@@ -97,28 +104,30 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
             throw new OdsReaderFileException(msg);
         }
 
-        File fileOdsTemp;
-        try {
-            fileOdsTemp = OdsFileReader.transferMultiPartFileToFile(multiPartFile);
-        } catch (IOException e) {
-            String msg = "Error saving file: " + multiPartFile.getOriginalFilename();
-            log.error(msg);
-            throw new OdsReaderFileException(msg + " " + e.getMessage());
+        Network network = networkOpt.get();
+        NetworkDTO networkDTO = networkMapper.toDto(network);
+        if (origFileName != null) {
+            String fileName = FileUtils.getFileLessExtension(origFileName);
+            log.info("Network fileName: {}", fileName);
+            network.setMpcName(fileName);
+            Optional<NetworkDTO> networkDtoOptSaved = networkService.partialUpdate(networkMapper.toDto(network));
+            if (networkDtoOptSaved.isPresent()) {
+                network = networkMapper.toEntity(networkDtoOptSaved.get());
+                log.info("Network partialUpdate: {}", network);
+            }
         }
 
-        OdsNetworkFileReader reader = new OdsNetworkFileReader();
+        OdsNetworkFileReader reader = new OdsNetworkFileReader(multiPartFile);
         List<Bus> buses = new ArrayList<Bus>();
         List<Branch> branches = new ArrayList<Branch>();
         List<Load> loads = new ArrayList<Load>();
         List<Generator> gens = new ArrayList<Generator>();
         List<BaseMVA> baseMvas = new ArrayList<BaseMVA>();
-
-        Network network = networkOpt.get();
         List<Sheet> sheets;
 
         // Get file's sheets
         try {
-            sheets = reader.parseFile(fileOdsTemp);
+            sheets = reader.parseOdsNetworkFile();
         } catch (Exception e) {
             throw new OdsReaderFileException(e.getMessage());
         }
@@ -127,22 +136,26 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         try {
             for (Sheet sheet : sheets) {
                 String name = sheet.getName();
-                log.debug("Reading... sheet: " + name);
-
+                log.info("Reading... sheet: " + name);
                 if (name.equals(T41FileInputFormat.networkSheetHeaders.get(0))) {
                     buses = reader.parseSheetBuses(sheet, network);
+                    if (buses != null) log.debug("sheet 'Buses' contain: {} rows ", buses.size());
                 }
                 if (name.equals(T41FileInputFormat.networkSheetHeaders.get(1))) {
                     branches = reader.parseSheetLines(sheet, network);
+                    if (branches != null) log.debug("sheet 'Branches' contain: {} rows", branches.size());
                 }
                 if (name.equals(T41FileInputFormat.networkSheetHeaders.get(2))) {
                     loads = reader.parseSheetLoads(sheet);
+                    if (loads != null) log.debug("sheet 'Load' contain: {} row ", loads.size());
                 }
                 if (name.equals(T41FileInputFormat.networkSheetHeaders.get(3))) {
                     gens = reader.parseSheetGens(sheet, network);
+                    if (gens != null) log.debug("sheet 'Gens' contain: {} rows ", gens.size());
                 }
                 if (name.equals(T41FileInputFormat.networkSheetHeaders.get(4))) {
                     baseMvas = reader.parseSheetBaseMVA(sheet, network);
+                    if (baseMvas != null) log.debug("sheet Base_MVA contains: {} rows ", baseMvas.size());
                 }
             }
             // -- merge buses and loads
@@ -156,23 +169,32 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         try {
             // -- store data on DB
             List<Bus> busesSaved = this.busService.saveAll(buses);
+            busesSaved.forEach(elem -> log.debug("busesSaved saved: {}", elem));
+
             List<Branch> branchSaved = this.branchService.saveAll(branches);
+            branchSaved.forEach(elem -> log.debug("branchSaved saved: {}", elem));
+
             List<Generator> gensSaved = this.generatorService.saveAll(gens);
+            gensSaved.forEach(elem -> log.debug("Genearator saved: {}", elem));
+
             List<BaseMVA> baseMVASaved = this.baseMVAService.saveAll(baseMvas);
+            baseMVASaved.forEach(elem -> log.debug("  BaseMVA saved: {}", elem));
         } catch (Exception e) {
-            String errMsg = "Error storing data in db" + " " + e.getMessage();
+            String errMsg = "Error saving data in the data base";
             log.error(errMsg);
-            throw new OdsReaderFileException(errMsg);
+            throw new OdsReaderFileException(errMsg, e);
         }
 
-        log.info("File Ods: {}, imported succesfully ", multiPartFile.getOriginalFilename());
-
-        //delete tempFile
-        try {
-            boolean isDeleted = FileUtils.deleteFile(fileOdsTemp);
-        } catch (IOException e) {
-            log.error("Error deleting temp file: {}, {}", fileOdsTemp.getAbsolutePath(), e.getMessage());
-        }
+        InputFileDTO inputFileSavedDTO = inputFileInputServiceImpl.saveFileForNetworkWithDescr(
+            multiPartFile,
+            networkDTO,
+            AttestConstants.INPUT_FILE_NETWORK_DESCR
+        );
+        log.info(
+            "File Ods: {}, imported successfully, inputFileSavedDTO saved: {} ",
+            multiPartFile.getOriginalFilename(),
+            inputFileSavedDTO
+        );
     }
 
     private Object[][] getBuses(Long networkId) {
@@ -244,7 +266,7 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         return valuesArray;
     }
 
-    private Object[][] getGenerators(Long networkId) {
+    private Object[][] getGenerators(Long networkId, List<Generator> elements) {
         // Gens
         String sheetName = T41FileInputFormat.networkSheetHeaders.get(3);
 
@@ -252,7 +274,6 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         // Qc2max ramp_agc ramp_10 ramp_30 ramp_q apf
         Object[] header = T41FileInputFormat.netwrokSheetMap.get(sheetName).toArray();
 
-        List<Generator> elements = generatorService.findByNetworkId(networkId);
         int count = elements.size();
         log.info("Found num: {} Generators, for networkID: {}", count, networkId);
         int numFields = header.length;
@@ -285,8 +306,20 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
                     elem.getApf(),
                 };
         }
-
         return valuesArray;
+    }
+
+    private Object[][] getGenerators(Long networkId, Double pg) {
+        if (pg == null) {
+            return getGenerators(networkId);
+        }
+        List<Generator> elements = generatorService.findByNetworkIdAndPg(networkId, pg);
+        return getGenerators(networkId, elements);
+    }
+
+    private Object[][] getGenerators(Long networkId) {
+        List<Generator> elements = generatorService.findByNetworkId(networkId);
+        return getGenerators(networkId, elements);
     }
 
     private Object[][] getLoads(Long networkId) {
@@ -295,7 +328,8 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         Object[] header = T41FileInputFormat.netwrokSheetMap.get(loadSheetName).toArray();
         int numFields = header.length;
 
-        List<Bus> elements = busService.getLoadsByNetworkId(networkId, 0.0, 0.0);
+        // List<Bus> elements = busService.getLoadsByNetworkId(networkId, 0.0, 0.0);
+        List<Bus> elements = busService.getBusesByNetworkId(networkId);
         int count = elements.size();
         log.info("Found {} Loads, for networkID: {}", count, networkId);
 
@@ -343,6 +377,4 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
             }
         }
     }
-
-    public static void main(String args[]) {}
 }

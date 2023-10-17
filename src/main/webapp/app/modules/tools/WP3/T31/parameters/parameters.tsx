@@ -1,12 +1,15 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Col, Collapse, Input, Label, Row } from 'reactstrap';
+import { Col, Collapse, Input, Label, Row, Tooltip } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
-import GrowthDSRTable from 'app/modules/tools/WP3/T31/parameters/growth-dsr-table/growth-dsr-table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+
+import GrowthDSRTable from 'app/modules/tools/WP3/T31/parameters/growth-dsr-table/growth-dsr-table';
+import Divider from 'app/shared/components/divider/divider';
+
 import { getEntitiesByNetworkId } from 'app/modules/tools/WP3/T31/reducer/branch-length.reducer';
-import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
+
 import { toast } from 'react-toastify';
 
 const Parameters = (props: any) => {
@@ -16,11 +19,16 @@ const Parameters = (props: any) => {
     reset,
     resetField,
     setValue,
+    getValues,
   } = useFormContext();
 
   const dispatch = useAppDispatch();
 
   const [showParameters, setShowParameters] = React.useState<boolean>(false);
+
+  const [showTooltip, setShowTooltip] = React.useState<boolean>(false);
+
+  const [requiredAddLoadData, setRequiredAddLoadData] = React.useState<boolean>(false);
 
   const allLineLength = useAppSelector(state => state.branchLength.entities);
 
@@ -58,6 +66,11 @@ const Parameters = (props: any) => {
       setLineDefaultValue();
     }
   }, [allLineLength]);
+
+  React.useEffect(() => {
+    const useLoadDataCheckbox = getValues('parameters[use_load_data_update]');
+    setRequiredAddLoadData(useLoadDataCheckbox);
+  }, []);
 
   return (
     <>
@@ -109,7 +122,7 @@ const Parameters = (props: any) => {
                 }
                 error={errors?.parameters?.TRS_capacities}
                 id={'trs-capacities'}
-                label="TRS Capacities [MVA]"
+                label="Transformer capacities [MVA]"
                 name="parameters[TRS_capacities]"
                 data-cy="TRS_capacities"
                 type="text"
@@ -130,7 +143,7 @@ const Parameters = (props: any) => {
                 }
                 error={errors?.parameters?.line_costs}
                 id={'line-costs'}
-                label="Line Costs [currency/km]"
+                label="Line costs [Currency/km]"
                 name="parameters[line_costs]"
                 data-cy="line_costs"
                 type="text"
@@ -151,7 +164,7 @@ const Parameters = (props: any) => {
                 }
                 error={errors?.parameters?.TRS_costs}
                 id={'tsr-costs'}
-                label="TSR Costs [currency]"
+                label="Transformer costs [Currency]"
                 name="parameters[TRS_costs]"
                 data-cy="TRS_costs"
                 type="text"
@@ -193,7 +206,7 @@ const Parameters = (props: any) => {
                 }
                 error={errors?.parameters?.line_length}
                 id={'line-length'}
-                label="Line Length [km]"
+                label="Length of each branch [km]"
                 name="parameters[line_length]"
                 data-cy="line_length"
                 type="text"
@@ -209,12 +222,12 @@ const Parameters = (props: any) => {
           </Row>
           <Row>
             <Col>
-              <GrowthDSRTable title="Growth [%]" section="growth" />
+              <GrowthDSRTable title="Dictionary with demand growth [%] for selected years" section="growth" />
             </Col>
           </Row>
           <Row>
             <Col>
-              <GrowthDSRTable title="DSR [%]" section="DSR" />
+              <GrowthDSRTable title="Dictionary with DSR [%] for selected years" section="DSR" />
             </Col>
           </Row>
           <Row>
@@ -223,7 +236,7 @@ const Parameters = (props: any) => {
                 register={register}
                 error={errors?.parameters?.cluster}
                 id={'cluster'}
-                label="Cluster [MVA]"
+                label="List of investment clusters [MVA]"
                 name="parameters[cluster]"
                 data-cy="cluster"
                 type="text"
@@ -237,7 +250,7 @@ const Parameters = (props: any) => {
                 register={register}
                 error={errors?.parameters?.oversize}
                 id={'oversize'}
-                label="Oversize"
+                label="Oversize: Option to intentionally oversize investments"
                 name="parameters[oversize]"
                 data-cy="oversize"
                 type="number"
@@ -251,11 +264,11 @@ const Parameters = (props: any) => {
                 register={register}
                 error={errors?.parameters?.Max_clusters}
                 id={'maxClusters'}
-                label="Max Clusters"
+                label="Max Clusters: Constraint on the maximum number of clusters considered"
                 name="parameters[Max_clusters]"
                 data-cy="Max_clusters"
                 type="number"
-                placeholder={'Default: 5'}
+                placeholder={'Default: 3'}
               />
             </Col>
           </Row>
@@ -272,7 +285,7 @@ const Parameters = (props: any) => {
                 }
                 error={errors?.parameters?.scenarios}
                 id={'scenarios'}
-                label="Scenarios"
+                label="List of Scenarios to model."
                 name="parameters[scenarios]"
                 data-cy="scenarios"
                 type="text"
@@ -281,6 +294,58 @@ const Parameters = (props: any) => {
             </Col>
           </Row>
         </Collapse>
+      </div>
+      <Divider />
+      <div className="section-with-border">
+        <span>{'Use additional ATTEST data for EV, PV and storage (EV-PV-Storage_Data_for_Simulations.xlsx)'}</span>
+        <div style={{ marginTop: 10, marginBottom: 10 }} />
+        <Row>
+          <Col style={{ alignSelf: 'center' }}>
+            <Tooltip target="use_load_data_update" isOpen={showTooltip}>
+              {' '}
+              Check for using ATTEST data for EV, PV and storage{' '}
+            </Tooltip>
+            <ValidatedField
+              register={register}
+              error={errors?.parameters?.use_load_data_update}
+              id="use_load_data_update"
+              className="input-row-checkbox"
+              label="Use Load Data Update"
+              name="parameters[use_load_data_update]"
+              data-cy="use_load_data_update"
+              type="checkbox"
+              onChange={e => setRequiredAddLoadData(e.target.checked)}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            />
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <ValidatedField
+              register={register}
+              error={errors?.parameters?.EV_data_file_path}
+              name="parameters[EV_data_file_path]"
+              label="EV-PV-Storage_Data_for_Simulations.xlsx"
+              type="file"
+              accept=".xlsx"
+              validate={requiredAddLoadData ? { required: true } : { required: false }}
+            />
+          </Col>
+          <Col>
+            <ValidatedField
+              register={register}
+              error={errors?.parameters?.add_load_data_case_name}
+              id={'add_load_data_case_name'}
+              label="Name of the case for which the additional load data should be included"
+              name="parameters[add_load_data_case_name]"
+              data-cy="add_load_data_case_name"
+              type="text"
+              validate={requiredAddLoadData ? { required: true } : { required: false }}
+            />
+          </Col>
+        </Row>
       </div>
     </>
   );

@@ -73,12 +73,14 @@ const NetworkActions = ({ match }) => {
           <ItemGrid id="sld_button" url={`${match.url}/sld`} title={'Diagram '} icon="project-diagram" disabled={disabled} />
         </Col>
       </Row>
-      <Row md="2">
+      {/* Comment on 2023/09/05:we are unable to show the network's map, due to the missing data such as coordinates
+       <Row md="2">
         <Col>
           <ItemGrid id="map_button" url={`${match.url}/map`} title={'Map '} icon="map" disabled={disabled} />
         </Col>
         <Col />
       </Row>
+       */}
       <Row>
         <Col md="8">
           <Button tag={Link} to={'/network'} color="info" data-cy="entityUploadBackButton">

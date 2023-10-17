@@ -91,4 +91,11 @@ public class TaskServiceImpl implements TaskService {
         log.debug("Request to delete Task : {}", id);
         taskRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TaskDTO> findBySimulationId(Long simulationId) {
+        log.debug("Request to get Task from simulationId : {}", simulationId);
+        return taskRepository.findBySimulationId(simulationId).map(taskMapper::toDto);
+    }
 }

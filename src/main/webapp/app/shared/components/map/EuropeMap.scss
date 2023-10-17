@@ -1,0 +1,23 @@
+.europe-map {
+  position: relative;
+  width: 550px;
+  height: 450px;
+}
+
+.leaflet-container {
+  background: whitesmoked;
+  color: #f9f9f9;
+}
+
+.leaflet-control-attribution.leaflet-control {
+  display: none;
+}
+
+.my-labels {
+  background-color: transparent;
+  border: transparent;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2820a7;
+}

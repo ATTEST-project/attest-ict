@@ -2,8 +2,8 @@ package com.attest.ict.web.rest;
 
 import com.attest.ict.custom.message.ResponseMessage;
 import com.attest.ict.custom.tools.utils.ToolVarName;
-import com.attest.ict.helper.csv.util.CsvConstants;
-import com.attest.ict.helper.excel.util.ExcelFileFormat;
+import com.attest.ict.custom.utils.FileUtils;
+import com.attest.ict.custom.utils.MimeUtils;
 import com.attest.ict.repository.ToolRepository;
 import com.attest.ict.service.InputFileService;
 import com.attest.ict.service.NetworkService;
@@ -16,19 +16,15 @@ import com.attest.ict.service.UserService;
 import com.attest.ict.service.dto.NetworkDTO;
 import com.attest.ict.service.dto.ToolDTO;
 import com.attest.ict.service.dto.custom.ToolExecutionResponseDTO;
-import com.attest.ict.tools.constants.T52FileFormat;
-import com.attest.ict.tools.constants.ToolFileFormat;
+import com.attest.ict.tools.constants.*;
 import com.attest.ict.tools.exception.RunningToolException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +34,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,7 +78,7 @@ public class ToolWp5Resource {
     ToolRepository toolRepository;
 
     /**
-     * @param file
+     * @param mpFile
      * @return file's header
      */
     @PostMapping("/tools/wp5/file-headers")
@@ -96,11 +91,12 @@ public class ToolWp5Resource {
 
             log.info("Request to get header of  the file: {}", mpFile.getOriginalFilename());
 
-            String contentType = mpFile.getContentType();
+            //String contentType = mpFile.getContentType();
+            String contentType = MimeUtils.detect(mpFile);
             if (
-                !contentType.equals(ExcelFileFormat.CONTENT_TYPE) &&
-                !contentType.equals(CsvConstants.CONTENT_TYPE) &&
-                !contentType.equals("application/vnd.ms-excel")
+                !contentType.equals(FileUtils.CONTENT_TYPE.get("xlsx")) &&
+                !contentType.equals(FileUtils.CONTENT_TYPE.get("csv")) && //CsvConstants.CONTENT_TYPE) &&
+                !contentType.equals(FileUtils.CONTENT_TYPE.get("xls")) // "application/vnd.ms-excel")
             ) {
                 String errMsg = "File not valid";
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(errMsg));
@@ -152,8 +148,22 @@ public class ToolWp5Resource {
 
             if (toolName.equals(ToolVarName.T51_CHARACTERIZATION)) {
                 try {
-                    uuid = toolWp5ExecutionServiceImpl.t511CharacterizationRun(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    // uuid = toolWp5ExecutionServiceImpl.t511CharacterizationRun(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
+                    //ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT511CharacterizationWorkingDir(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        jsonConfig,
+                        files
+                    );
+                    CompletableFuture t511CharacterizationRunAsync = toolExecutionServiceImpl.asyncRun(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        configMap,
+                        T51FileFormat.DOWNLOAD_FILES_EXTENSION
+                    );
+                    log.info("END t511CharacterizationRunAsync: {}", t511CharacterizationRunAsync);
+                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                     return new ResponseEntity<>(runResponse, HttpStatus.OK);
                 } catch (JsonProcessingException e) {
                     String errMsg = "Error converting jsonConfig to T52InputParamDTO";
@@ -164,18 +174,49 @@ public class ToolWp5Resource {
 
             if (toolName.equals(ToolVarName.T51_MONITORING)) {
                 try {
-                    uuid = toolWp5ExecutionServiceImpl.t512MonitoringRun(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    //uuid = toolWp5ExecutionServiceImpl.t512MonitoringRun(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
+                    //ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    //return new ResponseEntity<>(runResponse, HttpStatus.OK);
+                    Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT512MonitoringWorkingDir(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        jsonConfig,
+                        files
+                    );
+                    CompletableFuture t512MonitoringRunAsync = toolExecutionServiceImpl.asyncRun(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        configMap,
+                        T52FileFormat.DOWNLOAD_FILES_EXTENSION
+                    );
+                    log.info("END t512MonitoringRunAsync: {}", t512MonitoringRunAsync);
+                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                     return new ResponseEntity<>(runResponse, HttpStatus.OK);
                 } catch (JsonProcessingException e) {
-                    String errMsg = "Error converting jsonConfig to T52InputParamDTO";
+                    String errMsg = "Error converting jsonConfig to T51MonitoringLaunchParamDTO";
                     log.error(errMsg, e);
                     return new ResponseEntity<>("param jsonConfig param is not valid!", HttpStatus.BAD_REQUEST);
                 }
             } else if (toolName.equals(ToolVarName.T52_INDICATOR)) {
                 try {
-                    uuid = toolWp5ExecutionServiceImpl.t52Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    //  uuid = toolWp5ExecutionServiceImpl.t52Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
+                    // ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    // return new ResponseEntity<>(runResponse, HttpStatus.OK);
+                    Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT52WorkingDir(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        jsonConfig,
+                        files
+                    );
+                    CompletableFuture t52RunAsync = toolExecutionServiceImpl.asyncRun(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        configMap,
+                        T52FileFormat.DOWNLOAD_FILES_EXTENSION
+                    );
+
+                    log.info("END t52RunAsync: {}", t52RunAsync);
+                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                     return new ResponseEntity<>(runResponse, HttpStatus.OK);
                 } catch (JsonProcessingException e) {
                     String errMsg = "Error converting jsonConfig to T52InputParamDTO";
@@ -186,11 +227,27 @@ public class ToolWp5Resource {
 
             if (toolName.equals(ToolVarName.T53_MANAGEMENT)) {
                 try {
-                    uuid = toolWp5ExecutionServiceImpl.t53Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    // uuid = toolWp5ExecutionServiceImpl.t53Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
+                    // ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
+                    //return new ResponseEntity<>(runResponse, HttpStatus.OK);
+                    Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT53WorkingDir(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        jsonConfig,
+                        files
+                    );
+                    CompletableFuture t53RunAsync = toolExecutionServiceImpl.asyncRun(
+                        networkDtoOpt.get(),
+                        toolDtoOpt.get(),
+                        configMap,
+                        T53FileFormat.DOWNLOAD_FILES_EXTENSION
+                    );
+
+                    log.info("END t53RunAsync: {}", t53RunAsync);
+                    ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, "");
                     return new ResponseEntity<>(runResponse, HttpStatus.OK);
                 } catch (JsonProcessingException e) {
-                    String errMsg = "Error converting jsonConfig to T52InputParamDTO";
+                    String errMsg = "Error converting jsonConfig to T53LaunchParamDTO";
                     log.error(errMsg, e);
                     return new ResponseEntity<>("param jsonConfig param is not valid!", HttpStatus.BAD_REQUEST);
                 }
@@ -300,24 +357,13 @@ public class ToolWp5Resource {
 
             // build zip file
             String archiveFileName = uuid.concat(ToolFileFormat.ZIP_EXTENSION);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(bos);
-            for (File file : filesOutputResults) {
-                ZipEntry zipEntry = new ZipEntry(file.getName());
-                zipEntry.setSize(file.length());
-                zipOutputStream.putNextEntry(zipEntry);
-                StreamUtils.copy(new FileInputStream(file), zipOutputStream);
-                zipOutputStream.closeEntry();
-            }
-            zipOutputStream.finish();
-            zipOutputStream.close();
-
+            ByteArrayOutputStream bos = FileUtils.zipFiles(filesOutputResults);
             ByteArrayResource resource = new ByteArrayResource(bos.toByteArray());
 
             return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + archiveFileName)
-                .contentType(MediaType.parseMediaType(ToolFileFormat.ZIP_CONTENT_MEDIA_TYPE))
+                .contentType(MediaType.parseMediaType(FileUtils.CONTENT_TYPE.get("zip")))
                 .body(resource);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

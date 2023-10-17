@@ -5,12 +5,13 @@ import com.attest.ict.service.dto.NetworkDTO;
 import com.attest.ict.service.dto.OutputFileDTO;
 import com.attest.ict.service.dto.SimulationDTO;
 import com.attest.ict.service.dto.ToolDTO;
+import com.attest.ict.service.dto.custom.ToolResultsOutputFileDTO;
 import java.io.File;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service Interface for managing {@link com.attest.ict.domain.OutputFile}.
@@ -56,9 +57,20 @@ public interface OutputFileService {
     void delete(Long id);
 
     //Start Custom Methods
-    OutputFileDTO saveFileForNetworkAndTool(MultipartFile file, NetworkDTO networkDto, ToolDTO toolDto);
+    // OutputFileDTO saveFileForNetworkAndTool(MultipartFile file, NetworkDTO networkDto, ToolDTO toolDto);
 
     Optional<OutputFileDTO> findLastFileByNetworkIdAndFileNameAndToolName(Long networkId, String fileName, String toolName);
 
     List<OutputFile> findFromSimulationId(Long simulationId);
+
+    //  OutputFileDTO saveFileForNetworkAndToolAndSimulation(File file, NetworkDTO networkDto, ToolDTO toolDto, SimulationDTO simulationDTO);
+    OutputFileDTO saveFileForNetworkAndToolAndSimulation(
+        File file,
+        NetworkDTO networkDto,
+        ToolDTO toolDto,
+        SimulationDTO simulationDTO,
+        String fileNameModified
+    );
+
+    List<ToolResultsOutputFileDTO> findToolResults(Long networkId, Long toolId, String fileName, Instant dateTimeEnd);
 }

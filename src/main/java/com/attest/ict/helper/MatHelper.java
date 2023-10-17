@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
 import us.hebi.matlab.mat.types.Matrix;
@@ -17,16 +16,7 @@ import us.hebi.matlab.mat.types.Matrix;
 public class MatHelper {
 
     // type of matlab files
-    public static String TYPE = "application/octet-stream";
-
-    public static boolean hasMatlabFormat(MultipartFile file) {
-        // check if the file has .mat format
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-
-        return true;
-    }
+    // public static String TYPE = "application/octet-stream";
 
     /* matToBus method
      * parse a matlab file and return a list of bus

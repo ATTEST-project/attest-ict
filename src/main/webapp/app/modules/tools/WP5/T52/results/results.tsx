@@ -1,36 +1,41 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Button, Col, Input, Label, Row } from 'reactstrap';
-import mainClusteringPage from './sample-pages/main_Clustering.html';
-import assetsTable from './sample-pages/assets_table.html';
-import assetsLocation from './sample-pages/assets_location.html';
-import Divider from 'app/shared/components/divider/divider';
-import { reset as resetTable, showTable } from 'app/modules/tools/WP5/T52/reducer/tool-table.reducer';
-import { reset as resetCharts, showCharts } from 'app/modules/tools/WP5/T52/reducer/tool-charts.reducer';
-import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import mainClusteringPage from './sample-pages/main_Clustering.html';
+import assetsTable from './sample-pages/assets_table.html';
+import assetsLocation from './sample-pages/assets_location.html';
+
+import { reset as resetTable, showTable } from 'app/modules/tools/WP5/T52/reducer/tool-table.reducer';
+import { reset as resetCharts, showCharts } from 'app/modules/tools/WP5/T52/reducer/tool-charts.reducer';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+
+import Divider from 'app/shared/components/divider/divider';
+import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
+
 const T52Results = (props: any) => {
   const dispatch = useAppDispatch();
-
+  const toolDescription = TOOLS_INFO.T52_INDICATOR.description;
   const divRef = React.useRef<HTMLDivElement>();
   const iframeRef = React.useRef<HTMLIFrameElement>();
-
   const taskEntity = useAppSelector(state => state.task.entity);
+  const tableEntity = useAppSelector(state => state.t52ToolTable.entity);
+  const pageEntity = useAppSelector(state => state.t52ToolCharts.entity);
+  const loadingPage = useAppSelector(state => state.t52ToolCharts.loading);
+  const [pageSelected, setPageSelected] = React.useState<string>(null);
 
-  const response = useAppSelector(state => state.t52ToolExecution.entity) || {
+  // const response = useAppSelector(state => state.t52ToolExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
     },
     simulationId: taskEntity?.simulationUuid,
   };
-  const tableEntity = useAppSelector(state => state.t52ToolTable.entity);
-  const pageEntity = useAppSelector(state => state.t52ToolCharts.entity);
-  const loadingPage = useAppSelector(state => state.t52ToolCharts.loading);
-
-  const [pageSelected, setPageSelected] = React.useState<string>(null);
 
   if (!response) {
     return <div>No results to display. First, run the tool!</div>;
@@ -119,7 +124,10 @@ const T52Results = (props: any) => {
 
   return (
     <>
-      <div>T5.2 Definition of condition indicators Results</div>
+      <ToolTitle imageAlt={WP_IMAGE.WP5.alt} title={toolDescription} imageSrc={WP_IMAGE.WP5.src} />
+      <Divider />
+
+      <h4>Results: </h4>
       <Row>
         <Col md="3">
           <Input id="input-pages" type="select" onChange={event => setPageSelected(event.target.value)}>

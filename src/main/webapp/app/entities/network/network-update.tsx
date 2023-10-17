@@ -8,16 +8,29 @@ import { IBaseMVA } from 'app/shared/model/base-mva.model';
 import { getEntities as getBaseMvas } from 'app/entities/base-mva/base-mva.reducer';
 import { IVoltageLevel } from 'app/shared/model/voltage-level.model';
 import { getEntities as getVoltageLevels } from 'app/entities/voltage-level/voltage-level.reducer';
-import { getEntity, updateEntity, createEntity, reset } from './network.reducer';
+import { getEntity, updateEntity, partialUpdateEntity, createEntity, reset } from './network.reducer';
 import { INetwork } from 'app/shared/model/network.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
+
+import {
+  convertDateTimeFromServer,
+  convertDateTimeToServer,
+  displayDefaultDateTime,
+  displayCurrentDateTime,
+} from 'app/shared/util/date-utils';
+
 import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { useForm } from 'react-hook-form';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
 
+import { generateNetworkTypeOptions } from 'app/shared/util/authorizationUtils';
+import { generateCountryOptions } from 'app/shared/util/options-map-utils';
+
 export const NetworkUpdate = (props: RouteComponentProps<{ id: string }>) => {
+  const account = useAppSelector(state => state.authentication.account);
+  const isAdmin = hasAnyAuthority(account.authorities, [AUTHORITIES.ADMIN]);
+
   const dispatch = useAppDispatch();
 
   const [isNew] = useState(!props.match.params || !props.match.params.id);
@@ -28,12 +41,13 @@ export const NetworkUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const loading = useAppSelector(state => state.network.loading);
   const updating = useAppSelector(state => state.network.updating);
   const updateSuccess = useAppSelector(state => state.network.updateSuccess);
+
+  const networkTypeOptions = generateNetworkTypeOptions(account.authorities);
+  const countryOptions = generateCountryOptions();
+
   const handleClose = () => {
     props.history.push('/network' + props.location.search);
   };
-
-  const account = useAppSelector(state => state.authentication.account);
-  const isAdmin = hasAnyAuthority(account.authorities, [AUTHORITIES.ADMIN]);
 
   useEffect(() => {
     if (isNew) {
@@ -65,16 +79,17 @@ export const NetworkUpdate = (props: RouteComponentProps<{ id: string }>) => {
     if (isNew) {
       dispatch(createEntity(entity));
     } else {
-      dispatch(updateEntity(entity));
+      // dispatch(updateEntity(entity));
+      dispatch(partialUpdateEntity(entity));
     }
   };
 
   const defaultValues = () =>
     isNew
       ? {
-          networkDate: displayDefaultDateTime(),
-          creationDateTime: displayDefaultDateTime(),
-          updateDateTime: displayDefaultDateTime(),
+          networkDate: displayCurrentDateTime(),
+          creationDateTime: displayCurrentDateTime(),
+          updateDateTime: displayCurrentDateTime(),
         }
       : {
           ...networkEntity,
@@ -99,8 +114,8 @@ export const NetworkUpdate = (props: RouteComponentProps<{ id: string }>) => {
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? <ValidatedField name="id" required readOnly id="network-id" label="ID" validate={{ required: true }} /> : null}
-              <ValidatedField label="Name" id="network-name" name="name" data-cy="name" type="text" />
-              {isAdmin && <ValidatedField label="Mpc Name" id="network-mpcName" name="mpcName" data-cy="mpcName" type="text" />}
+              <ValidatedField label="Name" id="network-name" name="name" data-cy="name" type="text" validate={{ required: true }} />
+              <ValidatedField label="Mpc Name" id="network-mpcName" name="mpcName" data-cy="mpcName" type="text" />
               <ValidatedField
                 label="Country"
                 id="network-country"
@@ -110,22 +125,38 @@ export const NetworkUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 validate={{ required: true }}
               >
                 <option value="" hidden>
-                  Select the country...
+                  Select the Country...
                 </option>
-                <option value="ES">Spain</option>
-                <option value="HR">Croatia</option>
-                <option value="PT">Portugal</option>
-                <option value="UK">United Kingdom</option>
+                {countryOptions?.map((option, index) => (
+                  <option key={index} value={option.value}>
+                    {' '}
+                    {option.label}{' '}
+                  </option>
+                ))}
               </ValidatedField>
               <ValidatedField label="Type" id="network-type" name="type" data-cy="type" type="select" validate={{ required: true }}>
-                <option value="" hidden>
-                  Select the type...
-                </option>
-                <option value="DX">Distribution</option>
-                <option value="TX">Transmission</option>
+                {/* Check whether networkTypeOptions has only one element */}
+                {networkTypeOptions && networkTypeOptions.length === 1 ? (
+                  <option value={networkTypeOptions[0].value}>{networkTypeOptions[0].value}</option>
+                ) : (
+                  <>
+                    <option value="" hidden>
+                      Select the Type...
+                    </option>
+                    {networkTypeOptions?.map((option, index) => (
+                      <option key={index} value={option.value}>
+                        {' '}
+                        {option.label}{' '}
+                      </option>
+                    ))}
+                  </>
+                )}
               </ValidatedField>
               <ValidatedField label="Description" id="network-description" name="description" data-cy="description" type="text" />
-              <ValidatedField label="Is Deleted" id="network-isDeleted" name="isDeleted" data-cy="isDeleted" check type="checkbox" />
+              {/* Comment 2023/10/12
+                The functionality for logical deletion of the network has not been implemented yet
+                <ValidatedField label="Is Deleted" id="network-isDeleted" name="isDeleted" data-cy="isDeleted" check type="checkbox" />
+              */}
               <ValidatedField
                 label="Network Date"
                 id="network-networkDate"

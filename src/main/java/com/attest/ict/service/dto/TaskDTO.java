@@ -37,6 +37,7 @@ public class TaskDTO implements Serializable {
     private UUID simulationUuid;
 
     @Lob
+    @JsonIgnore
     private byte[] simulationConfigFile;
 
     @JsonIgnore
@@ -45,6 +46,14 @@ public class TaskDTO implements Serializable {
     private ToolDTO tool;
 
     private UserDTO user;
+
+    //20230526 add new field to show year, season, with or without flexibility
+    private String simulationDescr;
+
+    private String networkName;
+
+    //20231003 toolNum for sort
+    private String toolNum;
 
     public Long getId() {
         return id;
@@ -166,6 +175,30 @@ public class TaskDTO implements Serializable {
         this.simulationConfigFile = simulationConfigFile;
     }
 
+    public String getSimulationDescr() {
+        return simulationDescr;
+    }
+
+    public void setSimulationDescr(String simulationDescr) {
+        this.simulationDescr = simulationDescr;
+    }
+
+    public String getNetworkName() {
+        return networkName;
+    }
+
+    public void setNetworkName(String networkName) {
+        this.networkName = networkName;
+    }
+
+    public String getToolNum() {
+        return toolNum;
+    }
+
+    public void setToolNum(String toolNum) {
+        this.toolNum = toolNum;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -190,31 +223,49 @@ public class TaskDTO implements Serializable {
     @Override
     public String toString() {
         return (
-            "TaskDTO [id=" +
+            "TaskDTO{" +
+            "id=" +
             id +
-            ", taskStatus=" +
+            ", taskStatus='" +
             taskStatus +
-            ", info=" +
+            '\'' +
+            ", info='" +
             info +
+            '\'' +
             ", dateTimeStart=" +
             dateTimeStart +
             ", dateTimeEnd=" +
             dateTimeEnd +
+            ", toolLogFile=" +
+            toolLogFile +
             ", toolLogFileId=" +
             toolLogFileId +
-            ", toolLogFileName=" +
+            ", toolLogFileName='" +
             toolLogFileName +
+            '\'' +
             ", networkId=" +
             networkId +
             ", simulationId=" +
             simulationId +
             ", simulationUuid=" +
             simulationUuid +
+            //  ", simulationConfigFile=" + Arrays.toString(simulationConfigFile) +
+            ", simulation=" +
+            simulation +
             ", tool=" +
             tool +
             ", user=" +
             user +
-            "]"
+            ", simulationDescr='" +
+            simulationDescr +
+            '\'' +
+            ", networkName='" +
+            networkName +
+            '\'' +
+            ", toolNum='" +
+            toolNum +
+            '\'' +
+            '}'
         );
     }
     // prettier-ignore

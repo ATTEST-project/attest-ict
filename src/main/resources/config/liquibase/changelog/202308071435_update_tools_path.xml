@@ -1,0 +1,126 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+	<changeSet author="lp" id="202308071435-1">
+		<update tableName="tool">
+			<column name="path" value="\WP2\T26"/>
+			<where>num='T26'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-2">
+		<update tableName="tool">
+			<column name="path" value="\WP2\T251"/>
+			<where>num='T251'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-3">
+		<update tableName="tool">
+			<column name="path" value="\WP2\T252"/>
+			<where>num='T252'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-4">
+		<update tableName="tool">
+			<column name="path" value="\WP3\T31"/>
+			<where>num='T31'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-5">
+		<update tableName="tool">
+			<column name="path" value="\WP3\T32"/>
+			<where>num='T32'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-6">
+		<update tableName="tool">
+			<column name="path" value="\WP3\T33"/>
+			<where>num='T33'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-7">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T41"/>
+			<where>num='T41'</where>
+		</update>
+	</changeSet>
+
+    <changeSet author="lp" id="202308071435-8">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T42"/>
+			<where>num='T42'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-9">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T43"/>
+			<where>num='T43'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-10">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T44V3"/>
+			<where>num='T44'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-11">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T45"/>
+			<where>num='T45'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-12">
+		<update tableName="tool">
+			<column name="path" value="\WP4\T46"/>
+			<where>num='T46'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-13">
+		<update tableName="tool">
+			<column name="path" value="\WP4\TSG"/>
+			<where>num='TSG'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-14">
+		<update tableName="tool">
+			<column name="path" value="\WP5\T51"/>
+			<where>num='T511'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-15">
+		<update tableName="tool">
+			<column name="path" value="\WP5\T51"/>
+			<where>num='T512'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-16">
+		<update tableName="tool">
+			<column name="path" value="\WP5\T52"/>
+			<where>num='T52'</where>
+		</update>
+	</changeSet>
+
+	<changeSet author="lp" id="202308071435-17">
+		<update tableName="tool">
+			<column name="path" value="\WP5\T53"/>
+			<where>num='T53'</where>
+		</update>
+	</changeSet>
+
+
+	</databaseChangeLog>
+
+

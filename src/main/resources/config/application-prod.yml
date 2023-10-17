@@ -144,5 +144,13 @@ jhipster:
 # Tools
 #=============================================
 tools:
-  path: /ATTEST/tools/
-  pathSimulation: /ATSIM
+  path: \ATTEST\tools
+  pathSimulation: \ATSIM
+  # T44 tool's name (with matpower converter included)
+  t44WithConv: T44V3_DEMO
+
+#=============================================
+# CIM Repository
+#=============================================
+cimrepo:
+  base-url: http://localhost:5000

@@ -90,22 +90,40 @@ const Auxiliary = (props: any) => {
               </div>
             </Col>
           ) : (
-            <Col>
-              <ValidatedField
-                register={register}
-                error={errors?.config?.[index]?.variables2}
-                name={`config[${index}].variables2`}
-                label="Aux Variables"
-                type="select"
-              >
-                <option key="aux-var-0" value="" hidden>
-                  Variable...
-                </option>
-                {auxVariables?.map((variable, index) => (
-                  <option key={'aux-var-' + index}>{variable}</option>
-                ))}
-              </ValidatedField>
-            </Col>
+            <>
+              <Col>
+                <ValidatedField
+                  register={register}
+                  error={errors?.config?.[index]?.variables2}
+                  name={`config[${index}].component2_field`}
+                  label="Aux Variables"
+                  type="select"
+                >
+                  <option key="aux-var-0" value="" hidden>
+                    Variable...
+                  </option>
+                  {auxVariables?.map((variable, index) => (
+                    <option key={'aux-var-' + index}>{variable}</option>
+                  ))}
+                </ValidatedField>
+              </Col>
+              <Col>
+                <ValidatedField
+                  register={register}
+                  error={errors?.config?.[index]?.variables2}
+                  name={`config[${index}].variables2`}
+                  label="Group-by Attribute"
+                  type="select"
+                >
+                  <option key="aux-var1-0" value="" hidden>
+                    Variable...
+                  </option>
+                  {auxVariables?.map((variable, index) => (
+                    <option key={'aux-var1-' + index}>{variable}</option>
+                  ))}
+                </ValidatedField>
+              </Col>
+            </>
           )}
         </Row>
       </Collapse>

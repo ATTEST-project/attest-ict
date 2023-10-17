@@ -2,6 +2,7 @@ package com.attest.ict.repository;
 
 import com.attest.ict.domain.Task;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
 
     @Query(value = "SELECT * FROM tasks t where t.user_id=:userId", nativeQuery = true)
     List<Task> findTaskByUserId(@Param("userId") String userId);
+
+    Optional<Task> findBySimulationId(Long simulationId);
 }

@@ -8,6 +8,8 @@ public class AttestConstants {
     public static final String INPUT_FILE_FLEXIBILITY_DESCR = "flexibility";
     public static final String INPUT_LOAD_PROFILE_DESCR = "dso_tso_connection";
 
-    // network file could be in matpower or ods (for t41)
     public static final String INPUT_FILE_NETWORK_DESCR = "network";
+
+    public static final int SCALE = 4;
+    public static final String GEN_COST_DELIMITER = "|";
 }

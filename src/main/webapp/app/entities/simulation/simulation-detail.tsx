@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getEntity } from './simulation.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { hasAuthorityForUpdateSimulation } from 'app/shared/util/authorizationUtils';
 
 export const SimulationDetail = (props: RouteComponentProps<{ id: string }>) => {
   const dispatch = useAppDispatch();
@@ -14,6 +15,9 @@ export const SimulationDetail = (props: RouteComponentProps<{ id: string }>) => 
   useEffect(() => {
     dispatch(getEntity(props.match.params.id));
   }, []);
+
+  const userEntity = useAppSelector(state => state.authentication.account);
+  const hasAuthorityForUpdate = hasAuthorityForUpdateSimulation(userEntity.authorities);
 
   const simulationEntity = useAppSelector(state => state.simulation.entity);
   return (
@@ -66,7 +70,7 @@ export const SimulationDetail = (props: RouteComponentProps<{ id: string }>) => 
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
-        <Button tag={Link} to={`/simulation/${simulationEntity.id}/edit`} replace color="primary">
+        <Button hidden={!hasAuthorityForUpdate} tag={Link} to={`/simulation/${simulationEntity.id}/edit`} replace color="primary">
           <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>

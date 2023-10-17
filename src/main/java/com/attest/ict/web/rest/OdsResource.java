@@ -5,22 +5,14 @@ import com.attest.ict.custom.utils.DateFormatter;
 import com.attest.ict.custom.utils.FileUtils;
 import com.attest.ict.domain.Network;
 import com.attest.ict.helper.ods.utils.OdsFileFormat;
-import com.attest.ict.helper.ods.utils.T41FileInputFormat;
-import com.attest.ict.helper.ods.writer.NetworkOdsExporter;
 import com.attest.ict.service.NetworkService;
 import com.attest.ict.service.OdsNetworkService;
-import com.attest.ict.tools.constants.ToolFileFormat;
 import com.attest.ict.web.rest.errors.BadRequestAlertException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -79,7 +71,7 @@ public class OdsResource {
             return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
-                .contentType(MediaType.parseMediaType(OdsFileFormat.ODS_CONTENT_MEDIA_TYPE))
+                .contentType(MediaType.parseMediaType(FileUtils.CONTENT_TYPE.get("ods")))
                 .body(resource);
         } catch (Exception ioe) {
             log.info("Exception: " + ioe.getMessage());

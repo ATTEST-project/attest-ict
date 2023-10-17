@@ -4,44 +4,40 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomTooltip from 'app/shared/components/tooltip/custom-tooltip';
 import { useAppSelector } from 'app/config/store';
-import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import { AUTHORITIES } from 'app/config/constants';
+
+import { shouldShowToolCard, shouldShowButtonConfiguredAndRun } from 'app/shared/util/authorizationUtils';
 
 const ToolCard = props => {
-  const { index, title, text, toPage, isReady, type, network } = props;
+  const { index, title, text, toPage, isActive, supportedNetworkType, network } = props;
+  const currentUser = useAppSelector(state => state.authentication.account);
+  const authorities = currentUser.authorities;
 
-  const authentication = useAppSelector(state => state.authentication.account);
-  const isDSO = hasAnyAuthority(authentication.authorities, [AUTHORITIES.DSO]);
-  const isTSO = hasAnyAuthority(authentication.authorities, [AUTHORITIES.TSO]);
-  const isAdmin = hasAnyAuthority(authentication.authorities, [AUTHORITIES.ADMIN]);
+  const isConfAndRunEnabled = shouldShowButtonConfiguredAndRun(authorities, supportedNetworkType, isActive, network);
 
-  const showForDSO = (type === 'all' || type === 'distribution') && isDSO;
-  const showForTSO = (type === 'all' || type === 'transmission') && isTSO;
-
-  return isAdmin || showForDSO || showForTSO ? (
+  return shouldShowToolCard(authorities, supportedNetworkType) ? (
     <Card color="light" outline body>
       <CardTitle tag="h5">{title}</CardTitle>
       <CardText>{text}</CardText>
       <div id={'conf-run-button-' + index} style={{ marginTop: 'auto' }}>
         <Button
-          disabled={!network || !isReady}
-          color={isReady ? 'primary' : 'secondary'}
+          disabled={!isConfAndRunEnabled}
+          color={isActive ? 'primary' : 'secondary'}
           tag={Link}
           to={{ pathname: toPage, network }}
           style={{ width: '100%' }}
         >
-          {isReady ? (
+          {isActive ? (
             <>
               <FontAwesomeIcon icon="cog" />
               {' Configure and run'}
             </>
           ) : (
-            'Tool not ready'
+            'Tool not active'
           )}
         </Button>
       </div>
-      {!network && isReady && <CustomTooltip target={'conf-run-button-' + index} tooltip="First select a network" />}
-      {network && isReady && <CustomTooltip target={'conf-run-button-' + index} tooltip={'Last network selected: ' + network.mpcName} />}
+      {!network && isActive && <CustomTooltip target={'conf-run-button-' + index} tooltip="First select a network" />}
+      {network && isActive && <CustomTooltip target={'conf-run-button-' + index} tooltip={'Last network selected: ' + network.mpcName} />}
     </Card>
   ) : null;
 };

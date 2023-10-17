@@ -36,4 +36,5 @@ public class ToolsResultsChartConstants {
         .collect(Collectors.toList());
 
     public static final String X_TITLE_TIME = "Time [hh:mm]";
+    public static final String X_TITLE_TIME_HH = "Time [hh]";
 }

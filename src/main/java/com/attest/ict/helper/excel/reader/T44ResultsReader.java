@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -76,74 +75,12 @@ public class T44ResultsReader extends ToolResultReader {
         return mapDataForSheet;
     }
 
-    // Costs with contingencies are:
-    // Geereation Cost
-    // Flexibility Cost
-    // Storage Cost
-    // Load curt. Cost
-    // RES curt. Cost
-    // Post contingency costs
-    // Flexibility Cost
-    // Storage Cost
-    // Load curt. Cost
-    // RES curt. Cost
-    // Total Cost
-    // Elapsed time
-    // ----
-    // Cost less contingencies are:
-    // Geereation Cost
-    // Flexibility Cost
-    // Storage Cost
-    // Load curt. Cost
-    // RES curt. Cost
-    // Total Cost
-    // Elapsed time
-
-    public void readSheetCosts(Sheet sheet, List<FlexibleOptionWithContin> sheetData, String excelPath) {
-        log.debug("Read COST sheetName: {} START ", sheet.getSheetName());
-        // Reading each row of the sheet
-        FlexibleOptionWithContin flexibleOption = new FlexibleOptionWithContin();
-        List<FlexibleCost> costs = new ArrayList<FlexibleCost>();
-
-        for (Row currentRow : sheet) {
-            FlexibleCost flexCost = new FlexibleCost();
-            for (Cell currentCell : currentRow) {
-                CellType cellType = currentCell.getCellType();
-                //log.debug(" Read RowIdx: {} CellIdx:{}  Val: {}", currentCell.getRowIndex(), currentCell.getColumnIndex(), cellVal);
-
-                if (cellType.equals(CellType.BLANK) && currentCell.getColumnIndex() == 0) {
-                    //log.debug("Row {} is empty, skip row ", currentCell.getRowIndex(), currentCell.getColumnIndex());
-                    break;
-                }
-                switch (currentCell.getColumnIndex()) {
-                    case 0:
-                        // cost type Generation, Flexibility etc...
-                        flexCost.setCostType(ExcelFileUtils.getStringCellValue(currentCell));
-                        break;
-                    case 1:
-                        // cost value
-                        flexCost.setValue(ExcelFileUtils.getDoubleCellValue(currentCell));
-                        break;
-                    case 2:
-                        // description sometime there is a cost description or note
-                        flexCost.setDescription(ExcelFileUtils.getStringCellValue(currentCell));
-                        break;
-                }
-            }
-            costs.add(flexCost);
-        }
-
-        flexibleOption.setFlexCosts(costs);
-        sheetData.add(flexibleOption);
-        log.debug("Parsing sheetName: {} END ", sheet.getSheetName());
-    }
-
     public void readSheet(Sheet sheet, List<FlexibleOptionWithContin> sheetData, String excelPath) {
         String fileNameExt = this.getFileExtension(excelPath);
         //-- COSTS
         if (
             sheet.getSheetName().equals(T44FileOutputFormat.SHEETS_NAME.get(7)) ||
-            (fileNameExt.equals(T44FileOutputFormat.OUTPUT_FILES_EXTENSION.get(0)))
+            (fileNameExt.equals(T44FileOutputFormat.OUTPUT_FILES_SUFFIX.get(0)))
         ) {
             readSheetCosts(sheet, sheetData, excelPath);
             return;
@@ -161,9 +98,7 @@ public class T44ResultsReader extends ToolResultReader {
             // read all cell in row
             for (Cell currentCell : currentRow) {
                 CellType cellType = currentCell.getCellType();
-
                 //log.debug("Read Row num: {} CellIdx:{}  Val: {}", currentCell.getRowIndex(),	currentCell.getColumnIndex(), cellVal);
-
                 if (cellType.equals(CellType.BLANK) && currentCell.getColumnIndex() == 0) {
                     //log.info("Row {} is empty, skip row ", currentCell.getRowIndex(), currentCell.getColumnIndex());
                     break;
@@ -247,8 +182,7 @@ public class T44ResultsReader extends ToolResultReader {
     }
 
     /**
-     * Parsing output filenames
-     * @param output fileName
+     * Parsing output filenames     *
      * @return outputFileName's extension. Possible value are (_Costs, _Normal, _STR, RES_C, LC, FL_Dec, FL_Inc, Reactive_P, Active_P )
      */
     private String getFileExtension(String fileName) {
@@ -303,10 +237,6 @@ public class T44ResultsReader extends ToolResultReader {
             throw new FileNotFoundException("Directory not found: " + directoryName);
         }
         File[] fileList = dir.listFiles();
-        if (fileList.length == 0) {
-            log.warn("Directory: {}, doesn't contains any files ", directoryName);
-            return 0;
-        }
 
         for (File excelFile : fileList) {
             if (!isT44Results(excelFile)) {
@@ -316,7 +246,7 @@ public class T44ResultsReader extends ToolResultReader {
 
             try {
                 Map<String, List<FlexibleOptionWithContin>> mapDataForSheet = new HashMap<String, List<FlexibleOptionWithContin>>();
-                log.info(" fileName " + excelFile);
+                log.info(" -- fileName " + excelFile);
                 mapDataForSheet = this.read(excelFile);
                 numFileRead++;
                 mapAllExcelData.putAll(mapDataForSheet);
@@ -324,7 +254,73 @@ public class T44ResultsReader extends ToolResultReader {
                 throw e;
             }
         }
+
+        if (numFileRead == 0) {
+            log.warn("Directory: {}, doesn't contain any files ", directoryName);
+            return 0;
+        }
         return numFileRead;
+    }
+
+    // Costs with contingencies are:
+    // Geereation Cost
+    // Flexibility Cost
+    // Storage Cost
+    // Load curt. Cost
+    // RES curt. Cost
+    // Post contingency costs
+    // Flexibility Cost
+    // Storage Cost
+    // Load curt. Cost
+    // RES curt. Cost
+    // Total Cost
+    // Elapsed time
+    // ----
+    // Cost less contingencies are:
+    // Geereation Cost
+    // Flexibility Cost
+    // Storage Cost
+    // Load curt. Cost
+    // RES curt. Cost
+    // Total Cost
+    // Elapsed time
+    public void readSheetCosts(Sheet sheet, List<FlexibleOptionWithContin> sheetData, String excelPath) {
+        log.debug("Read COST sheetName: {} START ", sheet.getSheetName());
+        // Reading each row of the sheet
+        FlexibleOptionWithContin flexibleOption = new FlexibleOptionWithContin();
+        List<FlexibleCost> costs = new ArrayList<FlexibleCost>();
+
+        for (Row currentRow : sheet) {
+            FlexibleCost flexCost = new FlexibleCost();
+            for (Cell currentCell : currentRow) {
+                CellType cellType = currentCell.getCellType();
+                //log.debug(" Read RowIdx: {} CellIdx:{}  Val: {}", currentCell.getRowIndex(), currentCell.getColumnIndex(), cellVal);
+
+                if (cellType.equals(CellType.BLANK) && currentCell.getColumnIndex() == 0) {
+                    //log.debug("Row {} is empty, skip row ", currentCell.getRowIndex(), currentCell.getColumnIndex());
+                    break;
+                }
+                switch (currentCell.getColumnIndex()) {
+                    case 0:
+                        // cost type Generation, Flexibility etc...
+                        flexCost.setCostType(ExcelFileUtils.getStringCellValue(currentCell));
+                        break;
+                    case 1:
+                        // cost value
+                        flexCost.setValue(ExcelFileUtils.getDoubleCellValue(currentCell));
+                        break;
+                    case 2:
+                        // description sometime there is a cost description or note
+                        flexCost.setDescription(ExcelFileUtils.getStringCellValue(currentCell));
+                        break;
+                }
+            }
+            costs.add(flexCost);
+        }
+
+        flexibleOption.setFlexCosts(costs);
+        sheetData.add(flexibleOption);
+        log.debug("Parsing sheetName: {} END ", sheet.getSheetName());
     }
 
     /**
@@ -338,7 +334,7 @@ public class T44ResultsReader extends ToolResultReader {
     public Integer readFileInDirByType(String directoryName, Map<String, List<FlexibleOptionWithContin>> mapAllExcelData, String type)
         throws FileNotFoundException {
         int numFileRead = 0;
-        log.info("ReadFile by Type: {} ", type);
+        log.info("Read File by Type: {} ", type);
 
         File dir = new File(directoryName);
         if (!dir.isDirectory()) {
@@ -346,7 +342,7 @@ public class T44ResultsReader extends ToolResultReader {
         }
 
         File[] fileList = dir.listFiles();
-        if (fileList.length == 0) {
+        if (fileList == null || fileList.length == 0) {
             log.warn("Directory: {}, doesn't contains any files ", directoryName);
             return 0;
         }
@@ -357,24 +353,27 @@ public class T44ResultsReader extends ToolResultReader {
                 continue;
             }
             Map<String, List<FlexibleOptionWithContin>> mapDataForSheet = new HashMap<String, List<FlexibleOptionWithContin>>();
-            log.info(" Read fileName: " + excelFile);
+            log.info("Reading file: " + excelFile);
             mapDataForSheet = this.read(excelFile);
             numFileRead++;
             mapAllExcelData.putAll(mapDataForSheet);
         }
 
+        if (numFileRead == 0) {
+            throw new FileNotFoundException("Directory: " + directoryName + ", doesn't contain file with extension: " + type);
+        }
         return numFileRead;
     }
 
     private boolean isT44Results(File excelFile) {
         if (!excelFile.isFile()) {
-            log.error("{} is Not a file, skip ", excelFile.getName());
+            log.info("{} is Not a file, skip ", excelFile.getName());
             return false;
         }
 
         String fileName = excelFile.getName();
         String extension = this.getFileExtension(fileName);
-        return T44FileOutputFormat.OUTPUT_FILES_EXTENSION.contains(extension);
+        return T44FileOutputFormat.OUTPUT_FILES_SUFFIX.contains(extension);
     }
 
     /**
@@ -400,8 +399,8 @@ public class T44ResultsReader extends ToolResultReader {
 
     /**
      * Get flexibility options related to a specific contingency (contingIdx) and scenario (nScIdx)
-     * @param contingIdx
-     * @param nScIdx
+     * @param contingIdx contingency identifier
+     * @param nScIdx     scenario identifier
      * @param mapAllExcelData
      * @return map
      */
@@ -435,7 +434,7 @@ public class T44ResultsReader extends ToolResultReader {
 
     /**
      *
-     * @param sheetName
+     * @param sheetName sheet's name
      * @return Active_power_Contin_1_Scen_1, FL_dec_Contin_1_Scen_1,
      *         FL_inc_Contin_1_Scen_1 etc
      */

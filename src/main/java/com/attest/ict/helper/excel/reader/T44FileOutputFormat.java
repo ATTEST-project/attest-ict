@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.hibernate.mapping.Collection;
 
 public class T44FileOutputFormat extends ExcelFileFormat {
 
@@ -16,7 +15,8 @@ public class T44FileOutputFormat extends ExcelFileFormat {
 
     public static final String COSTS_SUB_STR = "_Costs";
 
-    public static final List<String> OUTPUT_FILES_EXTENSION = Stream
+    public static List<String> OUTPUT_FILE_EXTENSION = Stream.of(".xlsx").collect(Collectors.toList());
+    public static final List<String> OUTPUT_FILES_SUFFIX = Stream
         .of("Costs", "OPF", "Normal", "ActiveP", "ReactiveP", "FL_dec", "FL_inc", "LC", "RES_C", "STR")
         .collect(Collectors.toList());
 
@@ -68,31 +68,31 @@ public class T44FileOutputFormat extends ExcelFileFormat {
 
     static {
         //_Costs.xlsx
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(0), SHEETS_NAME_COST);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(0), SHEETS_NAME_COST);
 
         //"OPF.xlsx",
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(1), SHEETS_NAME);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(1), SHEETS_NAME);
 
         //"Normal.xlsx",
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(2), SHEETS_NAME);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(2), SHEETS_NAME);
 
         //"ActiveP.xlsx"
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(3), SHEETS_NAME_ACTIVE_P);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(3), SHEETS_NAME_ACTIVE_P);
 
         //"ReactiveP.xlsx"
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(4), SHEETS_NAME_REACTIVE_P);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(4), SHEETS_NAME_REACTIVE_P);
 
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(5), SHEETS_NAME_FL_DEC);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(5), SHEETS_NAME_FL_DEC);
 
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(6), SHEETS_NAME_FL_INC);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(6), SHEETS_NAME_FL_INC);
 
         //"LC.xlsx",
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(7), SHEETS_NAME_LC);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(7), SHEETS_NAME_LC);
 
         //"RES_C.xlsx",
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(8), SHEETS_NAME_RES_C);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(8), SHEETS_NAME_RES_C);
 
         //"STR.xlsx"
-        mapFileNameSheets.put(OUTPUT_FILES_EXTENSION.get(9), SHEETS_NAME_STR);
+        mapFileNameSheets.put(OUTPUT_FILES_SUFFIX.get(9), SHEETS_NAME_STR);
     }
 }

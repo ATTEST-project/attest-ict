@@ -1,19 +1,26 @@
 import React from 'react';
+import { Button, Col, List, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Table } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { showCharts } from 'app/modules/tools/WP3/T32/reducer/tool-results.reducer';
+
 import AllResults from 'app/modules/tools/WP3/T32/results/section/all/all-results';
 import TotalCost from 'app/modules/tools/WP3/T32/results/section/total-cost/total-cost';
 import CostPerYear from 'app/modules/tools/WP3/T32/results/section/cost-per-year/cost-per-year';
 import BranchInvestment from 'app/modules/tools/WP3/T32/results/section/branch-investment/branch-investment';
 import FlexInvestment from 'app/modules/tools/WP3/T32/results/section/flex-investment/flex-investment';
-import { Button, Col, List, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Table } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { showCharts } from 'app/modules/tools/WP3/T32/reducer/tool-results.reducer';
+import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+
 import Divider from 'app/shared/components/divider/divider';
-import { Link } from 'react-router-dom';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T32Results = (props: any) => {
   /* eslint-disable-next-line no-console */
   console.log('T32 Results ');
+
+  const toolDescription = TOOLS_INFO.T32_OPT_TOOL_TX.description;
   const dispatch = useAppDispatch();
 
   const taskEntity = useAppSelector(state => state.task.entity);
@@ -21,7 +28,8 @@ const T32Results = (props: any) => {
   /* eslint-disable-next-line no-console */
   console.log('T32 taskEntity ', taskEntity);
 
-  const response = useAppSelector(state => state.t32ToolExecution.entity) || {
+  // const response = useAppSelector(state => state.t32ToolExecution.entity) || {
+  const response = {
     args: {
       networkId: taskEntity?.networkId,
       toolName: taskEntity?.tool?.name,
@@ -92,7 +100,8 @@ const T32Results = (props: any) => {
             <Button color="dark" onClick={() => setOpenOffCanvas(true)}>
               <FontAwesomeIcon icon="bars" />
             </Button>
-            <h4 style={{ marginLeft: 20 }}>T3.2 Results</h4>
+
+            <ToolTitle imageAlt={WP_IMAGE.WP3.alt} title={toolDescription} imageSrc={WP_IMAGE.WP3.src} />
           </div>
           <Table>
             <thead>

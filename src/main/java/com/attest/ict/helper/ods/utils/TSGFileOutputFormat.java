@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 public class TSGFileOutputFormat extends OdsFileFormat {
 
+    public static final String toolOutputFile = "scenario_gen.ods";
+
     public static List<String> scenarioGenSheets = Stream
         .of("wind_scenarios", "pv_scenarios", "probabilities")
         .collect(Collectors.toList());

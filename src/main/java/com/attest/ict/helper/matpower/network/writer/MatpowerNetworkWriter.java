@@ -2,19 +2,7 @@ package com.attest.ict.helper.matpower.network.writer;
 
 import com.attest.ict.custom.model.matpower.MatpowerModel;
 import com.attest.ict.custom.utils.ConverterUtils;
-import com.attest.ict.domain.Branch;
-import com.attest.ict.domain.BranchExtension;
-import com.attest.ict.domain.Bus;
-import com.attest.ict.domain.BusCoordinate;
-import com.attest.ict.domain.BusExtension;
-import com.attest.ict.domain.BusName;
-import com.attest.ict.domain.CapacitorBankData;
-import com.attest.ict.domain.GenCost;
-import com.attest.ict.domain.GenTag;
-import com.attest.ict.domain.Generator;
-import com.attest.ict.domain.GeneratorExtension;
-import com.attest.ict.domain.Transformer;
-import com.attest.ict.domain.VoltageLevel;
+import com.attest.ict.domain.*;
 import com.attest.ict.helper.matpower.common.util.structure.MatpowerFileStruct;
 import com.attest.ict.helper.matpower.common.util.structure.MpcBaseElement;
 import com.attest.ict.helper.matpower.common.util.structure.MpcElement;
@@ -22,6 +10,7 @@ import com.attest.ict.helper.matpower.network.util.MatpowerAttributesTemplate;
 import com.attest.ict.helper.matpower.network.util.MatpowerNetworkSection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +39,12 @@ public class MatpowerNetworkWriter {
 
         MpcElement bus = new MpcElement(MatpowerNetworkSection.BUS);
         if (!model.getBusExtensions().isEmpty()) {
+            List<String> extensionFields = getBusExtensionFields(model.getBusExtensions());
             List<String> newComments = new ArrayList<>();
             newComments.add("%% bus data");
-            newComments.add("% " + String.join("\t", MatpowerAttributesTemplate.BUS_TOTAL));
+            newComments.add("% " + String.join("\t", extensionFields));
             bus.setComments(newComments);
-            bus.addContent(convertMpcBus(model.getBuses(), model.getBusExtensions()));
+            bus.addContent(convertMpcBus(model.getBuses(), model.getBusExtensions(), extensionFields));
         } else {
             bus.addContent(convertMpcBus(model.getBuses()));
         }
@@ -68,11 +58,12 @@ public class MatpowerNetworkWriter {
 
         MpcElement generator = new MpcElement(MatpowerNetworkSection.GENERATOR);
         if (!model.getGeneratorExtensions().isEmpty()) {
+            List<String> extensionFields = getGeneratorExtensionFields(model.getGeneratorExtensions());
             List<String> newComments = new ArrayList<>();
             newComments.add("%% generator data");
-            newComments.add("% " + String.join("\t", MatpowerAttributesTemplate.GENERATOR_TOTAL));
+            newComments.add("% " + String.join("\t", extensionFields));
             generator.setComments(newComments);
-            generator.addContent(convertMpcGenerator(model.getGenerators(), model.getGeneratorExtensions()));
+            generator.addContent(convertMpcGenerator(model.getGenerators(), model.getGeneratorExtensions(), extensionFields));
         } else {
             generator.addContent(convertMpcGenerator(model.getGenerators()));
         }
@@ -80,11 +71,12 @@ public class MatpowerNetworkWriter {
 
         MpcElement branch = new MpcElement(MatpowerNetworkSection.BRANCH);
         if (!model.getBranchExtensions().isEmpty()) {
+            List<String> extensionFields = getBranchExtensionFields(model.getBranchExtensions());
             List<String> newComments = new ArrayList<>();
             newComments.add("%% branch data");
-            newComments.add("% " + String.join("\t", MatpowerAttributesTemplate.BRANCH_TOTAL));
+            newComments.add("% " + String.join("\t", addKmToLengthField(extensionFields))); // 2023/03 branch line on DB are stored as KM.
             branch.setComments(newComments);
-            branch.addContent(convertMpcBranch(model.getBranches(), model.getBranchExtensions()));
+            branch.addContent(convertMpcBranch(model.getBranches(), model.getBranchExtensions(), extensionFields));
         } else {
             branch.addContent(convertMpcBranch(model.getBranches()));
         }
@@ -177,7 +169,7 @@ public class MatpowerNetworkWriter {
         return busesList;
     }
 
-    private static List<String> convertMpcBus(List<Bus> buses, List<BusExtension> busExtensions) {
+    private static List<String> convertMpcBus(List<Bus> buses, List<BusExtension> busExtensions, List extensionFields) {
         List<String> busesList = new ArrayList<>();
         for (int i = 0; i < buses.size(); ++i) {
             StringBuilder builder = new StringBuilder();
@@ -207,29 +199,41 @@ public class MatpowerNetworkWriter {
                 .append("\t")
                 .append(buses.get(i).getVmax())
                 .append("\t")
-                .append(buses.get(i).getVmin())
-                // bus extension values
-                .append("\t")
-                .append(busExtensions.get(i).getHasGen())
-                .append("\t")
-                .append(busExtensions.get(i).getIsLoad())
-                .append("\t")
-                .append(busExtensions.get(i).getSnomMva())
-                .append("\t")
-                .append(busExtensions.get(i).getSx())
-                .append("\t")
-                .append(busExtensions.get(i).getSy())
-                .append("\t")
-                .append(busExtensions.get(i).getGx())
-                .append("\t")
-                .append(busExtensions.get(i).getGy())
-                .append("\t")
-                .append(busExtensions.get(i).getStatus())
-                .append("\t")
-                .append(busExtensions.get(i).getIncrementCost())
-                .append("\t")
-                .append(busExtensions.get(i).getDecrementCost())
-                .append(";\n");
+                .append(buses.get(i).getVmin());
+            // ADD extension fields
+            if (extensionFields != null) {
+                builder
+                    .append("\t")
+                    .append(busExtensions.get(i).getHasGen())
+                    .append("\t")
+                    .append(busExtensions.get(i).getIsLoad())
+                    .append("\t")
+                    .append(busExtensions.get(i).getSnomMva())
+                    .append("\t")
+                    .append(busExtensions.get(i).getSx())
+                    .append("\t")
+                    .append(busExtensions.get(i).getSy())
+                    .append("\t")
+                    .append(busExtensions.get(i).getGx())
+                    .append("\t")
+                    .append(busExtensions.get(i).getGy());
+            }
+            builder.append("\n");
+            //    .append("\t")
+            //    .append(busExtensions.get(i).getStatus() != null ? busExtensions.get(i).getStatus() : "")
+            //    .append("\t")
+            //    .append(busExtensions.get(i).getIncrementCost() != null ? busExtensions.get(i).getIncrementCost() : "")
+            //     .append("\t")
+            //    .append(busExtensions.get(i).getDecrementCost() != null ? busExtensions.get(i).getDecrementCost() : "")
+            //.append(";\n");
+
+            //  .append(busExtensions.get(i).getStatus())
+            //  .append("\t")
+            //  .append(busExtensions.get(i).getIncrementCost())
+            //  .append("\t")
+            //  .append(busExtensions.get(i).getDecrementCost())
+            //.append(";\n");
+
             busesList.add(builder.toString());
         }
         return busesList;
@@ -288,7 +292,11 @@ public class MatpowerNetworkWriter {
         return generatorsList;
     }
 
-    private static List<String> convertMpcGenerator(List<Generator> generators, List<GeneratorExtension> generatorExtensions) {
+    private static List<String> convertMpcGenerator(
+        List<Generator> generators,
+        List<GeneratorExtension> generatorExtensions,
+        List<String> extensionAttributes
+    ) {
         List<String> generatorsList = new ArrayList<>();
         for (int i = 0; i < generators.size(); ++i) {
             StringBuilder builder = new StringBuilder();
@@ -334,14 +342,27 @@ public class MatpowerNetworkWriter {
                 .append("\t")
                 .append(generators.get(i).getRampQ())
                 .append("\t")
-                .append(generators.get(i).getApf())
-                .append("\t")
-                .append(generatorExtensions.get(i).getId())
+                .append(generators.get(i).getApf());
+            //2023/03 Fix: GeneratorExtension.IdGen contain the ID attribute present in mpc.gen struct
+            if (extensionAttributes != null && !extensionAttributes.isEmpty()) {
+                builder.append("\t").append(generatorExtensions.get(i).getIdGen());
+            }
+            builder.append(";\n");
+
+            //    .append(generatorExtensions.get(i).getStatusCurt() != null ? generatorExtensions.get(i).getStatusCurt(): "")
+            //    .append("\t")
+            //    .append(generatorExtensions.get(i).getDgType()!= null ? generatorExtensions.get(i).getDgType(): "")
+            //.append(";\n");
+            /*
+                //.append(generatorExtensions.get(i).getId())
+                .append(generatorExtensions.get(i).getIdGen() )  //2023/03 Fix: GeneratorExtension.IdGen contain the ID attribute present in mpc.gen struct
                 .append("\t")
                 .append(generatorExtensions.get(i).getStatusCurt())
                 .append("\t")
                 .append(generatorExtensions.get(i).getDgType())
                 .append(";\n");
+                */
+
             generatorsList.add(builder.toString());
         }
         return generatorsList;
@@ -384,7 +405,11 @@ public class MatpowerNetworkWriter {
         return branchesList;
     }
 
-    private static List<String> convertMpcBranch(List<Branch> branches, List<BranchExtension> branchExtensions) {
+    private static List<String> convertMpcBranch(
+        List<Branch> branches,
+        List<BranchExtension> branchExtensions,
+        List<String> extensionFields
+    ) {
         List<String> branchesList = new ArrayList<>();
         for (int i = 0; i < branches.size(); ++i) {
             StringBuilder builder = new StringBuilder();
@@ -424,26 +449,32 @@ public class MatpowerNetworkWriter {
                 .append("\t")
                 .append(branchExtensions.get(i).getMaxTap())
                 .append("\t")
-                .append(branchExtensions.get(i).getNormalTap())
-                .append("\t")
-                .append(branchExtensions.get(i).getNominalRatio())
-                .append("\t")
-                .append(branchExtensions.get(i).getrIp())
-                .append("\t")
-                .append(branchExtensions.get(i).getrN())
-                .append("\t")
-                .append(branchExtensions.get(i).getr0())
-                .append("\t")
-                .append(branchExtensions.get(i).getx0())
-                .append("\t")
-                .append(branchExtensions.get(i).getb0())
-                .append("\t")
-                .append(branchExtensions.get(i).getLength())
-                .append("\t")
-                .append(branchExtensions.get(i).getNormStat())
-                .append("\t")
-                .append(branchExtensions.get(i).getG())
-                .append(";\n");
+                .append(branchExtensions.get(i).getNormalTap());
+            // step_size, actTap,  minTap, maxTap, normalTap, nominalRatio, r_ip,  r_n, r0, x0, b0, length,NormSTAT
+            if (extensionFields.equals(MatpowerAttributesTemplate.BRANCH_EXTENSION_2)) {
+                builder
+                    .append("\t")
+                    .append(branchExtensions.get(i).getNominalRatio())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getrIp())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getrN())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getr0())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getx0())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getb0())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getLength())
+                    .append("\t")
+                    .append(branchExtensions.get(i).getNormStat());
+            }
+            // "step_size", "acttap", "mintap", "maxtap", "normaltap", "length"
+            if (extensionFields.equals(MatpowerAttributesTemplate.BRANCH_EXTENSION_1)) {
+                builder.append("\t").append(branchExtensions.get(i).getLength());
+            }
+            builder.append(";\n");
             branchesList.add(builder.toString());
         }
         return branchesList;
@@ -553,5 +584,60 @@ public class MatpowerNetworkWriter {
             coordinatesList.add(builder.toString());
         }
         return coordinatesList;
+    }
+
+    // -- 2023/03 add new method to fix network exporter problem
+    // @return branch attribute list with indication of (km) as length's unit measurement
+    public static List<String> addKmToLengthField(List<String> extensionsFields) {
+        return extensionsFields
+            .stream()
+            .map(s -> s.equals(MatpowerAttributesTemplate.ATTRIBUTE_LENGTH) ? MatpowerAttributesTemplate.ATTRIBUTE_LENGTH_KM : s)
+            .collect(Collectors.toList());
+    }
+
+    private static List<String> getBranchExtensionFields(List<BranchExtension> branchesExtension) {
+        if (branchesExtension == null || branchesExtension.isEmpty()) {
+            return null;
+        }
+        for (BranchExtension br : branchesExtension) {
+            if (br.getrIp() != null && br.getrN() != null && br.getr0() != null && br.getx0() != null && br.getb0() != null) {
+                return MatpowerAttributesTemplate.BRANCH_EXTENSION_2;
+            }
+        }
+        return MatpowerAttributesTemplate.BRANCH_EXTENSION_1;
+    }
+
+    private static List<String> getBusExtensionFields(List<BusExtension> busExtension) {
+        if (busExtension == null || busExtension.isEmpty()) {
+            return null;
+        }
+        for (BusExtension bs : busExtension) {
+            // hasgen", "isload", "snom_mva", "sx", "sy", "sx", "gy"
+            if (
+                bs.getHasGen() != null &&
+                bs.getIsLoad() != null &&
+                bs.getSnomMva() != null &&
+                bs.getSx() != null &&
+                bs.getSy() != null &&
+                bs.getSx() != null &&
+                bs.getGy() != null
+            ) {
+                return MatpowerAttributesTemplate.BUS_EXTENSION_1;
+            }
+        }
+        return null;
+    }
+
+    private static List<String> getGeneratorExtensionFields(List<GeneratorExtension> generatorExtensions) {
+        if (generatorExtensions == null || generatorExtensions.isEmpty()) {
+            return null;
+        }
+        for (GeneratorExtension gen : generatorExtensions) {
+            // ID
+            if (gen.getIdGen() != null) {
+                return MatpowerAttributesTemplate.GENERATOR_EXTENSION_1;
+            }
+        }
+        return null;
     }
 }

@@ -33,7 +33,8 @@ interface FormInfoProps {
 
 const UploadFileRowDT = (props: UploadFileRowProps) => {
   const { index, acceptType, nRows, callbackNRows, section, networkId, isTX } = props;
-
+  /* eslint-disable-next-line no-console */
+  // console.log('UploadFileRowDT: ', nRows);
   const {
     handleSubmit,
     register,
@@ -133,7 +134,7 @@ const UploadFileRowDT = (props: UploadFileRowProps) => {
   const submitForm = data => {
     const form = createFinalForm(data);
     /* eslint-disable-next-line no-console */
-    console.log('Form Data: ', form);
+    console.log('Form Data ROW DT: ', form);
     setLoading(true);
     if (form.extension === 'csv') {
       dispatch(uploadCSVProfile(form))
@@ -159,6 +160,8 @@ const UploadFileRowDT = (props: UploadFileRowProps) => {
   };
 
   const resetRow = () => {
+    /* eslint-disable-next-line no-console */
+    // console.log('resetRow ROW DT: ');
     reset();
   };
 
@@ -200,7 +203,7 @@ const UploadFileRowDT = (props: UploadFileRowProps) => {
               name="season"
               data-cy="season"
               type="select"
-              // validate={{ required: true }}
+              validate={{ required: true }}
               disabled={uploadCompleted}
             >
               <option value="" hidden>
@@ -232,30 +235,6 @@ const UploadFileRowDT = (props: UploadFileRowProps) => {
               <option value="Su">Sunday</option>
             </ValidatedField>
           </Col>
-          {/*
-          <Col style={{ alignSelf: 'end' }}>
-            <ValidatedField
-              register={register}
-              error={errors?.mode}
-              label={index === 0 || isTX ? 'Mode' : null}
-              id={'mode-select_' + section + '_' + index}
-              name="mode"
-              data-cy="mode"
-              type="select"
-              validate={{ required: true }}
-              disabled={uploadCompleted}
-            >
-              <option value="" hidden>
-                Mode...
-              </option>
-              <option value="1">{'Year time-series'}</option>
-              <option value="2">{'Business day for a season'}</option>
-              <option value="3">{'Business day for a month'}</option>
-              <option value="4">{'Weekend for a season'}</option>
-              <option value="5">{'Weekend for a month'}</option>
-            </ValidatedField>
-          </Col>
-			*/}
 
           <Col xs="4" style={{ alignSelf: 'end' }}>
             <ValidatedField

@@ -6,10 +6,11 @@ import SecondarySection from 'app/modules/tools/WP2/T26/config/secondary/seconda
 import TertiarySection from 'app/modules/tools/WP2/T26/config/tertiary/tertiary-section';
 import ParametersSection from 'app/modules/tools/WP2/T26/config/parameters/parameters-section';
 
-const Config = () => {
+const Config = (props: any) => {
+  const { marketNotSelected } = props;
   return (
     <>
-      <ParametersSection />
+      <ParametersSection marketNotSelected={marketNotSelected} />
       <Divider />
       <NetworkSection />
       <Divider />

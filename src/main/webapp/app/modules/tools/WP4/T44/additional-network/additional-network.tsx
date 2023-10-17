@@ -13,7 +13,7 @@ const AdditionalNetwork = () => {
   return (
     <>
       <div className="section-with-border">
-        <h6>Additional Network</h6>
+        <h6>ODS Network File </h6>
         <Row md="7">
           <Col md="4">
             <ValidatedField

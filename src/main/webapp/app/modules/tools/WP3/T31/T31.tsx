@@ -1,33 +1,53 @@
 import React from 'react';
-import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, Row, Col, Offcanvas, OffcanvasBody, OffcanvasHeader } from 'reactstrap';
+import { ValidatedField } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import carouselImage1 from '../../../../../content/images/carousel_img_1.png';
+
+import { FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
-import { FormProvider, useForm } from 'react-hook-form';
 import Parameters from 'app/modules/tools/WP3/T31/parameters/parameters';
-import { Link } from 'react-router-dom';
 import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
+import { defaultParametersES } from 'app/modules/tools/WP3/T31/parameters/default-parameters_ES';
+import { defaultParametersHR } from 'app/modules/tools/WP3/T31/parameters/default-parameters_HR';
+import { defaultParametersPT } from 'app/modules/tools/WP3/T31/parameters/default-parameters_PT';
+import { defaultParametersUK } from 'app/modules/tools/WP3/T31/parameters/default-parameters_UK';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { runT31Tool, reset as retry } from 'app/modules/tools/WP3/T31/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP3/T31/reducer/tool-results.reducer';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { pathButton } from 'app/shared/reducers/back-button-path';
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T31 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
-
-  const methods = useForm({
-    defaultValues: {
-      parameters: { ...defaultParameters },
-    },
-  });
-  const { handleSubmit, reset } = methods;
-
-  const dispatch = useAppDispatch();
-
+  const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
+  const country = network.country;
+  const toolDescription = TOOLS_INFO.T31_OPT_TOOL_DX.description;
+  const defaultParamsValues = () => {
+    switch (country) {
+      case 'UK':
+        return { parameters: { ...defaultParametersUK } };
+      case 'HR':
+        return { parameters: { ...defaultParametersHR } };
+      case 'PT':
+        return { parameters: { ...defaultParametersPT } };
+      case 'ES':
+        return { parameters: { ...defaultParametersES } };
+      default:
+        return { parameters: { ...defaultParameters } };
+    }
+  };
+
+  const methods = useForm({ defaultValues: defaultParamsValues() });
+  const { handleSubmit, reset } = methods;
+  const dispatch = useAppDispatch();
 
   if (!network) {
     props.history?.goBack();
@@ -41,9 +61,9 @@ const T31 = (props: any) => {
   const isRunning = useAppSelector(state => state.t31ToolExecution.loading);
   const response = useAppSelector(state => state.t31ToolExecution.entity);
   const completed = useAppSelector(state => state.t31ToolExecution.updateSuccess);
-
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [form, setForm] = React.useState(null);
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
 
   const convertStringToArray = React.useCallback((parameter, value) => {
     const listKeys = ['line_capacities', 'TRS_capacities', 'line_costs', 'TRS_costs', 'cont_list', 'line_length', 'scenarios'];
@@ -58,62 +78,82 @@ const T31 = (props: any) => {
     return value;
   }, []);
 
+  const convertBooleanToNumber = React.useCallback((parameter, value) => {
+    const listKeys = ['use_load_data_update'];
+    if (listKeys.includes(parameter) && typeof value === 'boolean') {
+      return value ? 1 : 0;
+    } else {
+      return value;
+    }
+  }, []);
+
+  const parametersToSend = (parameters: any) => {
+    const { ...rest } = parameters;
+    const evDataFileName = rest.EV_data_file_path?.[0]?.name;
+    const finalParameters = {
+      ...rest,
+      EV_data_file_path: evDataFileName,
+    };
+    return { parameters: finalParameters };
+  };
+
   const submitMethod = data => {
-    /* eslint-disable-next-line no-console */
-    console.log('Form data: ', data);
     const parameters = { ...data.parameters };
+    /* eslint-disable-next-line no-console */
+    // console.info('T31 submitMethod() - parameters! ', parameters);
+
     Object.keys(parameters).forEach(key => (parameters[key] = convertStringToArray(key, parameters[key])));
+    Object.keys(parameters).forEach(key => (parameters[key] = convertBooleanToNumber(key, parameters[key])));
     const finalForm = {
       networkId: network.id,
       toolName: TOOLS_INFO.T31_OPT_TOOL_DX.name,
-      ...parameters,
+      files: [parameters.EV_data_file_path?.[0]],
+      jsonConfig: JSON.stringify({ ...parametersToSend(parameters) }),
     };
     /* eslint-disable-next-line no-console */
-    console.log('Final Form data: ', finalForm);
+    console.log('T31 submitMethod() T31 Final Form data: ', finalForm);
     setForm({ ...finalForm });
     setOpenModal(true);
   };
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log('RUN T31!');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
         runT31Tool({
           ...form,
         })
-      );
+      )
+        .unwrap()
+        .then(res => {
+          if (res.data.status === 'ko') {
+            toast.error('Tool execution failure, check log file for more details...');
+            setShowBtnGoToTask(false);
+          } else {
+            toast.success('T31 is running!');
+            setShowBtnGoToTask(true);
+          }
+        })
+        .catch(err => {
+          /* eslint-disable-next-line no-console */
+          console.error('Error running T31! ' + err);
+        });
     }, 500);
   };
 
-  const retryToolRun = () => {
-    dispatch(retry());
-  };
-
-  const download = () => {
-    dispatch(
-      downloadResults({
-        networkId: response.args?.networkId,
-        toolName: response.args?.toolName,
-        simulationId: response.simulationId,
-      })
-    );
-  };
-
   const checkCompleted = () => {
-    return completed && response.args?.toolName === TOOLS_INFO.T31_OPT_TOOL_DX.name;
+    return !isRunning;
   };
 
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button color="dark">{<FontAwesomeIcon icon="bars" />}</Button>
-        <img alt="wp3" src={carouselImage1} width={100} height={70} />
-        <h4 style={{ marginLeft: 20 }}>{'T3.1 Optimisation Tool for distribution network planning'}</h4>
-      </div>
+
+      <ToolTitle imageAlt={WP_IMAGE.WP3.alt} title={toolDescription} imageSrc={WP_IMAGE.WP3.src} />
       <Divider />
+
       {network && (
         <>
           <NetworkInfo network={network} />
@@ -121,9 +161,11 @@ const T31 = (props: any) => {
           <FormProvider {...methods}>
             <Form onSubmit={handleSubmit(submitMethod)}>
               <Parameters network={network} />
+
               <Divider />
+
               <div style={{ float: 'right' }}>
-                {!checkCompleted() ? (
+                {!showBtnGoToTask ? (
                   <>
                     <Button color="primary" onClick={() => reset()}>
                       <FontAwesomeIcon icon="redo" />
@@ -136,23 +178,10 @@ const T31 = (props: any) => {
                   </>
                 ) : (
                   <>
-                    <Button color="primary" onClick={retryToolRun}>
-                      <FontAwesomeIcon icon="redo" />
-                      {' Retry'}
-                    </Button>{' '}
-                    <Button
-                      tag={Link}
-                      to={{ pathname: '/tools/t31/results', state: { fromConfigPage: true } }}
-                      color="success"
-                      type="button"
-                    >
+                    <Button tag={Link} to={'/task'} color="success">
                       <FontAwesomeIcon icon="poll" />
-                      {' Show Results'}
+                      {' Go to Tasks '}
                     </Button>{' '}
-                    <Button color="success" type="button" onClick={download}>
-                      <FontAwesomeIcon icon="file-download" />
-                      {' Download Results'}
-                    </Button>
                   </>
                 )}
               </div>
@@ -168,19 +197,13 @@ const T31 = (props: any) => {
         </Button>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

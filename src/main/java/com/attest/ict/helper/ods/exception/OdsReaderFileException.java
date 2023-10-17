@@ -1,12 +1,12 @@
 package com.attest.ict.helper.ods.exception;
 
 /**
- * Csv reader file exception.
+ * Ods reader file exception.
  */
 public class OdsReaderFileException extends RuntimeException {
 
     /**
-     * Instantiates a new Csv reader file exception.
+     * Instantiates a new Ods reader file exception.
      *
      * @param message the message
      */
@@ -15,7 +15,7 @@ public class OdsReaderFileException extends RuntimeException {
     }
 
     /**
-     * Instantiates a new Csv reader file exception.
+     * Instantiates a new Ods reader file exception.
      *
      * @param message the message
      * @param cause   the cause

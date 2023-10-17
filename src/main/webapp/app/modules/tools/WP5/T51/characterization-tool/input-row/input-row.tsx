@@ -58,6 +58,18 @@ const InputRow = (props: any) => {
         <Col md="3">
           <ValidatedField
             register={register}
+            error={errors?.config?.[index]?.assestsType}
+            name={`config[${index}].assestsType`}
+            label="Assets Type"
+            type="text"
+            placeholder="Assets type..."
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col md="3">
+          <ValidatedField
+            register={register}
             error={errors?.config?.[index]?.inputFile}
             name={`config[${index}].inputFile`}
             label="Input File"

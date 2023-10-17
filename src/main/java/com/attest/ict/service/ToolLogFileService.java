@@ -61,5 +61,7 @@ public interface ToolLogFileService {
     //==== Start Custom Method
     ToolLogFileDTO saveFileByTask(MultipartFile file, TaskDTO taskDto);
 
+    ToolLogFileDTO saveFile(MultipartFile file);
+
     Optional<ToolLogFile> findByTaskId(Long taskId);
 }

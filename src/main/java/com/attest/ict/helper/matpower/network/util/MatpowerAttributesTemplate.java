@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 
 public class MatpowerAttributesTemplate {
 
+    public static final String ATTRIBUTE_LENGTH = "length";
+    public static final String ATTRIBUTE_LENGTH_KM = "length (km)";
+
     public static final List<String> BUS_STANDARD = Arrays.asList(
         "bus_i",
         "type",
@@ -27,9 +30,11 @@ public class MatpowerAttributesTemplate {
         .concat(BUS_STANDARD.stream(), Stream.of("hasgen", "isload", "snom_mva", "sx", "sy", "sx", "gy"))
         .collect(Collectors.toList());
 
-    public static final List<String> BUS_EXTENSION_2 = Stream
+    /*
+        public static final List<String> BUS_EXTENSION_2 = Stream
         .concat(BUS_STANDARD.stream(), Stream.of("status", "increment_cost", "decrement_cost"))
         .collect(Collectors.toList());
+   */
 
     public static final List<String> BUS_TOTAL = Arrays.asList(
         "bus_i",
@@ -51,10 +56,11 @@ public class MatpowerAttributesTemplate {
         "SX",
         "SY",
         "GX",
-        "GY",
-        "Status",
-        "increment_cost",
-        "decrement_cost"
+        "GY"
+        // fix 2023/03 apparently  used from T41 first version of the tool
+        //"Status",
+        //"increment_cost",
+        //"decrement_cost"
     );
 
     public static final List<String> GENERATOR_STANDARD = Arrays.asList(
@@ -82,9 +88,11 @@ public class MatpowerAttributesTemplate {
     );
 
     public static final List<String> GENERATOR_EXTENSION_1 = Stream
-        .concat(GENERATOR_STANDARD.stream(), Stream.of("id"))
+        //.concat(GENERATOR_STANDARD.stream(), Stream.of("id"))
+        .concat(GENERATOR_STANDARD.stream(), Stream.of("ID"))
         .collect(Collectors.toList());
 
+    /**   fix 2023/03 apparently  used from T41 first version of the tool
     public static final List<String> GENERATOR_EXTENSION_2 = Stream
         .concat(GENERATOR_STANDARD.stream(), Stream.of("status_curt", "dg_type"))
         .collect(Collectors.toList());
@@ -111,10 +119,11 @@ public class MatpowerAttributesTemplate {
         "ramp_30",
         "ramp_q",
         "apf",
-        "ID",
-        "status_curt",
-        "dg_type"
-    );
+        "ID"  //2023/03 Bug Fix writer
+      //  "id",
+      //  "status_curt",
+      //  "dg_type"
+    ); */
 
     public static final List<String> BRANCH_STANDARD = Arrays.asList(
         "fbus",
@@ -156,7 +165,7 @@ public class MatpowerAttributesTemplate {
             )
         )
         .collect(Collectors.toList());
-
+    /*
     public static final List<String> BRANCH_EXTENSION_3 = Stream
         .concat(BRANCH_STANDARD.stream(), Stream.of("g", "mintap", "maxtap"))
         .collect(Collectors.toList());
@@ -186,8 +195,8 @@ public class MatpowerAttributesTemplate {
         "r0",
         "x0",
         "b0",
-        "length (meter)",
-        "NormSTAT",
-        "g"
-    );
+        "length (km)",  // 2023/03 length in DB table are stored in KM
+        "NormSTAT"
+     //   "g"
+    ); */
 }

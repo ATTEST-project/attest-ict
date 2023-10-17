@@ -49,6 +49,7 @@ const Auxiliary = props => {
             name="auxiliary[flex]"
             data-cy="flexData"
             type="file"
+            accept=".ods"
             validate={{ required: true }}
             onChange={event => setFlexFile(event.target.files[0])}
           />
@@ -74,6 +75,7 @@ const Auxiliary = props => {
             name="auxiliary[scenario]"
             data-cy="scenarioGenData"
             type="file"
+            accept=".ods"
             validate={{ required: true }}
             onChange={event => setScenarioGenFile(event.target.files[0])}
           />

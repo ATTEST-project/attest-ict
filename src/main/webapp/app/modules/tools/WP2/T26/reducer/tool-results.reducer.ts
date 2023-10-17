@@ -19,7 +19,7 @@ interface T26ToolResultsParams {
   simulationId: string;
 }
 
-const apiDownloadUrl = 'api/tools/wp3/download';
+const apiDownloadUrl = 'api/tools/wp2/download';
 
 export const downloadResults = createAsyncThunk(
   't26_tool/download-results',

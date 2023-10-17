@@ -13,6 +13,8 @@ import { SECTION } from 'app/shared/util/file-utils';
 
 const NetworkUploadMatpower = props => {
   const dispatch = useAppDispatch();
+  /* eslint-disable-next-line no-console */
+  console.log('NetworkUploadMatpower - props ', props);
 
   const {
     handleSubmit,
@@ -23,21 +25,28 @@ const NetworkUploadMatpower = props => {
 
   const [loading, setLoading] = React.useState(false);
   const [uploadedFile, setUploadedFile] = React.useState(null);
-
   const networkEntity = useAppSelector(state => state.network.entity);
   const operationCompleted = useAppSelector(state => state.networkMatpowerUpload.updateSuccess);
 
   const inputFileEntities = useAppSelector(state => state.inputFile.entities) || props.files;
 
+  const inputFileLoading = useAppSelector(state => state.inputFile.loading);
+
   const getMatpowerFile = () => {
     const matpowerFile = inputFileEntities.find(file => file.description === SECTION.NETWORK);
     if (matpowerFile) {
+      /* eslint-disable-next-line no-console */
+      console.log('NetworkUploadMatpower - getMatpowerFile(), found file:', matpowerFile.fileName);
+
       setUploadedFile(matpowerFile);
       props.callback(matpowerFile);
     }
   };
 
   React.useEffect(() => {
+    /* eslint-disable-next-line no-console */
+    console.log('NetworkUploadMatpower - useEffect(), inputFileEntities:', inputFileEntities);
+
     if (!inputFileEntities) {
       return;
     }
@@ -62,6 +71,8 @@ const NetworkUploadMatpower = props => {
   };
 
   React.useEffect(() => {
+    /* eslint-disable-next-line no-console */
+    console.log('NetworkUploadMatpower - useEffect(), operationCompleted:', operationCompleted);
     if (!operationCompleted) {
       return;
     }
@@ -70,6 +81,9 @@ const NetworkUploadMatpower = props => {
   }, [operationCompleted]);
 
   const submitUploadForm = (data: any) => {
+    /* eslint-disable-next-line no-console */
+    console.log('NetworkUploadMatpower - submitUploadForm() data:', data);
+
     setLoading(true);
     dispatch(uploadNetworkFile({ networkName: networkEntity.name, file: data.matpowerFile[0] }))
       .unwrap()

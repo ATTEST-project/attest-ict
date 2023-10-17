@@ -162,8 +162,11 @@ spring:
             scope: openid,profile,email
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      #max-file-size: 10MB
+      #max-request-size: 10MB
+      #ATTEST custom setting, T33 needs zip more than 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 server:
   servlet:
@@ -224,9 +227,3 @@ jhipster:
 
 # application:
 
-#=============================================
-# Tools
-#=============================================
-tools:
-  path: /ATTEST/tools/
-  pathSimulation: /ATSIM

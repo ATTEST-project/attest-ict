@@ -42,6 +42,7 @@ export const NetworkDeleteDialog = (props: RouteComponentProps<{ id: string }>) 
         if (networkSaved && JSON.parse(networkSaved).id === networkEntity.id) {
           sessionStorage.removeItem('network');
         }
+        handleClose();
       })
       .catch(err => setLoading(false));
   };

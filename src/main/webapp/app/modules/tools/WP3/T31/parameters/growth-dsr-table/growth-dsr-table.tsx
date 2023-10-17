@@ -32,6 +32,7 @@ const GrowthDSRTable = (props: any) => {
             <th>2020</th>
             <th>2030</th>
             <th>2040</th>
+            <th>2050</th>
           </tr>
         </thead>
         <tbody>
@@ -85,6 +86,22 @@ const GrowthDSRTable = (props: any) => {
                 step="any"
               />
             </td>
+            <td>
+              <ValidatedField
+                register={() =>
+                  register(`parameters[${section}][Active][2050]`, {
+                    setValueAs: value => convertStringToNumber(value, section, 'Active', '2050'),
+                  })
+                }
+                error={errors?.parameters?.[section]?.Active?.['2050']}
+                id={`${section}-active-2050`}
+                name={`parameters[${section}][Active][2050]`}
+                data-cy="growth"
+                type="number"
+                min={0}
+                step="any"
+              />
+            </td>
           </tr>
           <tr>
             <td>Slow</td>
@@ -130,6 +147,22 @@ const GrowthDSRTable = (props: any) => {
                 error={errors?.parameters?.[section]?.Slow?.['2040']}
                 id={`${section}-slow-2040`}
                 name={`parameters[${section}][Slow][2040]`}
+                data-cy="growth"
+                type="number"
+                min={0}
+                step="any"
+              />
+            </td>
+            <td>
+              <ValidatedField
+                register={() =>
+                  register(`parameters[${section}][Slow][2050]`, {
+                    setValueAs: value => convertStringToNumber(value, section, 'Slow', '2050'),
+                  })
+                }
+                error={errors?.parameters?.[section]?.Slow?.['2050']}
+                id={`${section}-slow-2050`}
+                name={`parameters[${section}][Slow][2050]`}
                 data-cy="growth"
                 type="number"
                 min={0}

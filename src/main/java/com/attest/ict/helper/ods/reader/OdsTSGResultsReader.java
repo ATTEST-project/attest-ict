@@ -5,34 +5,39 @@ import com.attest.ict.helper.ods.reader.model.ScenarioValues;
 import com.attest.ict.helper.ods.utils.TSGFileOutputFormat;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
-import com.github.miachm.sods.SpreadSheet;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 public class OdsTSGResultsReader extends OdsFileReader {
 
-    public final Logger log = LoggerFactory.getLogger(OdsTSGResultsReader.class);
-    public final String toolOutputFile = "scenario_gen.ods";
+    private final Logger log = LoggerFactory.getLogger(OdsTSGResultsReader.class);
 
-    public Map<String, List<ScenarioValues>> read(File odsFile) throws OdsReaderFileException {
+    public OdsTSGResultsReader(MultipartFile file) {
+        super(file);
+    }
+
+    public OdsTSGResultsReader(String strPath) {
+        super(strPath);
+    }
+
+    public OdsTSGResultsReader(File relativePath) {
+        super(relativePath);
+    }
+
+    public Map<String, List<ScenarioValues>> parseOdsTSGResults() throws OdsReaderFileException {
         try {
             Map<String, List<ScenarioValues>> mapDataForSheet = new HashMap<String, List<ScenarioValues>>();
-            if (!hasOdsFormat(odsFile)) {
-                throw new OdsReaderFileException("Invalid file format! ");
-            }
 
-            log.debug("Start reading file: {} ", odsFile.getName());
-            SpreadSheet spread = new SpreadSheet(odsFile);
+            log.debug("parseOdsTSGResults() - Reading file: {} ", this.odsFileName);
+
             // log.debug("File contains:  {} sheets.", spread.getNumSheets());
-            List<Sheet> sheets = spread.getSheets();
+            List<Sheet> sheets = this.spreadSheet.getSheets();
             for (Sheet sheet : sheets) {
                 String name = sheet.getName();
                 if (TSGFileOutputFormat.scenarioGenSheets.contains(name)) {
@@ -40,16 +45,13 @@ public class OdsTSGResultsReader extends OdsFileReader {
                     // -- sheet "wind_scenarios" or "pv_scenarios" or probabilities
                     mapDataForSheet.put(name, parseSheet(sheet));
                 } else {
-                    log.debug("Sheet {}, not required, skip ", name);
+                    // log.debug("Sheet {}, not required, skip ", name);
                 }
             }
+            log.debug("parseOdsTSGResults() - End reading file: {} ", this.odsFileName);
             return mapDataForSheet;
-        } catch (IOException e) {
-            String errMsg = "Error parsing ODS file: " + odsFile.getName() + " " + e.getMessage();
-            log.error(errMsg);
-            throw new OdsReaderFileException(errMsg);
         } catch (Exception e) {
-            throw new OdsReaderFileException("Error parsing ODS file: " + odsFile.getName() + " " + e.getMessage());
+            throw new OdsReaderFileException("Error parsing ODS file: " + this.odsFileName + " " + e.getMessage());
         }
     }
 
@@ -57,9 +59,10 @@ public class OdsTSGResultsReader extends OdsFileReader {
      * @param sheet with wind speed or solar value or probability for a particolar
      *              instant of the day
      * @return list of values (speed or solar values or probability) for each
-     *         scenario
+     * scenario
      */
     public List<ScenarioValues> parseSheet(Sheet sheet) {
+        log.debug("parseSheet() - sheet {} ", sheet.getName());
         List<ScenarioValues> scNumValues = new ArrayList<ScenarioValues>();
         Range range = sheet.getDataRange();
         if (this.hasContent(range)) {
@@ -78,11 +81,12 @@ public class OdsTSGResultsReader extends OdsFileReader {
                         switch (c) {
                             case 0:
                                 // scenario
+                                log.debug("parseSheet() - scenario: {}", rangeCell.getValue());
                                 scVal.setScNum((String) rangeCell.getValue());
                                 break;
                             default:
                                 // value
-                                log.debug("Val type:{} , value: {}", rangeCell.getValue().getClass(), rangeCell.getValue());
+                                log.debug("parseSheet() - Val type:{} , value: {}", rangeCell.getValue().getClass(), rangeCell.getValue());
                                 values.add((Double) rangeCell.getValue());
                                 break;
                         }
@@ -94,52 +98,15 @@ public class OdsTSGResultsReader extends OdsFileReader {
                 }
             }
         }
+        log.debug("parseSheet() - END ");
         return scNumValues;
     }
 
-    public Map<String, List<ScenarioValues>> readFileInDir(String directoryName) throws FileNotFoundException, OdsReaderFileException {
-        File dir = new File(directoryName);
-        if (!dir.isDirectory()) {
-            throw new FileNotFoundException("Directory: " + directoryName + " not found! ");
-        }
-
-        File[] fileList = dir.listFiles();
-        if (fileList.length == 0) {
-            log.warn("Directory:{} is empty", directoryName);
-            return Collections.EMPTY_MAP;
-        }
-
-        if (fileList.length > 1) {
-            log.warn("Directory: {}, contains more files than expected as results from T41_windpv execution!", directoryName);
-            throw new OdsReaderFileException("Directory: " + directoryName + ", contains more files than expected!");
-        }
-
-        File odsFile = fileList[0];
-        if (!isTSGResults(odsFile)) {
-            throw new OdsReaderFileException("Directory: " + directoryName + ", doesn't contain file: " + this.toolOutputFile);
-        }
-        return this.read(odsFile);
-    }
-
-    /**
-     *
-     * @param odsFile
-     * @return true if ods output file name is: 'scenario_gen.ods'
-     */
-    private boolean isTSGResults(File odsFile) {
-        if (!odsFile.isFile()) {
-            log.error("{} is Not a file, skip ", odsFile.getName());
-            return false;
-        }
-        String fileName = odsFile.getName();
-        return fileName.equals(this.toolOutputFile);
-    }
-
     public static void main(String args[]) {
-        File odsScenFile = new File("C:\\ATSIM\\WP4\\TSG\\42563759-3ce3-49d4-9e7c-6e21e75d4240\\output_data\\scenario_gen.ods");
-        OdsTSGResultsReader reader = new OdsTSGResultsReader();
+        File odsScenFile = new File("C:\\ATSIM\\WP4\\TSG\\8485fb2c-c031-407d-ba04-c66ee6a7d5db\\output_data\\scenario_gen.ods");
+        OdsTSGResultsReader reader = new OdsTSGResultsReader(odsScenFile);
         try {
-            Map<String, List<ScenarioValues>> mapDataForSheet = reader.read(odsScenFile);
+            Map<String, List<ScenarioValues>> mapDataForSheet = reader.parseOdsTSGResults();
             mapDataForSheet.entrySet().forEach(entry -> System.out.println("     " + entry));
         } catch (Exception e) {
             e.printStackTrace();

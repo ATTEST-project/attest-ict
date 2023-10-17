@@ -39,9 +39,9 @@ const ProfilesSection = props => {
     { headerName: 'Mode', field: 'mode', filter: true, valueFormatter: props => getMode(props.value) },
     { headerName: 'Time Interval', field: 'timeInterval', filter: true, valueFormatter: props => getTimeInterval(props.value) },
     { headerName: 'File Name', field: 'fileName', filter: true },
-    { headerName: 'View Chart', field: '', cellRenderer: CellButton },
+    // { headerName: 'View Chart', field: '', cellRenderer: CellButton },
     { headerName: 'Download', field: '', cellRenderer: CellButton },
-    { headerName: '', field: '', checkboxSelection: true },
+    { headerName: 'Selection', field: '', checkboxSelection: true },
   ]);
 
   const [profileSelected, setProfileSelected] = React.useState({
@@ -95,26 +95,11 @@ const ProfilesSection = props => {
     setValue('profiles', selectedData);
   };
 
-  /* React.useEffect(() => {
-    if (rowData && rowData.length > 0) {
-      register('profiles', { required: 'Please select at least one profile' });
-    } else {
-      register('profiles', { required: 'No profiles present. Upload load profiles data from the upload network page' });
-    }
-  }, [rowData]); */
-
   React.useEffect(() => {
-    if (profileSelected.eventType === 'chart') {
-      showChart(profileSelected.profile);
-    } else if (profileSelected.eventType === 'download') {
+    if (profileSelected.eventType === 'download') {
       downloadProfile(profileSelected.profile);
     }
   }, [profileSelected]);
-
-  const showChart = React.useCallback(profile => {
-    /* eslint-disable-next-line no-console */
-    console.log('Show chart of profile with id: ' + profile.id);
-  }, []);
 
   const downloadProfile = React.useCallback(profile => {
     /* eslint-disable-next-line no-console */

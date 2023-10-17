@@ -35,4 +35,17 @@ public class ToolsConfiguration {
     public void setSimulation(String pathSimulation) {
         this.pathSimulation = pathSimulation;
     }
+
+    // tools:
+    //		pathSimulation: /ATSIM
+    @Value("${tools.t44WithConv}")
+    String t44WithConv;
+
+    public String getT44WithConv() {
+        return t44WithConv;
+    }
+
+    public void setT44WithConv(String t44WithConv) {
+        this.t44WithConv = t44WithConv;
+    }
 }

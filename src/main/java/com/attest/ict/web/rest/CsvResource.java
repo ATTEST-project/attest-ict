@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/csv")
 public class CsvResource {
 
-    private final Logger log = LoggerFactory.getLogger(ExcelResource.class);
+    private final Logger log = LoggerFactory.getLogger(CsvResource.class);
 
     @Autowired
     CsvLoadProfileService csvLoadProfileService;

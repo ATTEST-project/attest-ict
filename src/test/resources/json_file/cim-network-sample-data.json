@@ -1,0 +1,30 @@
+[
+  {
+    "networkId": 2,
+    "networkName": "1"
+  },
+  {
+    "networkId": 11,
+    "networkName": "Area 1"
+  },
+  {
+    "networkId": 12,
+    "networkName": "Area 1 SSH"
+  },
+  {
+    "networkId": 13,
+    "networkName": "AreaCGMES3"
+  },
+  {
+    "networkId": 18,
+    "networkName": "KC10KV"
+  },
+  {
+    "networkId": 19,
+    "networkName": "kc35"
+  },
+  {
+    "networkId": 1,
+    "networkName": "zgimport"
+  }
+]
