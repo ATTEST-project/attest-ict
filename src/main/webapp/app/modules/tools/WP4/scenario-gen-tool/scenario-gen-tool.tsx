@@ -1,27 +1,32 @@
 import React from 'react';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Divider from 'app/shared/components/divider/divider';
 import { Button, Col, Form, Modal, ModalBody, ModalFooter, ModalHeader, Row, Spinner } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import { FormProvider, useForm } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+
 import ParametersSection from 'app/modules/tools/WP4/scenario-gen-tool/parameters/parameters';
 import { runTool, reset as retry } from 'app/modules/tools/reducer/tools-execution.reducer';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { TOOLS_INFO, TOOLS_NAMES } from 'app/modules/tools/info/tools-names';
+import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import { downloadResults } from 'app/modules/tools/WP4/reducer/tools-results.reducer';
-import { toast } from 'react-toastify';
 
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
+import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
+import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const ScenarioGenTool = (props: any) => {
+  const toolNum = toolsInfo.WP4[0].name;
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
-
   const divRef = React.useRef<HTMLDivElement>();
-
   const dispatch = useAppDispatch();
-
   const methods = useForm();
 
   const {
@@ -34,6 +39,9 @@ const ScenarioGenTool = (props: any) => {
   const isRunning = useAppSelector(state => state.toolsExecution.loading);
   const completed = useAppSelector(state => state.toolsExecution.updateSuccess);
   const response = useAppSelector(state => state.toolsExecution.entity);
+
+  const toolDescription = TOOLS_INFO.T41_WIND_AND_PV.description;
+  const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
 
   const [form, setForm] = React.useState<any>('');
 
@@ -58,7 +66,7 @@ const ScenarioGenTool = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log('TSG - checkAndRun() ');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -74,9 +82,10 @@ const ScenarioGenTool = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('Tool is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
+            setShowBtnGoToTask(true);
           }
         })
         .catch(err => {
@@ -84,17 +93,6 @@ const ScenarioGenTool = (props: any) => {
           console.error(err);
         });
     }, 500);
-
-    /* .unwrap()
-      .then(res => {
-        setCompleted(true);
-        setChartsResponse(res.data);
-      })
-      .catch(err => {
-        /!* eslint-disable-next-line no-console *!/
-        console.error(err);
-        setCompleted(false);
-    */
   };
 
   const retryToolRun = () => {
@@ -119,34 +117,39 @@ const ScenarioGenTool = (props: any) => {
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
       <div>
-        <h4>{'Scenario Generation Tool'}</h4>
+        <ToolTitle imageAlt={WP_IMAGE.WP4.alt} title={toolDescription} imageSrc={WP_IMAGE.WP4.src} />
         <NetworkInfo network={network} />
         <Divider />
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(submitForm)}>
+            <ParametersSection />
+
+            <Divider />
             <div className="section-with-border">
-              <h6>Choose the data scenario file</h6>
+              <SectionHeader title="Upload Auxiliary Data" />
+
+              <div style={{ marginBottom: 10 }} />
               <Row md="3">
                 <Col>
                   <ValidatedField
                     register={register}
                     error={errors?.dataScenarioFile}
                     id={'data-scenario-file'}
-                    label="Data Scenario File"
+                    label="Data Scenario File [e.g data_scenarios.ods]"
                     name="dataScenarioFile"
                     data-cy="dataScenarioFile"
                     type="file"
-                    accept=".ods,.xls,.xlsx"
+                    accept=".ods"
                     validate={{ required: true }}
                   />
                 </Col>
               </Row>
             </div>
+
             <Divider />
-            <ParametersSection />
-            <Divider />
+
             <div style={{ float: 'right' }}>
-              {!checkCompleted() ? (
+              {!showBtnGoToTask ? (
                 <>
                   <Button color="primary" onClick={() => reset()}>
                     <FontAwesomeIcon icon="redo" />
@@ -176,19 +179,13 @@ const ScenarioGenTool = (props: any) => {
         </div>
       </div>
       {form && (
-        <Modal isOpen={openModal}>
-          <ModalHeader toggle={() => setOpenModal(false)}>{'Configuration'}</ModalHeader>
-          <ModalBody>
-            {'Check the configuration...'}
-            <pre>{JSON.stringify({ ...form, files: form.files.map((v: File) => v.name) }, null, 2)}</pre>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-            <Button color="primary" onClick={checkAndRun}>
-              Run
-            </Button>{' '}
-          </ModalFooter>
-        </Modal>
+        <ModalConfirmToolExecution
+          toolDescription={toolDescription}
+          form={form}
+          openModal={openModal}
+          checkAndRun={checkAndRun}
+          setOpenModal={setOpenModal}
+        />
       )}
     </div>
   );

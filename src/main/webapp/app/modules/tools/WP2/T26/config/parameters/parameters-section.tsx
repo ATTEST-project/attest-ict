@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import Divider from 'app/shared/components/divider/divider';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const ParametersSection = (props: any) => {
   const { marketNotSelected } = props;
@@ -14,7 +15,7 @@ const ParametersSection = (props: any) => {
 
   return (
     <div className="section-with-border">
-      <h6>{'Parameters'}</h6>
+      <SectionHeader title="Parameters" />
       {marketNotSelected && <div> Please Select at least one market! </div>}
 
       <Divider />

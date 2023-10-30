@@ -2,9 +2,9 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Col, Row, Tooltip } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
-
-import './parameters.scss';
 import Divider from 'app/shared/components/divider/divider';
+import SectionHeader from 'app/shared/components/section-header/section-header';
+import './parameters.scss';
 
 const Parameters = () => {
   const {
@@ -21,7 +21,6 @@ const Parameters = () => {
   const [showRunBothTooltip, setShowRunBothTooltip] = React.useState<boolean>(false);
   const [showEvPvStrTooltip, setShowEvPvStrTooltip] = React.useState<boolean>(false);
   const [requiredAddLoadData, setRequiredAddLoadData] = React.useState<boolean>(false);
-
   const profiles = watch('profiles');
 
   React.useEffect(() => {
@@ -33,11 +32,10 @@ const Parameters = () => {
     return (
       <Col>
         <ValidatedField
-          // disabled={profiles?.length > 0}
           register={register}
           error={errors?.parameters?.xlsx_file_name}
           name="parameters.xlsx_file_name"
-          label="Profile File. [e.g: Transmission_Network_<*>_24hGenerationLoadData.xlsx]"
+          label="Profile File. [e.g: Transmission_Network_UK_24hLoadData_W_Bd.xlsx]"
           type="file"
           accept=".xlsx"
         />
@@ -48,7 +46,7 @@ const Parameters = () => {
   return (
     <>
       <div className="section-with-border">
-        <span>{'Tool Parameters'}</span>
+        <SectionHeader title="Parameters" />
         <Row>
           <Col>
             <Tooltip target="peak_hour" isOpen={showPeakTooltip}>
@@ -128,8 +126,8 @@ const Parameters = () => {
       <Divider />
 
       <div className="section-with-border">
-        <span>{'Upload auxiliary data'}</span>
-        <div style={{ marginTop: 10, marginBottom: 10 }} />
+        <SectionHeader title="Upload Auxiliary Data" />
+
         <Row md="3">
           {profiles?.length > 0 ? (
             <Col>
@@ -138,17 +136,21 @@ const Parameters = () => {
           ) : (
             profileSelection()
           )}
+        </Row>
+        <Row md="3">
           <Col>
             <ValidatedField
               register={register}
               error={errors?.parameters?.ods_file_name}
               name="parameters.ods_file_name"
-              label="Contingencies File. [e.g: <Country>_Tx_<Year>_PROF.ods]"
+              label="Contingencies File. [e.g: Transmission_Network_UK_v3_PROF_update.ods]"
               type="file"
               accept=".ods"
               validate={{ required: true }}
             />
           </Col>
+        </Row>
+        <Row md="3">
           <Col>
             <ValidatedField
               register={register}
@@ -161,12 +163,6 @@ const Parameters = () => {
             />
           </Col>
         </Row>
-      </div>
-
-      <Divider />
-      <div className="section-with-border">
-        <span>{'Use additional ATTEST data for EV, PV and storage'}</span>
-        <div style={{ marginTop: 10, marginBottom: 10 }} />
         <Row>
           <Col style={{ alignSelf: 'center' }}>
             <Tooltip target="use_load_data_update" isOpen={showEvPvStrTooltip}>
@@ -178,7 +174,7 @@ const Parameters = () => {
               error={errors?.parameters?.use_load_data_update}
               id="use_load_data_update"
               className="input-row-checkbox"
-              label="Use Load Data Update"
+              label="Use additional ATTEST data for EV, PV and storage"
               name="parameters[use_load_data_update]"
               data-cy="use_load_data_update"
               type="checkbox"
@@ -188,14 +184,13 @@ const Parameters = () => {
             />
           </Col>
         </Row>
-        <Divider />
         <Row>
           <Col>
             <ValidatedField
               register={register}
               error={errors?.parameters?.EV_data_file_name}
               name="parameters[EV_data_file_name]"
-              label="Simulation Data [e.g: EV-PV-Storage_Data_for_Simulations.xlsx]"
+              label=" ATTEST data for EV, PV and storage data for Simulation [e.g: EV-PV-Storage_Data_for_Simulations.xlsx]"
               type="file"
               accept=".xlsx"
               validate={requiredAddLoadData ? { required: true } : { required: false }}

@@ -31,7 +31,7 @@ export const Network = () => (
   <NavItem>
     <NavLink tag={Link} to="/network" className="d-flex align-items-center">
       <FontAwesomeIcon icon="network-wired" />
-      <span>Network</span>
+      <span>Networks</span>
     </NavLink>
   </NavItem>
 );

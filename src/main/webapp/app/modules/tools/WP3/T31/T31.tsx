@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Parameters from 'app/modules/tools/WP3/T31/parameters/parameters';
 import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
 import { defaultParametersES } from 'app/modules/tools/WP3/T31/parameters/default-parameters_ES';
@@ -16,6 +16,7 @@ import { defaultParametersPT } from 'app/modules/tools/WP3/T31/parameters/defaul
 import { defaultParametersUK } from 'app/modules/tools/WP3/T31/parameters/default-parameters_UK';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { runT31Tool, reset as retry } from 'app/modules/tools/WP3/T31/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP3/T31/reducer/tool-results.reducer';
@@ -23,6 +24,7 @@ import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overla
 import { pathButton } from 'app/shared/reducers/back-button-path';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 
 const T31 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
@@ -30,6 +32,7 @@ const T31 = (props: any) => {
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
   const country = network.country;
   const toolDescription = TOOLS_INFO.T31_OPT_TOOL_DX.description;
+  const toolNum = toolsInfo.WP3[0].name;
   const defaultParamsValues = () => {
     switch (country) {
       case 'UK':
@@ -118,7 +121,7 @@ const T31 = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN T31!');
+    console.log('T31 checkAndRun()');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -129,10 +132,9 @@ const T31 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
-            setShowBtnGoToTask(false);
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T31 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

@@ -5,6 +5,8 @@ import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import Config from 'app/modules/tools/WP5/T52/config/config';
 import Divider from 'app/shared/components/divider/divider';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const T53Config = () => {
   const dispatch = useAppDispatch();
@@ -21,9 +23,11 @@ const T53Config = () => {
 
   return (
     <>
-      <Config />
-      <Divider />
       <div className="section-with-border">
+        <SectionHeader title="Upload Auxiliary Data" />
+        <Config />
+        <Divider />
+
         <Row md="4">
           <Col>
             <ValidatedField

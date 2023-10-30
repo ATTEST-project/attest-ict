@@ -9,24 +9,20 @@ import { IToolResult } from 'app/shared/model/tool-results.model';
 import { defaultValue as filterDefaultValue, IToolResultsFilter } from 'app/shared/model/tool-results-filter.model';
 import { isStringNotUndefinedNotNullNotEmpty } from 'app/shared/util/string-utils';
 import { SELECTION_TYPE } from 'app/shared/components/network-search/constants/constants';
-// -- reducers
 import { getToolByNum, getToolResults, getTools, reset } from 'app/shared/reducers/tool-results-search';
-// -- components
+import SectionHeader from 'app/shared/components/section-header/section-header';
 import ToolResults from 'app/shared/components/tool-results-search/tool-results';
 
 const ToolResultsSearch = (props: any) => {
   const { network, setRowsSelectedCallback, selectionType, toolNum, filtersBy } = props;
-  // list of ATTEST tools
+  // list of the ATTEST's tools
   const dispatch = useAppDispatch();
   const toolListLoading = useAppSelector(state => state.toolResultsSearch.loading);
   const toolList = useAppSelector(state => state.toolResultsSearch.toolList);
   const [showResults, setShowResults] = React.useState<boolean>(false);
-
   const [defaultToolId, setDefaultToolId] = React.useState(null);
 
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    // console.log('Tool-results- useEffect() 1 - toolList  ', toolList);
     if (isStringNotUndefinedNotNullNotEmpty(toolNum)) {
       dispatch(getToolByNum(toolNum)); // get tool identified by tollNum (api/tools?num.equals=toolNum)
     } else {
@@ -36,12 +32,8 @@ const ToolResultsSearch = (props: any) => {
 
   React.useEffect(() => {
     if (!toolList) {
-      // eslint-disable-next-line no-console
-      // console.log('Tool-results- useEffect() 2 - toolList :  ', toolList);
       return;
     }
-    // eslint-disable-next-line no-console
-    // console.log('Tool-results- useEffect() 2 - toolList:  ', toolList);
     if (toolList.length === 1) {
       setDefaultToolId(toolList[0].id.toString());
     }
@@ -49,8 +41,6 @@ const ToolResultsSearch = (props: any) => {
 
   React.useEffect(() => {
     if (!defaultToolId) {
-      // eslint-disable-next-line no-console
-      // console.log('Tool-results- useEffect() 3 - defaultToolId :  ', defaultToolId);
       return;
     }
     // eslint-disable-next-line no-console
@@ -159,7 +149,7 @@ const ToolResultsSearch = (props: any) => {
 
   return (
     <div style={{ border: '1px solid white', borderRadius: 10, padding: 10 }}>
-      <h5>{'Tool Results Search'}</h5>
+      <SectionHeader title="Search for Tool Execution Results" />
 
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(submitForm)}>

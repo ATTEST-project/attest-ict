@@ -20,7 +20,7 @@ import networkCSVProfileUpload from 'app/entities/network/network-csv-profile.re
 // prettier-ignore
 import networkExcelProfileUpload from 'app/entities/network/network-excel-profile.reducer';
 // prettier-ignore
-import networkSearch from 'app/entities/network/network-search.reducer';
+import networkSearch from 'app/shared/reducers/network-search';
 // prettier-ignore
 import baseMVA from 'app/entities/base-mva/base-mva.reducer';
 // prettier-ignore

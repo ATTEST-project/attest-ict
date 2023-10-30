@@ -6,13 +6,17 @@ import { ValidatedField } from 'react-jhipster';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import SpreadSheet from 'app/shared/components/spreadsheet/spreadsheet';
 import { tractabilitySampleData } from 'app/shared/components/spreadsheet/sample-data/tractability-sample-data';
+import { PrintResult } from 'app/shared/components/tool-results-search/print-results-selected';
+import { IToolResult } from 'app/shared/model/tool-results.model';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 interface IT45AuxiliaryFileProp {
   enableUploadT44Results: boolean;
+  resultsSelected?: IToolResult[];
 }
 
 const Auxiliary = (props: IT45AuxiliaryFileProp) => {
-  const { enableUploadT44Results } = props;
+  const { enableUploadT44Results, resultsSelected } = props;
   const {
     register,
     formState: { errors },
@@ -77,8 +81,8 @@ const Auxiliary = (props: IT45AuxiliaryFileProp) => {
 
   return (
     <div className="section-with-border">
-      <span>{'Upload auxiliary data'}</span>
-      <div style={{ marginTop: 10, marginBottom: 10 }} />
+      <SectionHeader title="Upload Auxiliary Data" />
+
       <Row>
         <Col md="4">
           <ValidatedField
@@ -116,7 +120,7 @@ const Auxiliary = (props: IT45AuxiliaryFileProp) => {
             register={register}
             error={errors?.auxiliary?.flex_devices_tech_char_file}
             id={'flex_devices_tech_char_file'}
-            label="Flex Devices Tech Char File [e.g. HR_TX_2050.xlsx]"
+            label="Flex Devices Tech Char File [e.g. HR_Tx_01_2030.xlsx]"
             name="auxiliary[flex_devices_tech_char_file]"
             data-cy="flex_devices_tech_char_file"
             type="file"
@@ -150,7 +154,7 @@ const Auxiliary = (props: IT45AuxiliaryFileProp) => {
                 register={register}
                 error={errors?.auxiliary?.flexibity_devices_states_file}
                 id={'flexibity_devices_states_file'}
-                label="T44 Flexibility Devices states file [e.g. procured_flexibility_2050_SU_wf.xlsx]"
+                label="Flexibility Devices states file from T44 [e.g. procured_flexibility_HR_2030_wf_Su.xlsx]"
                 name="auxiliary[flexibity_devices_states_file]"
                 data-cy="flexibity_devices_states_file"
                 type="file"
@@ -182,7 +186,7 @@ const Auxiliary = (props: IT45AuxiliaryFileProp) => {
                 register={register}
                 error={errors?.auxiliary?.DA_curtailment_file}
                 id={'da_curtailment_file'}
-                label="T44 DA curtailment file [e.g.  2050_SU_wf_Normal.xlsx]"
+                label="DA curtailment file from T44 [e.g. HR_2030_wf_Normal_Su.xlsx]"
                 name="auxiliary[DA_curtailment_file]"
                 data-cy="da_curtailment_file"
                 type="file"
@@ -209,7 +213,10 @@ const Auxiliary = (props: IT45AuxiliaryFileProp) => {
           </Row>
         </>
       ) : (
-        <> {" T44 OutputFiles' results selected before! "}</>
+        <>
+          {' '}
+          <PrintResult toolResults={resultsSelected} title={'Results from T44: '} />
+        </>
       )}
 
       <hr />

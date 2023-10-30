@@ -52,7 +52,7 @@ export const TaskDeleteDialog = (props: RouteComponentProps<{ id: string }>) => 
       <ModalHeader toggle={handleClose} data-cy="taskDeleteDialogHeading">
         Confirm delete operation
       </ModalHeader>
-      <ModalBody id="attestApp.task.delete.question">Are you sure you want to delete this Task?</ModalBody>
+      <ModalBody id="attestApp.task.delete.question">Are you sure you want to delete the Task {taskEntity.id}? </ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={handleClose}>
           <FontAwesomeIcon icon="ban" />

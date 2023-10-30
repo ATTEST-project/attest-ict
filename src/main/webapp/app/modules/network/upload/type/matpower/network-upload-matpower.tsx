@@ -3,7 +3,7 @@ import './network-upload-matpower.scss';
 import { Button, Col, Form, Input, Row, Spinner } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { uploadNetworkFile } from 'app/entities/network/network-matpower-upload.reducer';
+import { uploadNetworkFile, reset as resetReducer } from 'app/entities/network/network-matpower-upload.reducer';
 import { toast } from 'react-toastify';
 import { getEntity } from 'app/entities/network/network.reducer';
 import { getEntitiesByNetworkId } from 'app/entities/input-file/input-file.reducer';
@@ -13,8 +13,6 @@ import { SECTION } from 'app/shared/util/file-utils';
 
 const NetworkUploadMatpower = props => {
   const dispatch = useAppDispatch();
-  /* eslint-disable-next-line no-console */
-  console.log('NetworkUploadMatpower - props ', props);
 
   const {
     handleSubmit,
@@ -27,30 +25,23 @@ const NetworkUploadMatpower = props => {
   const [uploadedFile, setUploadedFile] = React.useState(null);
   const networkEntity = useAppSelector(state => state.network.entity);
   const operationCompleted = useAppSelector(state => state.networkMatpowerUpload.updateSuccess);
-
   const inputFileEntities = useAppSelector(state => state.inputFile.entities) || props.files;
-
   const inputFileLoading = useAppSelector(state => state.inputFile.loading);
 
   const getMatpowerFile = () => {
     const matpowerFile = inputFileEntities.find(file => file.description === SECTION.NETWORK);
     if (matpowerFile) {
-      /* eslint-disable-next-line no-console */
-      console.log('NetworkUploadMatpower - getMatpowerFile(), found file:', matpowerFile.fileName);
-
       setUploadedFile(matpowerFile);
       props.callback(matpowerFile);
     }
   };
 
   React.useEffect(() => {
-    /* eslint-disable-next-line no-console */
-    console.log('NetworkUploadMatpower - useEffect(), inputFileEntities:', inputFileEntities);
-
-    if (!inputFileEntities) {
-      return;
-    }
     getMatpowerFile();
+    return () => {
+      // -- call  reset,  when unmount component (-> page exit)
+      dispatch(resetReducer());
+    };
   }, [inputFileEntities]);
 
   const showSuccess = () => {
@@ -71,8 +62,6 @@ const NetworkUploadMatpower = props => {
   };
 
   React.useEffect(() => {
-    /* eslint-disable-next-line no-console */
-    console.log('NetworkUploadMatpower - useEffect(), operationCompleted:', operationCompleted);
     if (!operationCompleted) {
       return;
     }
@@ -81,9 +70,6 @@ const NetworkUploadMatpower = props => {
   }, [operationCompleted]);
 
   const submitUploadForm = (data: any) => {
-    /* eslint-disable-next-line no-console */
-    console.log('NetworkUploadMatpower - submitUploadForm() data:', data);
-
     setLoading(true);
     dispatch(uploadNetworkFile({ networkName: networkEntity.name, file: data.matpowerFile[0] }))
       .unwrap()
@@ -100,7 +86,7 @@ const NetworkUploadMatpower = props => {
       <div id="matpower-upload" className="matpower-upload-row">
         {!uploadedFile ? (
           <>
-            <span style={{ fontSize: 16 }}>Upload a Network file</span>
+            <h5>Upload a Network file:</h5>
             <Form onSubmit={handleSubmit(submitUploadForm)}>
               <Row>
                 <Col md="4">
@@ -139,14 +125,12 @@ const NetworkUploadMatpower = props => {
           </>
         ) : (
           <>
-            <span style={{ fontSize: 16 }}>{'Network file uploaded:'}</span>
             <Row>
               <Col md="4">
-                {uploadedFile && (
-                  <div>
-                    <span style={{ fontSize: 20 }}>{uploadedFile.fileName}</span>
-                  </div>
-                )}
+                <h5>Network file uploaded:</h5>
+                <div>
+                  <span style={{ fontSize: 16 }}>{uploadedFile.fileName}</span>
+                </div>
               </Col>
             </Row>
           </>

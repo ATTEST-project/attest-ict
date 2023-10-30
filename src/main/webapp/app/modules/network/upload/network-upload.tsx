@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { Button, Col, Row } from 'reactstrap';
+import { Button, Col, Row, Table } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
+import { TextFormat } from 'react-jhipster';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import { getEntity } from 'app/entities/network/network.reducer';
 import { getEntitiesByNetworkId } from 'app/entities/input-file/input-file.reducer';
 
 import NetworkUploadDX from 'app/modules/network/upload/type/distribution/network-upload-dx';
 import NetworkUploadMatpower from 'app/modules/network/upload/type/matpower/network-upload-matpower';
 import NetworkUploadTX from 'app/modules/network/upload/type/transmission/network-upload-tx';
+import Divider from 'app/shared/components/divider/divider';
 
+import { APP_DATE_FORMAT } from 'app/config/constants';
 import { SECTION } from 'app/shared/util/file-utils';
 
 export const NetworkUpload = (props: RouteComponentProps<{ id: string }>) => {
@@ -19,6 +22,7 @@ export const NetworkUpload = (props: RouteComponentProps<{ id: string }>) => {
   const [networkEntity, setNetworkEntity] = React.useState(null);
   const [inputFile, setInputFile] = React.useState(null);
   const [isFetchInputFilesFulfilled, setFetchInputFilesFulfilled] = React.useState<boolean>(false);
+  const [isHideSld, setHideSld] = React.useState<boolean>(true);
 
   const getNetworkFilesUploaded = () => {
     // eslint-disable-next-line no-console
@@ -37,8 +41,6 @@ export const NetworkUpload = (props: RouteComponentProps<{ id: string }>) => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('NetworkUpload - useEffect(), network id: ', props.match.params.id);
     dispatch(getEntity(props.match.params.id))
       .unwrap()
       .then(res => {
@@ -56,8 +58,9 @@ export const NetworkUpload = (props: RouteComponentProps<{ id: string }>) => {
 
   const setInputFileCallback = file => {
     // eslint-disable-next-line no-console
-    console.log('NetworkUpload - setInputFileCallback()  ', file);
+    // console.log('NetworkUpload - setInputFileCallback()  ', file);
     setInputFile(file);
+    setHideSld(false);
   };
 
   const handleGoBack = () => {
@@ -68,8 +71,15 @@ export const NetworkUpload = (props: RouteComponentProps<{ id: string }>) => {
     <>
       {networkEntity && isFetchInputFilesFulfilled && (
         <>
-          <h4>{'Upload data for network: ' + networkEntity.name}</h4>
+          <h4>
+            <FontAwesomeIcon icon="file-upload" /> Upload Network Data{' '}
+          </h4>
+          <Divider />
+          <NetworkInfo network={networkEntity} hideSld={isHideSld} />
+          <Divider />
+
           <NetworkUploadMatpower network={networkEntity} callback={setInputFileCallback} />
+
           {inputFile &&
             (networkEntity.type && networkEntity.type.toLowerCase() === 'dx' ? (
               <NetworkUploadDX network={networkEntity} />

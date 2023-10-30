@@ -16,7 +16,7 @@ const NetworkUploadTX = props => {
     <>
       <div className="upload-file-row">
         <div className="title-row">
-          <span style={{ fontSize: 20 }}>{'h24 Profiles'}</span>
+          <h6>{'H24 Profiles'}</h6>
           {inputFileEntities && <FilesUploaded networkId={network.id} files={inputFileEntities} isTx />}
         </div>
         {/* <LabelsRow section="gen" /> */}

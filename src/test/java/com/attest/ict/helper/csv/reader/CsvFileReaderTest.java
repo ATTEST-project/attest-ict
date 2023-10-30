@@ -21,7 +21,7 @@ class CsvFileReaderTest {
 
     private String load_1h = "src\\test\\resources\\csv_file\\test_1h.csv";
 
-    private String load_1h_with_err = "src\\test\\resources\\csv_file\\test_1h_meno_Col.csv";
+    private String load_1h_with_err = "src\\test\\resources\\csv_file\\test_1h_less_Columns.csv";
 
     private String toolCsvFile = "src\\test\\resources\\csv_file\\tool.csv";
 

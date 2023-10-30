@@ -3,12 +3,13 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
 import { SELECTION_TYPE } from 'app/shared/components/network-search/constants/constants';
 import { Link } from 'react-router-dom';
@@ -18,6 +19,7 @@ import { downloadResults } from 'app/modules/tools/WP2/T26/reducer/tool-results.
 import { toast } from 'react-toastify';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 
 const T26 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
@@ -31,6 +33,7 @@ const T26 = (props: any) => {
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
 
   const toolDescription = TOOLS_INFO.T26_MARKET_SIMUL.description;
+  const toolNum = toolsInfo.WP2[2].name;
 
   if (!network) {
     props.history?.goBack();
@@ -147,9 +150,9 @@ const T26 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T26 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

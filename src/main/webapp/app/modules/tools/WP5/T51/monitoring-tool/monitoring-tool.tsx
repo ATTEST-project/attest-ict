@@ -8,19 +8,23 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import Config from 'app/modules/tools/WP5/T51/monitoring-tool/config/config';
 import { runT512Tool, reset as retry } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP5/T51/monitoring-tool/reducer/tool-table.reducer';
 
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import { isStringEmptyOrNullOrUndefined } from 'app/shared/util/string-utils';
 
 const T51Monitoring = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
   const toolDescription = TOOLS_INFO.T51_MONITORING.description;
+  const toolNum = toolsInfo.WP5[0].name + ' Monitoring';
 
   const dispatch = useAppDispatch();
 
@@ -46,13 +50,11 @@ const T51Monitoring = (props: any) => {
   const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [form, setForm] = React.useState(null);
-
-  // 2023 08 25 start
   const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
-  // 2023 08 25 end
 
   const cleanDataForm = (form: any) => {
     const { modelpath1, modelpath2, filepath2, ...rest } = form.config;
+
     const modelFileName = modelpath1?.[0].name;
     const errorModelFileName = modelpath2?.[0].name;
     const inputFileName = filepath2?.[0].name;
@@ -67,6 +69,7 @@ const T51Monitoring = (props: any) => {
   const submitMethod = data => {
     /* eslint-disable-next-line no-console */
     console.log('Form data: ', data);
+
     const finalForm = {
       networkId: network.id,
       toolName: TOOLS_INFO.T51_MONITORING.name,
@@ -75,6 +78,7 @@ const T51Monitoring = (props: any) => {
     };
     /* eslint-disable-next-line no-console */
     console.log('Final form data: ', finalForm);
+
     setForm({ ...finalForm });
     setOpenModal(true);
   };
@@ -92,9 +96,9 @@ const T51Monitoring = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('Tool Monitoring is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

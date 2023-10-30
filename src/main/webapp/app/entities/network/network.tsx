@@ -10,6 +10,7 @@ import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.cons
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import CustomTooltip from 'app/shared/components/tooltip/custom-tooltip';
+import TextTruncate from 'app/shared/components/text/text-truncate';
 
 export const Network = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
@@ -138,9 +139,11 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('networkDate')}>
                   Network Date <FontAwesomeIcon icon="sort" />
                 </th>
+                {/*  Comment 2023/10/12
                 <th className="hand" onClick={sort('version')}>
                   Version <FontAwesomeIcon icon="sort" />
-                </th>
+                </th> */}
+
                 <th className="hand" onClick={sort('creationDateTime')}>
                   Creation Date Time <FontAwesomeIcon icon="sort" />
                 </th>
@@ -158,17 +161,28 @@ export const Network = (props: RouteComponentProps<{ url: string }>) => {
                       {network.id}
                     </Button>
                   </td>
-                  <td>{network.name}</td>
-                  <td>{network.mpcName}</td>
+                  <td>
+                    <td>{network.name}</td>
+                  </td>
+                  <td>
+                    <td>
+                      <TextTruncate maxWidth={'200px'} text={network.mpcName} />{' '}
+                    </td>
+                  </td>
                   <td>{network.country}</td>
                   <td>{network.type}</td>
-                  <td>{network.description}</td>
+
+                  <td>
+                    <TextTruncate maxWidth={'200px'} text={network.description} />{' '}
+                  </td>
+
                   {/* Comment 2023/10/12
                         The functionality for logical deletion of the network has not been implemented yet
                         <td>{network.isDeleted ? 'true' : 'false'}</td>
                    */}
                   <td>{network.networkDate ? <TextFormat type="date" value={network.networkDate} format={APP_DATE_FORMAT} /> : null}</td>
-                  <td>{network.version}</td>
+                  {/* Comment 2023/10/19
+                      <td>{network.version}</td> */}
                   <td>
                     {network.creationDateTime ? <TextFormat type="date" value={network.creationDateTime} format={APP_DATE_FORMAT} /> : null}
                   </td>

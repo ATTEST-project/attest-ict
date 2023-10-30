@@ -5,6 +5,7 @@ import { ValidatedField } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormContext } from 'react-hook-form';
 import Divider from 'app/shared/components/divider/divider';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const ParametersSection = props => {
   const {
@@ -22,7 +23,7 @@ const ParametersSection = props => {
           style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => setShowParameters(!showParameters)}
         >
-          <h6>{'Parameters'}</h6>
+          <SectionHeader title={'Parameters'} />
           <div style={{ marginRight: 10 }}>
             <FontAwesomeIcon icon="angle-down" style={showParameters && { transform: 'rotate(180deg)' }} />
           </div>
@@ -55,9 +56,7 @@ const ParametersSection = props => {
                 validate={{ required: true }}
               />
             </Col>
-          </Row>
-          <Divider />
-          <Row>
+
             <Col>
               <ValidatedField
                 register={register}

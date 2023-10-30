@@ -52,7 +52,7 @@ export const NetworkDeleteDialog = (props: RouteComponentProps<{ id: string }>) 
       <ModalHeader toggle={handleClose} data-cy="networkDeleteDialogHeading">
         Confirm delete operation
       </ModalHeader>
-      <ModalBody id="attestApp.network.delete.question">Are you sure you want to delete this Network?</ModalBody>
+      <ModalBody id="attestApp.network.delete.question">Are you sure you want to delete the Network {networkEntity.id}?</ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={handleClose}>
           <FontAwesomeIcon icon="ban" />

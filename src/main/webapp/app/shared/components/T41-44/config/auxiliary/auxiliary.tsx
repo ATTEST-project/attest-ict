@@ -6,6 +6,7 @@ import { ValidatedField } from 'react-jhipster';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import SpreadSheet from 'app/shared/components/spreadsheet/spreadsheet';
 import { tractabilitySampleData } from 'app/shared/components/spreadsheet/sample-data/tractability-sample-data';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Auxiliary = props => {
   const {
@@ -37,8 +38,8 @@ const Auxiliary = props => {
 
   return (
     <div className="section-with-border">
-      <span>{'Upload auxiliary data'}</span>
-      <div style={{ marginTop: 10, marginBottom: 10 }} />
+      <SectionHeader title="Upload Auxiliary Data" />
+
       <Row>
         <Col md="4">
           <ValidatedField
@@ -71,7 +72,7 @@ const Auxiliary = props => {
             register={register}
             error={errors?.auxiliary?.scenario}
             id={'scenario-gen-data'}
-            label="Scenario Generation Data"
+            label="Scenario Generation Data [e.g scenario_gen.ods]"
             name="auxiliary[scenario]"
             data-cy="scenarioGenData"
             type="file"

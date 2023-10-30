@@ -8,23 +8,25 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 
 import Config from 'app/modules/tools/WP5/T52/config/config';
 import Coordinates from 'app/modules/tools/WP5/T52/coordinates/coordinates';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 
 import { runT52Tool, reset as retry } from 'app/modules/tools/WP5/T52/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP5/T52/reducer/tool-table.reducer';
-
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
 
 const T52 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
   const dispatch = useAppDispatch();
   const toolDescription = TOOLS_INFO.T52_INDICATOR.description;
+  const toolNum = toolsInfo.WP5[1].name;
 
   const methods = useForm();
   const { handleSubmit, reset } = methods;
@@ -101,9 +103,9 @@ const T52 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('T52 execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T52 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

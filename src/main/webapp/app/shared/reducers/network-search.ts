@@ -2,6 +2,7 @@ import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
 import { createEntitySlice, EntityState } from 'app/shared/reducers/reducer.utils';
 import { defaultValue, INetwork } from 'app/shared/model/network.model';
 import axios from 'axios';
+import { MAX_SIZE } from 'app/shared/util/pagination.constants';
 
 const initialState: EntityState<INetwork> = {
   loading: false,
@@ -16,6 +17,7 @@ const initialState: EntityState<INetwork> = {
 interface SearchQueryParams {
   country: string;
   type: string;
+  name?: string;
   mpcName?: string;
   fromNetworkDate?: string;
   toNetworkDate?: string;
@@ -25,11 +27,12 @@ const apiUrl = 'api/networks';
 
 export const getEntities = createAsyncThunk(
   'network/search',
-  async ({ country, type, mpcName, fromNetworkDate, toNetworkDate }: SearchQueryParams) => {
+  async ({ country, type, name, mpcName, fromNetworkDate, toNetworkDate }: SearchQueryParams) => {
     const params = {
       'country.equals': country,
       'type.equals': type,
-      size: 9999,
+      size: MAX_SIZE,
+      ...(name && { 'name.contains': name }),
       ...(mpcName && { 'mpcName.contains': mpcName }),
       ...(fromNetworkDate && { 'networkDate.greaterThanOrEqual': new Date(fromNetworkDate).toISOString() }),
       ...(toNetworkDate && { 'networkDate.lessThanOrEqual': new Date(toNetworkDate).toISOString() }),

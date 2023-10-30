@@ -59,7 +59,7 @@ export const TOOLS_INFO = {
   T41_WIND_AND_PV: {
     name: 'T41_windpv',
     path: '/tools/sgt',
-    description: 'SGT Scenario Generation Tool',
+    description: 'TSG - Scenario Generation Tool',
   },
 
   T41_STOCHASTIC_MP_ACOPF: {

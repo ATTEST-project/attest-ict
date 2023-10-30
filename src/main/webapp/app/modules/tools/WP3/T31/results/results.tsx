@@ -108,20 +108,24 @@ const T31Results = (props: any) => {
 
             <ToolTitle imageAlt={WP_IMAGE.WP3.alt} title={toolDescription} imageSrc={WP_IMAGE.WP3.src} />
           </div>
-          <Table>
-            <thead>
-              <tr>
-                <th>Country</th>
-                <th>Case Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{results?.['Country']}</td>
-                <td>{results?.['Case name']}</td>
-              </tr>
-            </tbody>
-          </Table>
+
+          <div className="section-with-border">
+            <h5>Input Data Summary: </h5>
+            <Table responsive className="table-responsive">
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>Case Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{results?.['Country']}</td>
+                  <td>{results?.['Case name']}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
           <Divider />
           {results && sections[section]}
         </>

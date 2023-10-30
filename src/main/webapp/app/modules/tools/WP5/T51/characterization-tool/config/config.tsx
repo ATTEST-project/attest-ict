@@ -4,6 +4,7 @@ import { Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import Divider from 'app/shared/components/divider/divider';
 import InputRow from 'app/modules/tools/WP5/T51/characterization-tool/input-row/input-row';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Config = (props: any) => {
   const {
@@ -17,6 +18,7 @@ const Config = (props: any) => {
 
   return (
     <div className="section-with-border">
+      <SectionHeader title="Upload Auxiliary Data" />
       {/* moved into InputRow component
       <Row>
         <Col md="3">

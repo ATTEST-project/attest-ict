@@ -15,6 +15,7 @@ import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.cons
 import { ITask, TaskStatus } from 'app/shared/model/task.model';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { getEntities } from './task.reducer';
+import TextTruncate from 'app/shared/components/text/text-truncate';
 
 export const Task = (props: RouteComponentProps<{ url: string }>) => {
   const intervalInMilliSec = 50000;
@@ -157,6 +158,10 @@ export const Task = (props: RouteComponentProps<{ url: string }>) => {
     return enabled;
   };
 
+  const showDeleteButton = (task: ITask) => {
+    return task.taskStatus !== TaskStatus.ONGOING;
+  };
+
   return (
     <div>
       <h2 id="task-heading" data-cy="TaskHeading">
@@ -206,7 +211,9 @@ export const Task = (props: RouteComponentProps<{ url: string }>) => {
                   <td>{task.info ? task.info : task.taskStatus}</td>
                   <td>{task.dateTimeStart ? <TextFormat type="date" value={task.dateTimeStart} format={APP_DATE_FORMAT} /> : null}</td>
                   <td>{task.dateTimeEnd ? <TextFormat type="date" value={task.dateTimeEnd} format={APP_DATE_FORMAT} /> : null}</td>
-                  <td>{addSpaceAfterComma(task.simulationDescr)}</td>
+                  <td>
+                    <TextTruncate maxWidth={'300px'} text={addSpaceAfterComma(task.simulationDescr)} />{' '}
+                  </td>
                   <td>{task.networkName ? task.networkName : ''}</td>
                   <td>{task.toolNum ? task.toolNum : ''}</td>
                   <td>{task.user ? task.user.login : ''}</td>
@@ -260,6 +267,7 @@ export const Task = (props: RouteComponentProps<{ url: string }>) => {
                         <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
                       <Button
+                        disabled={!showDeleteButton(task)}
                         tag={Link}
                         to={`${match.url}/${task.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="danger"

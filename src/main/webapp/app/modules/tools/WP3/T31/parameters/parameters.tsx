@@ -1,16 +1,14 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Col, Collapse, Input, Label, Row, Tooltip } from 'reactstrap';
-import { ValidatedField } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toast } from 'react-toastify';
+import { ValidatedField } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
 import GrowthDSRTable from 'app/modules/tools/WP3/T31/parameters/growth-dsr-table/growth-dsr-table';
 import Divider from 'app/shared/components/divider/divider';
-
 import { getEntitiesByNetworkId } from 'app/modules/tools/WP3/T31/reducer/branch-length.reducer';
-
-import { toast } from 'react-toastify';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Parameters = (props: any) => {
   const {
@@ -23,17 +21,11 @@ const Parameters = (props: any) => {
   } = useFormContext();
 
   const dispatch = useAppDispatch();
-
   const [showParameters, setShowParameters] = React.useState<boolean>(false);
-
   const [showTooltip, setShowTooltip] = React.useState<boolean>(false);
-
   const [requiredAddLoadData, setRequiredAddLoadData] = React.useState<boolean>(false);
-
   const allLineLength = useAppSelector(state => state.branchLength.entities);
-
   const numbersListRegex = React.useMemo(() => /^(\s*-?\d+(\.\d+)?)(\s*,\s*-?\d+(\.\d+)?)*$/, []);
-
   const setLineDefaultValue = () => {
     resetField('parameters.line_length');
   };
@@ -47,11 +39,11 @@ const Parameters = (props: any) => {
       .unwrap()
       .then(res => {
         if (res.data?.length === 0) {
-          toast.error('No length data found for network: ' + props.network.name);
+          toast.error('No data related to branch length was found in the database for the network: ' + props.network.name);
         }
       })
       .catch(err => {
-        toast.error('Error retrieving length data for network: ' + props.network.name);
+        toast.error('An error occurred while trying to retrieve branch length data for the network: ' + props.network.name);
       });
   };
 
@@ -79,7 +71,8 @@ const Parameters = (props: any) => {
           style={{ display: 'flex', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => setShowParameters(!showParameters)}
         >
-          <h6>{'Tool Parameters'}</h6>
+          <SectionHeader title="Parameters" />
+
           <div style={{ marginRight: 10 }}>
             <FontAwesomeIcon icon="angle-down" style={showParameters && { transform: 'rotate(180deg)' }} />
           </div>
@@ -297,8 +290,8 @@ const Parameters = (props: any) => {
       </div>
       <Divider />
       <div className="section-with-border">
-        <span>{'Use additional ATTEST data for EV, PV and storage (EV-PV-Storage_Data_for_Simulations.xlsx)'}</span>
-        <div style={{ marginTop: 10, marginBottom: 10 }} />
+        <SectionHeader title="Upload Auxiliary Data" />
+
         <Row>
           <Col style={{ alignSelf: 'center' }}>
             <Tooltip target="use_load_data_update" isOpen={showTooltip}>
@@ -310,7 +303,7 @@ const Parameters = (props: any) => {
               error={errors?.parameters?.use_load_data_update}
               id="use_load_data_update"
               className="input-row-checkbox"
-              label="Use Load Data Update"
+              label="Use additional ATTEST data for EV, PV and storage"
               name="parameters[use_load_data_update]"
               data-cy="use_load_data_update"
               type="checkbox"
@@ -327,7 +320,7 @@ const Parameters = (props: any) => {
               register={register}
               error={errors?.parameters?.EV_data_file_path}
               name="parameters[EV_data_file_path]"
-              label="EV-PV-Storage_Data_for_Simulations.xlsx"
+              label="ATTEST data for EV, PV and storage [e.g EV-PV-Storage_Data_for_Simulations.xlsx]"
               type="file"
               accept=".xlsx"
               validate={requiredAddLoadData ? { required: true } : { required: false }}

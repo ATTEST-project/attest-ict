@@ -6,14 +6,18 @@ import { ValidatedField } from 'react-jhipster';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import SpreadSheet from 'app/shared/components/spreadsheet/spreadsheet';
 import { tractabilitySampleData } from 'app/shared/components/spreadsheet/sample-data/tractability-sample-data';
+import { IToolResult } from 'app/shared/model/tool-results.model';
+import { PrintResult } from 'app/shared/components/tool-results-search/print-results-selected';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 interface IT42AuxiliaryFileProp {
   enableUploadOtherToolResults: boolean;
+  resultsSelected?: IToolResult[];
 }
 
 const Auxiliary = (props: IT42AuxiliaryFileProp) => {
-  const { enableUploadOtherToolResults } = props;
-
+  const { enableUploadOtherToolResults, resultsSelected } = props;
+  const titleForT41ResultsFile = 'Flexibility Devices states file from T41';
   const {
     register,
     formState: { errors },
@@ -79,10 +83,11 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
 
   return (
     <div className="section-with-border">
-      <span>{'Upload auxiliary data'}</span>
-      <div style={{ marginTop: 10, marginBottom: 10 }} />
+      <SectionHeader title="Upload Auxiliary Data" />
+
+      <div style={{ marginBottom: 10 }} />
       <Row>
-        <Col md="4">
+        <Col md="5">
           <ValidatedField
             register={register}
             error={errors?.auxiliary?.PV_production_profile_file}
@@ -113,7 +118,7 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
       </Row>
       <hr />
       <Row>
-        <Col md="4">
+        <Col md="5">
           <ValidatedField
             register={register}
             error={errors?.auxiliary?.flex_devices_tech_char_file}
@@ -147,12 +152,12 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
       {enableUploadOtherToolResults ? (
         <>
           <Row>
-            <Col md="4">
+            <Col md="5">
               <ValidatedField
                 register={register}
                 error={errors?.auxiliary?.flexibity_devices_states_file}
                 id={'flexibity_devices_states_file'}
-                label="Flexibility Devices states file from T41 [e.g. ES_Dx_03_2030_W_Bd_WithoutFlex_output.xlsx]"
+                label={titleForT41ResultsFile + ' [e.g. ES_Dx_03_2030_W_Bd_WithoutFlex_output.xlsx]'}
                 name="auxiliary[flexibity_devices_states_file]"
                 data-cy="flexibity_devices_states_file"
                 type="file"
@@ -178,12 +183,12 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
           </Row>
         </>
       ) : (
-        <>{" T41 OutputFiles' results selected before! "}</>
+        <PrintResult toolResults={resultsSelected} title={titleForT41ResultsFile} />
       )}
       <hr />
 
       <Row>
-        <Col md="4">
+        <Col md="5">
           <ValidatedField
             register={register}
             error={errors?.auxiliary?.trans_activation_file}
@@ -217,7 +222,7 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
 
       <hr />
       <Row>
-        <Col md="4">
+        <Col md="5">
           <ValidatedField
             register={register}
             error={errors?.auxiliary?.state_estimation_csv_file}

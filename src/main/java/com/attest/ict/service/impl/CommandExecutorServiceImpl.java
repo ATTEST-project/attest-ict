@@ -80,26 +80,20 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
     }
 
     @Override
-    public boolean killProcessByTaskId(Long taskId) throws KillProcessException {
+    public boolean killProcessByTaskId(Long taskId, Process process) throws KillProcessException {
         log.info("Enter: killProcessByTaskId() - TaskId: {} ", taskId);
         boolean isTerminated = false;
         try {
-            Process process = getProcessByTaskId(taskId);
-            if (process != null) {
-                ProcessHandle processHandle = process.toHandle();
-                long pid = processHandle.pid();
-                log.info("Parent Process PID: {}, INFO: {}, isAlive:{} ", pid, processHandle.info(), processHandle.isAlive());
-                if (processHandle.isAlive()) {
-                    this.printProcessTree(processHandle);
-                    int exitCode = killProcessAndChildren(pid);
-                    isTerminated = (exitCode == 0);
-                } else {
-                    log.info("Process PID: {}, is NOT Alive! ", pid);
-                }
+            ProcessHandle processHandle = process.toHandle();
+            long pid = processHandle.pid();
+            log.info("Parent Process PID: {}, INFO: {}, isAlive:{} ", pid, processHandle.info(), processHandle.isAlive());
+            if (processHandle.isAlive()) {
+                this.printProcessTree(processHandle);
+                int exitCode = killProcessAndChildren(pid);
+                isTerminated = (exitCode == 0);
             } else {
-                log.warn("Unable to find process for taskId: {}", taskId);
+                log.info("Process PID: {}, is NOT Alive! ", pid);
             }
-
             log.info("Exit: killProcessByTaskId() isTerminated: {} ", isTerminated);
             return isTerminated;
         } catch (IOException | InterruptedException e) {
@@ -131,15 +125,6 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
         return exitCode;
     }
 
-    private Process getProcessByTaskId(Long taskId) {
-        try {
-            lock.readLock().lock();
-            return processMap.get(taskId);
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
     /**
      * Print info about all children process of the parent process
      * @param parentProcess Parent Process
@@ -150,5 +135,15 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
             log.info("Child Process PID: {}, INFO: {} : " + childProcess.info());
             printProcessTree(childProcess);
         });
+    }
+
+    @Override
+    public Process getProcessByTaskId(Long taskId) {
+        try {
+            lock.readLock().lock();
+            return processMap.get(taskId);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 }

@@ -1,0 +1,53 @@
+/* ==========================================================================
+Main page styles
+========================================================================== */
+.hipster {
+  display: inline-block;
+  width: 100%;
+  height: 497px;
+  background: url('../../../content/images/jhipster_family_member_3.svg') no-repeat center top;
+  background-size: contain;
+}
+
+.home-main-div {
+  background: #303030;
+  color: #009fe3;
+}
+
+.home-card {
+  border: 1px solid #052b67;
+  background-color: white;
+}
+
+.home-container {
+  display: flex;
+  flex-flow: row;
+  width: 100%;
+  gap: 10px 20px;
+  flex-wrap: nowrap;
+}
+
+.home-column1 {
+  display: flex;
+  margin: auto;
+  flex-direction: column;
+}
+
+.home-column2 {
+  display: flex;
+  gap: 10px 20px;
+  margin: auto;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-wrap: inherit;
+}
+
+/* for screens with width less than a certain size (e.g., 768px) */
+@media (max-width: 768px) {
+  .home-container {
+    flex-direction: column;
+  }
+  .home-column2 {
+    flex-direction: column;
+  }
+}

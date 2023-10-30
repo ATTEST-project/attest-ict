@@ -5,6 +5,7 @@ import EnergySection from 'app/modules/tools/WP2/T26/config/energy/energy-sectio
 import SecondarySection from 'app/modules/tools/WP2/T26/config/secondary/secondary-section';
 import TertiarySection from 'app/modules/tools/WP2/T26/config/tertiary/tertiary-section';
 import ParametersSection from 'app/modules/tools/WP2/T26/config/parameters/parameters-section';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Config = (props: any) => {
   const { marketNotSelected } = props;
@@ -12,13 +13,19 @@ const Config = (props: any) => {
     <>
       <ParametersSection marketNotSelected={marketNotSelected} />
       <Divider />
-      <NetworkSection />
-      <Divider />
-      <EnergySection />
-      <Divider />
-      <SecondarySection />
-      <Divider />
-      <TertiarySection />
+      <div className="section-with-border">
+        <SectionHeader title="Upload Auxiliary Data" />
+        <NetworkSection />
+        <Divider />
+
+        <EnergySection />
+        <Divider />
+
+        <SecondarySection />
+        <Divider />
+
+        <TertiarySection />
+      </div>
     </>
   );
 };

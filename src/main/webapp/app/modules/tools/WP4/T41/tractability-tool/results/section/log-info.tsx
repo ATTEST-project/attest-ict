@@ -12,7 +12,7 @@ const LogInfo = (props: LogInfoInterface) => {
   return (
     <>
       <div className="section-with-border">
-        <Table>
+        <Table responsive className="table-responsive">
           <thead>
             <tr>
               <th>Case Name</th>

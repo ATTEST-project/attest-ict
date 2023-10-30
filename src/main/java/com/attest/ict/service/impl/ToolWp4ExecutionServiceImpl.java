@@ -8,6 +8,7 @@ import com.attest.ict.custom.tools.utils.ToolVarName;
 import com.attest.ict.custom.utils.ConverterUtils;
 import com.attest.ict.custom.utils.FileUtils;
 import com.attest.ict.domain.InputFile;
+import com.attest.ict.helper.matpower.exception.MatpowerReaderFileException;
 import com.attest.ict.helper.ods.exception.OdsWriterFileException;
 import com.attest.ict.service.*;
 import com.attest.ict.service.dto.*;
@@ -17,10 +18,7 @@ import com.attest.ict.tools.constants.*;
 import com.attest.ict.tools.parameter.constants.ToolWp4Parameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,6 +65,9 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
 
     @Autowired
     private OutputFileService outputFileServiceImpl;
+
+    @Autowired
+    private MatpowerNetworkService matpowerNetworkServiceImpl;
 
     public ToolWp4ExecutionServiceImpl(ToolsConfiguration toolsConfig) {
         // ATTEST/tools
@@ -367,6 +368,7 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
             inputNetworkFile = simulationWorkingPath.concat(File.separator).concat(odsFileName);
             try {
                 log.debug("prepareT41WorkingDir() - Convert '.m' file in '.ods' ...");
+
                 ByteArrayOutputStream byteArrayOutputStream = odsNetworkService.exportNetworkToOdsFile(networkDto.getId());
                 try (FileOutputStream fileOutputStream = new FileOutputStream(inputNetworkFile)) {
                     byteArrayOutputStream.writeTo(fileOutputStream);
@@ -768,26 +770,93 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
 
         List<InputFileDTO> inputFileDtoSavedList = new ArrayList<InputFileDTO>();
 
+        if (otherToolOutputFileIds != null && otherToolOutputFileIds.length > 0) {
+            addDAToolResults(otherToolOutputFileIds, simulationWorkingPath, networkDto, toolDto, inputFileDtoSavedList, paramsMap);
+        }
+
         // read network input file from DB using selected network id as key
         InputFile testCasesNetwork = inputFileServiceImpl.findNetworkFileByNetworkId(networkDto.getId());
         Path pathNetworkDataFile = Paths.get(testCasesNetwork.getFileName());
-        // add network file into list of input file saved
-        InputFileDTO inputFileTestCaseNetworkDTO = inputFileMapper.toDto(testCasesNetwork);
-        inputFileDtoSavedList.add(inputFileTestCaseNetworkDTO);
 
+        //---20231025 start modify to include the possibility of using the .ods file (used for T41)
+        String mimeType = FileUtils.probeContentType(pathNetworkDataFile);
+        if (
+            !FileUtils.CONTENT_TYPE.get("ods").equals(mimeType) && !FileUtils.getFileExtension(testCasesNetwork.getFileName()).equals("m")
+        ) {
+            String errMsg =
+                "Network input file " +
+                testCasesNetwork.getFileName() +
+                " for tool: " +
+                toolDto.getName() +
+                " must be in MATPOWER case file format or .ODS format!";
+            log.error("prepareT42WorkingDir() - " + errMsg);
+            throw new Exception(errMsg);
+        }
+        //---20231025 stop modify
+
+        //-- save the network file present into the DB  in the file sistem in simulation working dir
         String inputNetworkFile = simulationWorkingPath.concat(File.separator).concat(testCasesNetwork.getFileName());
         try (FileOutputStream fos = new FileOutputStream(inputNetworkFile)) {
             fos.write(testCasesNetwork.getData());
-            log.info("prepareT42WorkingDir() - Matpower network File: {}, Saved on fileSystem!", inputNetworkFile);
+            log.info("prepareT42WorkingDir() - Network File: {}, Saved on fileSystem!", inputNetworkFile);
         } catch (Exception e) {
             String errMsg = "Error saving file: " + inputNetworkFile;
             log.error("prepareT42WorkingDir() - " + errMsg);
             throw new Exception(errMsg, e);
         }
+
+        //-- add network file into list of input file saved
+        InputFileDTO inputFileTestCaseNetworkDTO = inputFileMapper.toDto(testCasesNetwork);
+        inputFileDtoSavedList.add(inputFileTestCaseNetworkDTO);
+
+        if (FileUtils.CONTENT_TYPE.get("ods").equals(mimeType)) {
+            //-- Convert the '.ods' file into the '.m' file
+            String matpowerFileName = replaceFileNameExtension(testCasesNetwork.getFileName(), ".m");
+            inputNetworkFile = simulationWorkingPath.concat(File.separator).concat(matpowerFileName);
+            try {
+                log.debug("prepareT42WorkingDir() - Convert the file  '.ods' into a file in '.m' format ");
+                InputStream matpowerFileInputStream = matpowerNetworkServiceImpl.exportToMatpowerFile(networkDto.getName());
+                try (FileOutputStream fileOutputStream = new FileOutputStream(inputNetworkFile)) {
+                    matpowerFileInputStream.transferTo(fileOutputStream);
+                    log.info("prepareT42WorkingDir() - Network data: {}, Saved to .m file successfully.", inputNetworkFile);
+                } catch (IOException e) {
+                    String errMsg =
+                        "Error saving: " + testCasesNetwork.getFileName() + " to the file system for tool: " + toolDto.getName();
+                    log.error("prepareT42WorkingDir() - " + errMsg);
+                    throw new Exception(errMsg, e);
+                }
+                //-- save .m file in input_file db table
+                try {
+                    InputFileDTO inputFileNetOdsDto = inputFileServiceImpl.saveFileForNetworkAndTool(
+                        matpowerFileInputStream.readAllBytes(),
+                        matpowerFileName,
+                        FileUtils.CONTENT_TYPE.get("m"),
+                        networkDto,
+                        toolDto
+                    );
+                    inputFileDtoSavedList.add(inputFileNetOdsDto);
+                } catch (Exception ex) {
+                    String errMsg =
+                        "Error saving: " + testCasesNetwork.getFileName() + " in InputFile DB's table for tool: " + toolDto.getName();
+                    log.error("prepareT42WorkingDir() - " + errMsg);
+                    throw new Exception(errMsg, ex);
+                }
+            } catch (MatpowerReaderFileException ex) {
+                String errMsg = "Exception running tool: " + toolDto.getName();
+                log.error("prepareT42WorkingDir() - " + errMsg);
+                throw new Exception(errMsg, ex);
+            }
+        }
         paramsMap.put("matpower_network_file", inputNetworkFile);
         log.info("prepareT42WorkingDir() - Param: matpower_network_file: {}, ", inputNetworkFile);
-        pos = testCasesNetwork.getFileName().indexOf(".m");
-        filePrefix = testCasesNetwork.getFileName().substring(0, pos);
+
+        pos =
+            testCasesNetwork.getFileName().indexOf(".m") > 0
+                ? testCasesNetwork.getFileName().indexOf(".m")
+                : testCasesNetwork.getFileName().indexOf(".ods");
+        if (pos > 0) {
+            filePrefix = testCasesNetwork.getFileName().substring(0, pos);
+        }
 
         if (StringUtils.isBlank((String) paramsMap.get(ToolWp4Parameters.PARAM_CASE_NAME))) {
             paramsMap.put(ToolWp4Parameters.PARAM_CASE_NAME, filePrefix);
@@ -962,7 +1031,7 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
         List<InputFileDTO> inputFileDtoSavedList = new ArrayList<InputFileDTO>();
 
         if (otherToolOutputFileIds != null && otherToolOutputFileIds.length > 0) {
-            addT44ToolResults(otherToolOutputFileIds, simulationWorkingPath, networkDto, toolDto, inputFileDtoSavedList, paramsMap);
+            addDAToolResults(otherToolOutputFileIds, simulationWorkingPath, networkDto, toolDto, inputFileDtoSavedList, paramsMap);
         }
 
         // read network input file from DB using selected network id as key
@@ -1059,7 +1128,7 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
         return configMap;
     }
 
-    private void addT44ToolResults(
+    private void addDAToolResults(
         Long[] otherToolOutputFileIds,
         String workingDir,
         NetworkDTO networkDto,
@@ -1068,7 +1137,7 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
         LinkedHashMap<String, Object> paramsMap
     ) throws Exception {
         for (Long id : otherToolOutputFileIds) {
-            log.debug("addT44ToolResults() -  T44 outputFile's Id - id:{} ", id);
+            log.debug("addDAToolResults() -   outputFile's Id - id:{} ", id);
 
             Optional<OutputFileDTO> outputFileDTO = outputFileServiceImpl.findOne(id);
             if (outputFileDTO.isPresent()) {
@@ -1078,17 +1147,17 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
                 String contentType = outputFileDto.getDataContentType();
 
                 String inputFileName = workingDir + File.separator + fileName;
-                log.debug("addT44ToolResults() - Saving file in the File System:{} ", inputFileName);
+                log.debug("addDAToolResults() - Saving file in the File System:{} ", inputFileName);
                 try (FileOutputStream fos = new FileOutputStream(inputFileName)) {
                     fos.write(data);
-                    log.debug("addT44ToolResults() - Input File: {}, Saved on fileSystem!", inputFileName);
+                    log.debug("addDAToolResults() - Input File: {}, Saved on fileSystem!", inputFileName);
                 } catch (Exception e) {
                     String errMsg = "Error saving file: " + inputFileName;
-                    log.error("addT44ToolResults() - " + errMsg);
+                    log.error("addDAToolResults() - " + errMsg);
                     throw new Exception(errMsg);
                 }
                 // save file as input file for T45
-                log.debug("addT44ToolResults() - Saving file: {}, in the INPUT_FILE DB table ", fileName);
+                log.debug("addDAToolResults() - Saving file: {}, in the INPUT_FILE DB table ", fileName);
                 InputFileDTO inputFileDTO = inputFileServiceImpl.saveFileForNetworkAndTool(
                     data,
                     fileName,
@@ -1107,7 +1176,7 @@ public class ToolWp4ExecutionServiceImpl implements ToolWp4ExecutionService {
                 }
             }
         }
-        log.debug("addT44ToolResults() - EXIT");
+        log.debug("addDAToolResults() - EXIT");
     }
 
     private List<InputFileDTO> saveInputFileOnDbAndFileSystem(

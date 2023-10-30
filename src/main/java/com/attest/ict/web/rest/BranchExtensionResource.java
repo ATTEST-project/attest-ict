@@ -225,7 +225,7 @@ public class BranchExtensionResource {
     /**
      * {@code GET  /branch-extensions/network} : get the all network's branches with length greater than param: length (if specified), all network's branches if length param is not present
      * @param networkId the id of the network  to retrieve.
-     * @param length minLength
+     * @param minLength
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the BranchCustomDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/branch-extensions/network")
@@ -252,7 +252,7 @@ public class BranchExtensionResource {
 
             return new ResponseEntity<>(branchExtensionList, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Error quering Branch_Extension table ");
+            log.error("Error querying Branch_Extension table ");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

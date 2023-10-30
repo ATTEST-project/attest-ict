@@ -16,15 +16,25 @@ const InputRow = (props: any) => {
     formState: { errors },
     unregister,
     reset,
+    setValue,
   } = useFormContext();
 
   const dispatch = useAppDispatch();
-
   const [inputFile, setInputFile] = React.useState<File>(null);
   const [uploadLoading, setUploadLoading] = React.useState<boolean>(false);
   const [variables, setVariables] = React.useState<string[]>(null);
-
   const results = React.useMemo(() => ['Asset Assessment', 'Number of Clusters assessment', 'Clustering Training Process'], []);
+
+  const [defaultHeader, setDefaultHeader] = React.useState(null);
+  const [checkboxVariables, setCheckboxVariables] = React.useState<string[]>(null);
+
+  const filterAssetTypeAndFirstColumn = (element, index, array) => {
+    return index > 0 && !element.includes('asset_type');
+  };
+
+  const isFirstColumn = (element, index, array) => {
+    return index === 0;
+  };
 
   React.useEffect(() => {
     return () => {
@@ -32,9 +42,20 @@ const InputRow = (props: any) => {
     };
   }, []);
 
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    // console.log('T51  useEffect() enter - defaultHeader :  ', defaultHeader);
+    if (!defaultHeader) {
+      return;
+    }
+    setValue(`config[${index}].selectedVariables`, defaultHeader);
+  }, [defaultHeader]);
+
   const onFileChange = event => {
     setInputFile(event.target.files[0]);
     setVariables(null);
+    setCheckboxVariables(null);
+    setDefaultHeader(null);
   };
 
   const onUploadButtonClick = () => {
@@ -42,7 +63,9 @@ const InputRow = (props: any) => {
     dispatch(getFileHeader(inputFile))
       .unwrap()
       .then(res => {
+        setCheckboxVariables(res.data.filter(filterAssetTypeAndFirstColumn));
         setVariables(res.data);
+        setDefaultHeader(res.data[0]);
         setUploadLoading(false);
       })
       .catch(err => {
@@ -103,8 +126,10 @@ const InputRow = (props: any) => {
                   register={register}
                   error={errors?.config?.[index]?.selectedVariables}
                   name={`config[${index}].selectedVariables`}
-                  label="Selected Variables"
+                  label="Header"
                   type="select"
+                  value={defaultHeader}
+                  validate={{ required: true }}
                 >
                   <option key="opt-0" value="" hidden>
                     Header...
@@ -117,12 +142,12 @@ const InputRow = (props: any) => {
               <Col>
                 <Label htmlFor="variables">Variables</Label>
                 <div id="variables" className="variables-container">
-                  {variables?.map((variable, i) => (
+                  {checkboxVariables?.map((variable, i) => (
                     <ValidatedField
                       key={'variable-' + i}
                       className="input-row-checkbox"
                       register={register}
-                      errors={errors?.config?.[index]?.variables?.[variable]}
+                      errors={errors?.config?.[index]?.checkboxVariables?.[variable]}
                       name={`config[${index}].variables[${variable}]`}
                       label={variable}
                       type="checkbox"
@@ -155,6 +180,7 @@ const InputRow = (props: any) => {
                   label="Method"
                   type="select"
                   validate={{ required: true }}
+                  value="Auto"
                 >
                   <option value="" hidden>
                     Method...

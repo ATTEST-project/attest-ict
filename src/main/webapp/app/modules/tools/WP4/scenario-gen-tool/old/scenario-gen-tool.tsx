@@ -1,5 +1,5 @@
 import React from 'react';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Divider from 'app/shared/components/divider/divider';
 import { Button, Col, Form, Row, Spinner } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';

@@ -336,26 +336,12 @@ public class ToolWp3Resource {
                 HttpStatus.NOT_FOUND
             );
 
-            if (
-                !toolName.equals(ToolVarName.T31_OPT_TOOL_DX) &&
-                !toolName.equals(ToolVarName.T32_OPT_TOOL_TX) &&
-                !toolName.equals(ToolVarName.T33_OPT_TOOL_PLAN_TSO_DSO)
-            ) {
+            if (!toolName.equals(ToolVarName.T31_OPT_TOOL_DX) && !toolName.equals(ToolVarName.T32_OPT_TOOL_TX)) {
                 return new ResponseEntity<>("Tool: " + toolName + " is not part of WP3!", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            File fileToDownload = null;
-
+            File fileToDownload = toolWp3ShowResultsImpl.getOutputFile(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
             String json = "";
-
-            if (toolName.equals(ToolVarName.T33_OPT_TOOL_PLAN_TSO_DSO)) {
-                //TODO implement a new service to generate correct  json respose
-                fileToDownload =
-                    new File(
-                        "C:\\SVILUPPO\\ATTEST\\GIT-LAB\\ATTEST-ICT-PLATFORM\\jhipster-attest\\src\\test\\resources\\json_file\\response-tables-charts.json"
-                    );
-            } else fileToDownload = toolWp3ShowResultsImpl.getOutputFile(networkDtoOpt.get(), toolDtoOpt.get(), uuid);
-
             if (fileToDownload == null) {
                 return new ResponseEntity<>("Output results for tool:  " + toolName + " not found!", HttpStatus.NOT_FOUND);
             }

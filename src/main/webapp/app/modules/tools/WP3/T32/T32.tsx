@@ -11,10 +11,11 @@ import { toast } from 'react-toastify';
 import { pathButton } from 'app/shared/reducers/back-button-path';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import { defaultParameters } from 'app/modules/tools/WP3/T31/parameters/default-parameters';
 
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Parameters from 'app/modules/tools/WP3/T32/parameters/parameters';
 
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
@@ -24,6 +25,7 @@ import { SELECTION_TYPE } from 'app/shared/components/network-search/constants/c
 
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 
 const T32 = (props: any) => {
   const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
@@ -32,6 +34,7 @@ const T32 = (props: any) => {
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
   const country = network.country;
   const toolDescription = TOOLS_INFO.T32_OPT_TOOL_TX.description;
+  const toolNum = toolsInfo.WP3[1].name;
 
   const defaultParamsValues = () => {
     switch (country) {
@@ -120,10 +123,9 @@ const T32 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
-            setShowBtnGoToTask(false);
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T32 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

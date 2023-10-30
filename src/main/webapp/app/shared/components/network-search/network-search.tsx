@@ -4,7 +4,7 @@ import { ValidatedField } from 'react-jhipster';
 import { useForm } from 'react-hook-form';
 import { INetwork } from 'app/shared/model/network.model';
 import { useAppDispatch } from 'app/config/store';
-import { getEntities } from 'app/entities/network/network-search.reducer';
+import { getEntities } from 'app/shared/reducers/network-search';
 import NetworkSearchResults from 'app/shared/components/network-search/results/network-search-results-1';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppSelector } from 'app/config/store';
@@ -53,7 +53,8 @@ const NetworkSearch = props => {
       getEntities({
         type: data.type,
         country: data.country,
-        mpcName: data.mpcName,
+        name: data.name,
+        // mpcName: data.mpcName,
         fromNetworkDate: data.fromDate,
         toNetworkDate: data.toDate,
       })
@@ -79,7 +80,7 @@ const NetworkSearch = props => {
 
   return (
     <div style={{ border: '1px solid white', borderRadius: 10, padding: 10 }}>
-      <h5>{'Search Test Cases'}</h5>
+      <h5>{'Search Network'}</h5>
       <Form onSubmit={handleSubmit(submitForm)}>
         <Row md="7">
           <Col>
@@ -136,6 +137,20 @@ const NetworkSearch = props => {
           <Col>
             <ValidatedField
               register={register}
+              error={errors?.name}
+              id={'name-select'}
+              label="Name"
+              name="name"
+              data-cy="name"
+              type="text"
+              placeholder="Name... (optional)"
+            />
+          </Col>
+
+          {/*
+          <Col>
+            <ValidatedField
+              register={register}
               error={errors?.mpcName}
               id={'mpc-name-select'}
               label="MPC Name"
@@ -145,6 +160,8 @@ const NetworkSearch = props => {
               placeholder="MPC Name... (optional)"
             />
           </Col>
+          */}
+
           <Col>
             <ValidatedField
               id="from-date-input"

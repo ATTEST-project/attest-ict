@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import { Link } from 'react-router-dom';
 import Config from 'app/modules/tools/WP5/T51/characterization-tool/config/config';
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
@@ -18,12 +18,15 @@ import { downloadResults } from 'app/modules/tools/WP5/T51/characterization-tool
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 
 const T51Characterization = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
 
   const dispatch = useAppDispatch();
   const toolDescription = TOOLS_INFO.T51_CHARACTERIZATION.description;
+  const toolNum = toolsInfo.WP5[0].name + ' Characterization';
   const methods = useForm();
   const {
     register,
@@ -98,7 +101,7 @@ const T51Characterization = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log('Characterization tool - checkAndRun()');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -109,9 +112,9 @@ const T51Characterization = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Characterization tool execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('Characterization tool is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

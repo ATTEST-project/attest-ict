@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
 import { useFormContext } from 'react-hook-form';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const ParametersSection = () => {
   const {
@@ -13,7 +14,7 @@ const ParametersSection = () => {
   return (
     <>
       <div className="section-with-border">
-        <h6>Tool Parameters</h6>
+        <SectionHeader title="Parameters" />
         <Row md="7">
           <Col md="4">
             <ValidatedField

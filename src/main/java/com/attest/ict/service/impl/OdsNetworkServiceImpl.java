@@ -64,9 +64,11 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
     NetworkMapper networkMapper;
 
     /**
-     * @param networkId network identifier
-     * @return ODS file with network data one component for each sheet:
-     *  (buses, branches, loads, generators, baseMVA)
+     * Export network data to an ODS file, organized into distinct sheets for buses, branches, loads, generators, and base MVA.
+     *
+     * @param networkId The unique network identifier.
+     * @return A ByteArrayOutputStream containing the network data in ODS format.
+     * @throws OdsWriterFileException If an error occurs during the export process.
      */
     @Override
     public ByteArrayOutputStream exportNetworkToOdsFile(Long networkId) throws OdsWriterFileException {

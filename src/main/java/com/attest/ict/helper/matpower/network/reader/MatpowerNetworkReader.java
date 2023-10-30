@@ -363,12 +363,10 @@ public class MatpowerNetworkReader extends MatpowerReader {
             if (MatpowerAttributesTemplate.BUS_EXTENSION_1.size() == attributesSize) {
                 //LOGGER.debug("getAttributesList - BUS_EXTENSION_1");
                 attributesList = MatpowerAttributesTemplate.BUS_EXTENSION_1;
-            } /** 2023/03 Fix else if (MatpowerAttributesTemplate.BUS_EXTENSION_2.size() == attributesSize) {
+            }/** 2023/03 Fix else if (MatpowerAttributesTemplate.BUS_EXTENSION_2.size() == attributesSize) {
              LOGGER.debug("getAttributesList - BUS_EXTENSION_2");
              attributesList = MatpowerAttributesTemplate.BUS_EXTENSION_2;
-             }*/
-
-            else {
+             }*/ else {
                 //LOGGER.debug("getAttributesList - BUS_STANDARD");
                 attributesList = MatpowerAttributesTemplate.BUS_STANDARD;
             }
@@ -379,12 +377,11 @@ public class MatpowerNetworkReader extends MatpowerReader {
             } else if (MatpowerAttributesTemplate.BRANCH_EXTENSION_2.size() == attributesSize) {
                 //LOGGER.debug("getAttributesList - BRANCH_EXTENSION_2");
                 attributesList = MatpowerAttributesTemplate.BRANCH_EXTENSION_2;
-            } /* else if (MatpowerAttributesTemplate.BRANCH_EXTENSION_3.size() == attributesSize) {
+            }/* else if (MatpowerAttributesTemplate.BRANCH_EXTENSION_3.size() == attributesSize) {
                 LOGGER.debug("getAttributesList - BRANCH_EXTENSION_3");
                 attributesList = MatpowerAttributesTemplate.BRANCH_EXTENSION_3;
 
-            } */
-            else {
+            } */ else {
                 //LOGGER.debug("getAttributesList - BRANCH_STANDARD");
                 attributesList = MatpowerAttributesTemplate.BRANCH_STANDARD;
             }
@@ -561,17 +558,11 @@ public class MatpowerNetworkReader extends MatpowerReader {
     }
 
     public static void main(String[] args) {
-        // String filePath = "src\\test\\resources\\m_file\\Distribution_Network_Urban_UK_new.m";
-        // String filePath = "src\\test\\resources\\m_file\\PT_DX_02_2020_exported.m";
-
+        String filePath = "src\\test\\resources\\m_file\\matpower_rnm_network.m"; // no extension
+        //String filePath = "src\\test\\resources\\m_file\\Distribution_Network_Urban_UK_new.m";
         //String filePath = "src\\test\\resources\\m_file\\Distribution_Network_PT2.m"; // length in meter
         //String filePath = "src\\test\\resources\\m_file\\Transmission_Network_PT_2020.m"; // length KM
-        String filePath = "src\\test\\resources\\m_file\\matpower_rnm_network.m"; // no extension
-
-        // String filePath ="src\\test\\resources\\m_file\\A_BJ_35.m"; // extention declared as attribute values but not value are defined
-
-        //String filePath ="src\\test\\resources\\m_file\\Transmission_Network_PT_2030_Active_Economy_EXPORTED.m"; // extention declared as attribute values but not value are defined
-
+        //String filePath ="src\\test\\resources\\m_file\\A_BJ_35.m"; //
         //String filePath = "src\\test\\resources\\m_file\\A_KPC_35.m";
         File fileToParse = new File(filePath);
         FileInputStream input;

@@ -24,7 +24,7 @@ const NetworkUploadDX = props => {
     <>
       <div className="upload-file-row">
         <div className="title-row">
-          <span style={{ fontSize: 20 }}>{'Generator Profile'}</span>
+          <h6>Generator Profile</h6>
           {inputFileEntities && <FilesUploaded networkId={network.id} section={SECTION.GENERATOR} files={inputFileEntities} />}
         </div>
         {/* <LabelsRow section="gen" /> */}
@@ -43,7 +43,7 @@ const NetworkUploadDX = props => {
       </div>
       <div className="upload-file-row">
         <div className="title-row">
-          <span style={{ fontSize: 20 }}>{'Load Profile'}</span>
+          <h6>Load Profile</h6>
           {inputFileEntities && <FilesUploaded networkId={network.id} section={SECTION.LOAD} files={inputFileEntities} />}
         </div>
         {/* <LabelsRow section="load" /> */}
@@ -62,7 +62,7 @@ const NetworkUploadDX = props => {
       </div>
       <div className="upload-file-row">
         <div className="title-row">
-          <span style={{ fontSize: 20 }}>{'Flex Profile'}</span>
+          <h6>Flex Profile</h6>
           {inputFileEntities && <FilesUploaded networkId={network.id} section={SECTION.FLEXIBILITY} files={inputFileEntities} />}
         </div>
         {/* <LabelsRow section="flex" /> */}

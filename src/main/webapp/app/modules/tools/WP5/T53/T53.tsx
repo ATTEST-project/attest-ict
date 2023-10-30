@@ -8,19 +8,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
+
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Config from 'app/modules/tools/WP5/T53/config/config';
 import { runT53Tool, reset as retry } from 'app/modules/tools/WP5/T53/reducer/tool-execution.reducer';
 import { downloadResults } from 'app/modules/tools/WP5/T53/reducer/tool-table.reducer';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 
 const T53 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
   const toolDescription = TOOLS_INFO.T53_MANAGEMENT.description;
+  const toolNum = toolsInfo.WP5[2].name;
   const dispatch = useAppDispatch();
   const methods = useForm();
 
@@ -79,7 +83,7 @@ const T53 = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log('T53 - checkAndRun()');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -90,9 +94,9 @@ const T53 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('T53 execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T53 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })

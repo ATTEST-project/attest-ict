@@ -1,8 +1,6 @@
 package com.attest.ict.web.rest;
 
-import com.attest.ict.custom.exception.FileStorageException;
 import com.attest.ict.custom.message.ResponseMessage;
-import com.attest.ict.custom.utils.MimeUtils;
 import com.attest.ict.domain.Network;
 import com.attest.ict.helper.ProtectionToolsHelper;
 import com.attest.ict.helper.TopologyBusesHelper;
@@ -78,9 +76,15 @@ public class FileResource {
     @Autowired
     MatpowerNetworkService matpowerNetworkService;
 
+    /**
+     * Export network data to a Matpower file and provide it as a downloadable resource.
+     *
+     * @param networkName The name of the network to export.
+     * @return A ResponseEntity containing the Matpower file as a downloadable resource.
+     * @throws IOException If an error occurs during the export process or resource creation.
+     */
     @GetMapping("/export-data/{networkName}")
     public ResponseEntity<Resource> exportData(@PathVariable("networkName") String networkName) throws IOException {
-        //InputStreamResource file = new InputStreamResource(fileServiceImpl.getNetworkData(networkName));
         InputStreamResource file = new InputStreamResource(matpowerNetworkService.exportToMatpowerFile(networkName));
         return ResponseEntity
             .ok()

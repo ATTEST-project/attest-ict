@@ -1,16 +1,15 @@
-import './home_grid.scss';
+import './home.scss';
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardTitle, CardBody, CardImg } from 'reactstrap';
+import { Button, Card, CardTitle, CardBody, CardImg, CardColumns, CardText } from 'reactstrap';
 
 import { getLoginUrl, REDIRECT_URL } from 'app/shared/util/url-utils';
 
-import attest_home from '../../../content/images/home_smartenergy.png';
-import task_img from '../../../content/images/home_tasks.jpg';
-import tool_img from '../../../content/images/home_tools.jpg';
-
-import EuropeMap from 'app/shared/components/map/EuropeMap';
+import attestHomeImg from '../../../content/images/home_static_attest_650.png';
+import tasksHomeImg from '../../../content/images/home_tasks_small.png';
+import toolsHomeImg from '../../../content/images/home_tools_small.png';
+import networkHomeImg from '../../../content/images/home_map.png';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
@@ -26,40 +25,35 @@ export const Home = () => {
 
   return (
     <div className={'home-main-div'}>
-      <div className={'home-container-grid'}>
-        <div id="home-container-img" className={'grid-item1'}>
-          <img className={'home-container-img'} alt={'attest-logo'} src={attest_home} />
+      <div className={'home-container'}>
+        <div className={'home-column1 home-image'}>
+          <img src={attestHomeImg} alt="Image of the home page Ict Platform" />
         </div>
-
-        <div id="map" className={'grid-item2'}>
+        <div className={'home-column2'}>
           <Card className={'home-card'}>
             <Link to={`/network`}>
-              <EuropeMap highlightedCountries={['ES', 'HR', 'PT', 'UK']} />
+              <CardImg alt="Image of the home page network map" src={networkHomeImg} top width="100%" />
             </Link>
             <CardBody>
               <CardTitle tag="h5">Networks</CardTitle>
             </CardBody>
           </Card>
-        </div>
 
-        <div id="card-tool" className={'grid-item3'}>
           <Card className={'home-card'}>
             <Link to={`/tools`}>
-              <CardImg alt="tools" src={tool_img} top width="100%" />
+              <CardImg alt="Image of the home page tools" src={toolsHomeImg} top width="100%" />
             </Link>
             <CardBody>
               <CardTitle tag="h5">Tools</CardTitle>
             </CardBody>
           </Card>
-        </div>
 
-        <div id="card-task" className={'grid-item4'}>
           <Card className={'home-card'}>
             <Link to={`/task`}>
-              <CardImg alt="task" src={task_img} top width="100%" />
+              <CardImg alt="Image of the home page tasks" src={tasksHomeImg} top width="100%" />
             </Link>
             <CardBody>
-              <CardTitle tag="h5">Task</CardTitle>
+              <CardTitle tag="h5">Tasks</CardTitle>
             </CardBody>
           </Card>
         </div>

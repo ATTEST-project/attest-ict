@@ -5,6 +5,7 @@ import { ValidatedField } from 'react-jhipster';
 import { getFileHeader } from 'app/modules/tools/WP5/T52/reducer/tool-file-header.reducer';
 import { useAppDispatch } from 'app/config/store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Config = (props: any) => {
   const {
@@ -14,10 +15,13 @@ const Config = (props: any) => {
   } = useFormContext();
 
   const dispatch = useAppDispatch();
-
   const [inputFile, setInputFile] = React.useState<File>(null);
   const [variables, setVariables] = React.useState<string[]>(null);
   const [uploadLoading, setUploadLoading] = React.useState<boolean>(false);
+
+  const filterEmptyAndFirstColumn = (element, index, array) => {
+    return index > 0 && element.length > 0;
+  };
 
   const onFileChange = event => {
     setInputFile(event.target.files[0]);
@@ -29,7 +33,7 @@ const Config = (props: any) => {
     dispatch(getFileHeader(inputFile))
       .unwrap()
       .then(res => {
-        setVariables(res.data);
+        setVariables(res.data.filter(filterEmptyAndFirstColumn));
         setUploadLoading(false);
       })
       .catch(err => {
@@ -41,6 +45,8 @@ const Config = (props: any) => {
 
   return (
     <div className="section-with-border">
+      <SectionHeader title="Upload Auxiliary Data" />
+
       <Row>
         <Col md="4">
           <ValidatedField
@@ -99,40 +105,25 @@ const Config = (props: any) => {
           </Col>
         )}
       </Row>
+
       {variables && (
         <>
-          <h6>Variables Selection</h6>
+          <h5>Variables Selection</h5>
           <Row>
             <Col>
               <Label htmlFor="current">Current (A)</Label>
               <div id="current" className="variables-container">
                 {variables?.map((variable, i) => (
                   <ValidatedField
-                    key={'variable-' + i}
-                    className="input-row-checkbox"
+                    key={'current-' + i}
                     register={register}
+                    className="input-row-checkbox"
                     errors={errors?.config?.item1}
                     name={`config.item1`}
                     label={variable}
                     type="radio"
                     value={variable}
-                  />
-                ))}
-              </div>
-            </Col>
-            <Col>
-              <Label htmlFor="oil-temp">Oil Temperature (°C)</Label>
-              <div id="oil-temp" className="variables-container">
-                {variables?.map((variable, i) => (
-                  <ValidatedField
-                    key={'variable-' + i}
-                    className="input-row-checkbox"
-                    register={register}
-                    errors={errors?.config?.item1}
-                    name={`config.item2`}
-                    label={variable}
-                    type="radio"
-                    value={variable}
+                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
                   />
                 ))}
               </div>
@@ -142,14 +133,33 @@ const Config = (props: any) => {
               <div id="wind-temp" className="variables-container">
                 {variables?.map((variable, i) => (
                   <ValidatedField
-                    key={'variable-' + i}
+                    key={'wind-temp-' + i}
                     className="input-row-checkbox"
                     register={register}
-                    errors={errors?.config?.item1}
+                    errors={errors?.config?.item3}
                     name={`config.item3`}
                     label={variable}
                     type="radio"
                     value={variable}
+                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
+                  />
+                ))}
+              </div>
+            </Col>
+            <Col>
+              <Label htmlFor="oil-temp">Oil Temperature (°C)</Label>
+              <div id="oil-temp" className="variables-container">
+                {variables?.map((variable, i) => (
+                  <ValidatedField
+                    key={'oil-temp-' + i}
+                    className="input-row-checkbox"
+                    register={register}
+                    errors={errors?.config?.item2}
+                    name={`config.item2`}
+                    label={variable}
+                    type="radio"
+                    value={variable}
+                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
                   />
                 ))}
               </div>

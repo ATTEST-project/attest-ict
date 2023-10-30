@@ -385,14 +385,4 @@ public class NetworkResource {
         log.debug("handleConstraintViolationException() return message: {}", errorMessage);
         return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    /*
-    @ExceptionHandler(org.hibernate.exception.ConstraintViolationException.class)
-    public ResponseEntity<String> duplicateNetworkNameException(
-        HttpServletRequest req,
-        org.hibernate.exception.ConstraintViolationException e
-    ) {
-        return new ResponseEntity<>("A network with the same name already exists! ", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    */
-
 }

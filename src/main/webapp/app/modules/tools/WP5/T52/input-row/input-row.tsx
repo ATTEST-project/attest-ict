@@ -18,11 +18,23 @@ const InputRow = (props: any) => {
     reset,
     resetField,
     unregister,
+    setValue,
   } = useFormContext();
 
   const [assetsFile, setAssetsFile] = React.useState<File>(null);
   const [uploadLoading, setUploadLoading] = React.useState<boolean>(false);
   const [variables, setVariables] = React.useState<string[]>(null);
+
+  const [defaultHeader, setDefaultHeader] = React.useState(null);
+  const [checkboxVariables, setCheckboxVariables] = React.useState<string[]>(null);
+
+  const filterAssetTypeAndFirstColumn = (element, index, array) => {
+    return index > 0 && !element.includes('asset_type');
+  };
+
+  const isFirstColumn = (element, index, array) => {
+    return index === 0;
+  };
 
   React.useEffect(() => {
     return () => {
@@ -30,12 +42,23 @@ const InputRow = (props: any) => {
     };
   }, []);
 
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    // console.log('T52  useEffect() enter - defaultHeader :  ', defaultHeader);
+    if (!defaultHeader) {
+      return;
+    }
+    setValue(`mainConfig[${index}].index`, defaultHeader);
+  }, [defaultHeader]);
+
   const onUploadButtonClick = () => {
     setUploadLoading(true);
     dispatch(getFileHeader(assetsFile))
       .unwrap()
       .then(res => {
+        setCheckboxVariables(res.data.filter(filterAssetTypeAndFirstColumn));
         setVariables(res.data);
+        setDefaultHeader(res.data[0]);
         setUploadLoading(false);
       })
       .catch(err => {
@@ -95,9 +118,10 @@ const InputRow = (props: any) => {
                 name={`mainConfig[${index}].index`}
                 label="Header"
                 type="select"
+                value={defaultHeader}
                 validate={{ required: true }}
               >
-                <option key="select-index" value="" hidden>
+                <option key="select-index-0" value="" hidden>
                   Header...
                 </option>
                 {variables.map((variable, index) => (
@@ -108,7 +132,7 @@ const InputRow = (props: any) => {
             <Col>
               <Label htmlFor="variables">Variables</Label>
               <div id="variables" className="variables-container">
-                {variables.map((variable, i) => (
+                {checkboxVariables.map((variable, i) => (
                   <ValidatedField
                     key={'variable-' + i}
                     className="input-row-checkbox"

@@ -116,27 +116,31 @@ public class TaskAdditionalResource {
      */
     @PatchMapping(value = "/tasks/kill/{id}")
     public ResponseEntity<?> killProcess(@PathVariable(value = "id", required = true) final Long id) throws URISyntaxException {
-        log.info("REST request to KILL the process launched by the Task id: {}", id);
-
+        log.info("REST request to KILL the process launched by the Task ID: {}", id);
         try {
-            boolean isKilled = commandExecutionService.killProcessByTaskId(id);
-            log.debug("Request Kill process Find Task, taskid: {}", id);
             Optional<TaskDTO> taskDtoOpt = taskService.findOne(id);
             if (!taskDtoOpt.isPresent()) {
                 throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
             }
-            if (isKilled) {
+
+            Process process = commandExecutionService.getProcessByTaskId(id);
+            if (process == null) {
+                log.warn("Request to KILL the process -  Unable to find a process for Task ID: {}", id);
+            }
+            boolean isKilled = (process != null) ? commandExecutionService.killProcessByTaskId(id, process) : false;
+
+            if (isKilled || (process == null)) {
                 TaskDTO taskDTO = taskDtoOpt.get();
                 taskDTO.setInfo(TaskStatus.Status.KILLED.name());
                 taskDTO.setTaskStatus(TaskStatus.Status.FAILED.name());
                 Optional<TaskDTO> result = taskService.partialUpdate(taskDTO);
-                log.info("Exit: Request Kill process task updated:{} ", result);
+                log.info("Exit: Request to KILL the process - task updated :{} ", result);
                 return ResponseUtil.wrapOrNotFound(
                     result,
                     HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, taskDTO.getId().toString())
                 );
             } else {
-                log.info("Exit: Request Kill process with result: stop process not needed!");
+                log.info("Request to KILL the process for task ID {} - not needed!", id);
                 return ResponseUtil.wrapOrNotFound(
                     taskDtoOpt,
                     HeaderUtil.createAlert(applicationName, "Kill process not needed", taskDtoOpt.get().getId().toString())

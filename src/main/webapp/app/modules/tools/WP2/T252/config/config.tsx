@@ -2,6 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Config = () => {
   const {
@@ -11,6 +12,7 @@ const Config = () => {
 
   return (
     <div className="section-with-border">
+      <SectionHeader title="Upload Auxiliary Data" />
       <Row md="3">
         <Col>
           <ValidatedField

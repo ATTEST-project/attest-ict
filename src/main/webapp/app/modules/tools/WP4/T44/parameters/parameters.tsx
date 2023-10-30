@@ -2,6 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Col, Row } from 'reactstrap';
 import { ValidatedField } from 'react-jhipster';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const Parameters = () => {
   const {
@@ -13,7 +14,8 @@ const Parameters = () => {
   return (
     <>
       <div className="section-with-border">
-        <h6>Tool Parameters</h6>
+        <SectionHeader title="Parameters" />
+
         <Row>
           <Col md="3">
             <ValidatedField
@@ -26,8 +28,6 @@ const Parameters = () => {
               validate={{ required: false }}
             />
           </Col>
-        </Row>
-        <Row>
           <Col md="2">
             <ValidatedField
               register={register}
@@ -60,8 +60,6 @@ const Parameters = () => {
               </option>
             </ValidatedField>
           </Col>
-        </Row>
-        <Row>
           <Col md="2">
             <ValidatedField
               register={register}
@@ -80,8 +78,6 @@ const Parameters = () => {
               <option value="2">Winter</option>
             </ValidatedField>
           </Col>
-        </Row>
-        <Row>
           <Col md="2">
             <ValidatedField
               register={register}
@@ -103,8 +99,6 @@ const Parameters = () => {
               <option value="2050">2050</option>
             </ValidatedField>
           </Col>
-        </Row>
-        <Row>
           <Col md="1" style={{ alignSelf: 'center' }}>
             <ValidatedField
               className="input-row-checkbox"

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { toast } from 'react-toastify';
 
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import Divider from 'app/shared/components/divider/divider';
 import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overlay';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
@@ -16,16 +16,20 @@ import ParametersSection from 'app/modules/tools/WP3/T33/parameters/parameters';
 import { runT33, reset as retry } from 'app/modules/tools/WP3/T33/reducer/tool-execution.reducer';
 import { TOOLS_INFO, TOOLS_NAMES } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
+import toolsInfo from 'app/modules/tools/info/tools-info';
 import { downloadResults } from 'app/modules/tools/WP4/reducer/tools-results.reducer';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import SectionHeader from 'app/shared/components/section-header/section-header';
 
 const T33 = (props: any) => {
   /* eslint-disable-next-line no-console */
-  console.log('T33 Config page - propos: ', props);
+  console.log('T33 Config page - props: ', props);
   const [openOffCanvas, setOpenOffCanvas] = React.useState<boolean>(false);
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
   const divRef = React.useRef<HTMLDivElement>();
   const dispatch = useAppDispatch();
   const toolDescription = TOOLS_INFO.T33_OPT_TOOL_PLAN_TSO_DSO.description;
+  const toolNum = toolsInfo.WP3[2].name;
   const methods = useForm();
   const {
     register,
@@ -67,7 +71,7 @@ const T33 = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('T33 RUN!');
+    console.log('T33 checkAndRun()!');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -78,9 +82,9 @@ const T33 = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
+            toast.error(toolNum + ': ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('T33 is running!');
+            toast.success(toolNum + ': ' + RUN_TOOL_START);
             setShowBtnGoToTask(true);
           }
         })
@@ -99,18 +103,23 @@ const T33 = (props: any) => {
       <div>
         <Divider />
         <NetworkInfo network={network} />
+
         <Divider />
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(submitMethod)}>
+            <ParametersSection />
+
+            <Divider />
+
             <div className="section-with-border">
-              <h6>Choose the case dir zip file</h6>
+              <SectionHeader title="Upload Auxiliary Data" />
               <Row md="3">
                 <Col>
                   <ValidatedField
                     register={register}
                     error={errors?.caseDirZipFile}
                     id={'case-dir-zipfile'}
-                    label="Case Dir Zip File"
+                    label="Choose the case dir zip file"
                     name="caseDirZipFile"
                     data-cy="caseDirZipFile"
                     type="file"
@@ -121,8 +130,7 @@ const T33 = (props: any) => {
               </Row>
             </div>
             <Divider />
-            <ParametersSection />
-            <Divider />
+
             <div style={{ float: 'right' }}>
               {!showBtnGoToTask ? (
                 <>

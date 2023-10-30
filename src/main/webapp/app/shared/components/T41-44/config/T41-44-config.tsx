@@ -9,7 +9,7 @@ import { runTool, reset as retry } from 'app/modules/tools/reducer/tools-executi
 import { downloadResults } from 'app/modules/tools/WP4/reducer/tools-results.reducer';
 
 import Divider from 'app/shared/components/divider/divider';
-import NetworkInfo from 'app/shared/components/T41-44/config/network-info/network-info';
+import NetworkInfo from 'app/shared/components/network-info/network-info';
 import ProfilesSection from 'app/shared/components/T41-44/config/profiles/profiles';
 import Auxiliary from 'app/shared/components/T41-44/config/auxiliary/auxiliary';
 import { Link } from 'react-router-dom';
@@ -23,9 +23,10 @@ import { pathButton } from 'app/shared/reducers/back-button-path';
 import { SELECTION_TYPE } from 'app/shared/components/network-search/constants/constants';
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 
 const T4144Config = (props: any) => {
-  const { title, toolName, resultsPath, additionalNetwork, parameters } = props;
+  const { toolNum, title, toolName, resultsPath, additionalNetwork, parameters } = props;
 
   const divRef = React.useRef<HTMLDivElement>();
 
@@ -59,18 +60,6 @@ const T4144Config = (props: any) => {
   const response = useAppSelector(state => state.toolsExecution.entity);
   const completed = useAppSelector(state => state.toolsExecution.updateSuccess);
 
-  /* eslint-disable-next-line no-console */
-  // console.log('loading: ', loading);
-
-  /* eslint-disable-next-line no-console */
-  console.log('entity: ', response);
-
-  /* eslint-disable-next-line no-console */
-  // console.log('completed: ', completed);
-
-  // debugger;
-  // eslint-disable-line no-debugger
-
   const convertBooleanToString = React.useCallback((value: boolean) => {
     return value ? '1' : '0';
   }, []);
@@ -102,7 +91,7 @@ const T4144Config = (props: any) => {
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('RUN!');
+    console.log(toolName + ' checkAndRun()');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -119,9 +108,9 @@ const T4144Config = (props: any) => {
         .unwrap()
         .then(res => {
           if (res.data.status === 'ko') {
-            toast.error('Tool execution failure, check log file for more details...');
+            toast.error(toolNum + ' ' + RUN_TOOL_FAILURE);
           } else {
-            toast.success('Tool is running!');
+            toast.success(toolNum + ' ' + RUN_TOOL_START);
             setBtnGoToTask(true);
           }
         })

@@ -17,13 +17,6 @@ const TertiarySection = () => {
   const run_secondary = getValues('parameters.run_secondary');
   const run_tertiary = getValues('parameters.run_tertiary');
 
-  /* eslint-disable-next-line no-console */
-  console.log(' Tetiary-Section: run_energy:  ' + run_energy);
-  /* eslint-disable-next-line no-console */
-  console.log(' Tetiary-Section: run_secondary:  ' + run_secondary);
-  /* eslint-disable-next-line no-console */
-  console.log(' Tetiary-Section: run_tertiary:  ' + run_tertiary);
-
   return (
     <div className="section-with-border">
       <div

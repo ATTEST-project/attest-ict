@@ -1,5 +1,6 @@
 package com.attest.ict.web.rest;
 
+import com.attest.ict.helper.TaskStatus;
 import com.attest.ict.repository.TaskRepository;
 import com.attest.ict.service.*;
 import com.attest.ict.service.criteria.TaskCriteria;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -229,11 +231,41 @@ public class TaskResource {
      */
     @DeleteMapping("/tasks/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        log.debug("REST request to delete Task : {}", id);
-        taskService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+        log.debug("REST request to delete Task by ID: {}", id);
+        Optional<TaskDTO> taskDtoOpt = taskService.findOne(id);
+        if (!taskDtoOpt.isPresent()) {
+            log.warn("Task with ID {} not found.", id);
+            return ResponseEntity.notFound().build();
+        }
+
+        TaskDTO task = taskDtoOpt.get();
+        String status = taskDtoOpt.get().getTaskStatus();
+
+        log.debug("REST request to delete Task: {}", task);
+
+        if (TaskStatus.Status.ONGOING.name().equals(status)) {
+            log.info(
+                "Deletion of Task ID: {} for Simulation UUID: {} is forbidden, the task is in ONGOING status.",
+                task.getId(),
+                task.getSimulationUuid()
+            );
+            return ResponseEntity
+                .noContent()
+                .headers(
+                    HeaderUtil.createAlert(
+                        applicationName,
+                        "Deletion is forbidden for the task in ONGOING status",
+                        taskDtoOpt.get().getId().toString()
+                    )
+                )
+                .build();
+        } else {
+            taskService.delete(id);
+            log.info("Deleted Task ID: {} for Simulation UUID: {}", task.getId(), task.getSimulationUuid());
+            return ResponseEntity
+                .noContent()
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
+        }
     }
 }
