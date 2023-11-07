@@ -102,7 +102,7 @@ public class ToolWp4Resource {
         @RequestParam(name = "profilesId", required = false) String[] profilesId,
         @RequestParam(name = "otherToolOutputFileIds", required = false) Long[] otherToolOutputFileIds // t44OutputFileIds
     ) {
-        log.info("REST Request to run tool: {}", toolName);
+        log.info("REST Request for running tool: {}", toolName);
 
         final String SUCCESS = "ok";
         //final String SUCCESS = "Tool's is running";
@@ -264,7 +264,7 @@ public class ToolWp4Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.info("Request to show table results for tool: {}", toolName);
+            log.info("Request to show table results for the tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -419,7 +419,7 @@ public class ToolWp4Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request output results file for tool: {}", toolName);
+            log.info("Request to download results file produced by the  tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);

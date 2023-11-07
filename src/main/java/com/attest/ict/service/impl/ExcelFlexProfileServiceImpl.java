@@ -64,21 +64,17 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
     @Override
     public void flexProfile(MultipartFile file, Optional<Network> networkOpt, Boolean headerEnabled) {
         String fileNameFull = file.getOriginalFilename();
-        log.debug("fileName: {} ", fileNameFull);
-
-        //int pos = fileNameFull.lastIndexOf(".");
-        //String fileName = fileNameFull.substring(0, pos);
-        //String[] loadProfile = fileName.split("_");
+        log.debug("flexProfile() - fileName: {} ", fileNameFull);
 
         String[] profile = ProfileUtil.getProfile(fileNameFull);
         String season = ProfileUtil.getSeason(profile);
-        log.debug("season: {} ", season);
+        log.debug("flexProfile() - season: {} ", season);
 
         String typicalDay = ProfileUtil.getTypicalDay(profile);
-        log.debug("typicalDay: {} ", typicalDay);
+        log.debug("flexProfile() - typicalDay: {} ", typicalDay);
 
         int mode = ProfileUtil.getMode(season, typicalDay);
-        log.debug("mode: {} ", mode);
+        log.debug("flexProfile() - mode: {} ", mode);
         flexProfile(file, networkOpt, mode, season, typicalDay, headerEnabled);
     }
 
@@ -96,6 +92,14 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
         if (headerEnabled != null) isHeaderEnabled = headerEnabled.booleanValue();
 
         Network network = networkOpt.get();
+        log.info(
+            "flexProfile() - parse the auxiliary file: {} for networkId: {}, mode: {}, season: {}, typicalDay: {} ",
+            file.getOriginalFilename(),
+            network.getId(),
+            mode,
+            season,
+            typicalDay
+        );
 
         // Parse file with one sheet
         // busNum;type;val1,.........val_24; if time frame = 1hour
@@ -112,7 +116,7 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
             List<LoadGeneratorPower> loadsData = mapSheet.get(sheetName);
             int numColMax = ProfileUtil.getMaxNumCol(loadsData);
             timeInterval = ProfileUtil.getTimeInterval(numColMax);
-            log.info("SheetName: {},  numCols:{} , Time Interval: {} ", sheetName, numColMax, timeInterval);
+            log.info("flexProfile() - reading SheetName: {},  numCols:{} , Time Interval: {} ", sheetName, numColMax, timeInterval);
             // time Interval
             //1.0 = 1 hour
             // 0.5 = 30 mins
@@ -197,34 +201,20 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
             }
         }
 
-        //clean old value loaded precedentily, if there are.
-        //20221130 comment
-        //cleanOldValues(file, mode, timeInterval, season, typicalDay, networkOpt);
-
         // SavefIle in table: inputFile
         InputFileDTO inputFileDto = inputFileServiceImpl.saveFileForNetworkWithDescr(
             file,
             networkMapper.toDto(network),
             AttestConstants.INPUT_FILE_FLEXIBILITY_DESCR
         );
-        //log.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+        log.info("New File: {}, saved in InputFile ", inputFileDto.getFileName());
 
         FlexProfile lp = saveFlexProfile(mode, timeInterval, season, typicalDay, networkOpt, inputFileDto);
-        //log.debug("New Flex Profile: {} saved in FlexProfile" + lp);
+        log.info("New FlexProfile saved successfully: {} ", lp);
 
         Instant start = Instant.now();
         List<FlexElVal> genVals = saveFlexProfileVals(mapFlexElVal, lp);
         Duration d = Duration.between(start, Instant.now());
-        //log.info(" Insert into FlexElVal takes: {} seconds", d.toSeconds());
-
-        log.info(
-            "New Flex Profile values saved for network: {}, mode: {} , timeInterval: {} season: {} , typicalDay: {}  ",
-            network,
-            mode,
-            timeInterval,
-            season,
-            typicalDay
-        );
     }
 
     private FlexProfile saveFlexProfile(
@@ -255,6 +245,7 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
             FlexElVal newLoadElVal = flexElValRepository.save(mapLoadElVal.get(key));
             flexVals.add(newLoadElVal);
         }
+        log.info("Number of FlexElVal saved: {}", flexVals.size());
         return flexVals;
     }
 
@@ -276,7 +267,7 @@ public class ExcelFlexProfileServiceImpl implements ExcelFlexProfileService {
             );
             boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
             if (isRemoved) {
-                log.info("Input File: {} removed succesfully! " + fileName);
+                log.info("Input File: {} removed successfully! " + fileName);
             } else {
                 log.warn("Input File: {} not removed! " + fileName);
             }

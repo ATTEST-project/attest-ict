@@ -12,6 +12,8 @@ public class T33MainInfoResults {
 
     private T33MainInfoDTO mapDataToDTO(List<String> data) {
         String[] val = new String[data.size()];
+
+        log.debug(Arrays.stream(val).toString());
         data.toArray(val);
         try {
             // String agent, NodeId, Value,  Double year2020, Double year2030, Double year2040, Double year2050
@@ -29,7 +31,7 @@ public class T33MainInfoResults {
                 ConverterUtils.roundStringValue(val[10]) // 2050 Winter
             );
         } catch (Exception ex) {
-            log.error(" Error Converting excel Row:{} into T33MainInfoResults, exception: {}", data, ex.getMessage());
+            log.error("Error Converting excel Row:{} into T33MainInfoResults, exception: {}", data, ex.getMessage());
             return null;
         }
     }

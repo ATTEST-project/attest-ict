@@ -85,6 +85,7 @@ public class FileResource {
      */
     @GetMapping("/export-data/{networkName}")
     public ResponseEntity<Resource> exportData(@PathVariable("networkName") String networkName) throws IOException {
+        log.info("REST request to export network data to a Matpower file, name of the network: {} ", networkName);
         InputStreamResource file = new InputStreamResource(matpowerNetworkService.exportToMatpowerFile(networkName));
         return ResponseEntity
             .ok()
@@ -95,6 +96,7 @@ public class FileResource {
 
     @GetMapping("/download-file/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long id) throws URISyntaxException {
+        log.info("REST request to download file id: {}", id);
         // Load file from database
         Optional<InputFileDTO> inputFileOpt = inputFileInputServiceImpl.findOne(id);
         if (!inputFileOpt.isPresent()) {
@@ -117,9 +119,10 @@ public class FileResource {
      */
     @PostMapping("/upload-network")
     public ResponseEntity<ResponseMessage> importNetworkFromFile(@RequestParam("file") MultipartFile mpFile, String networkName) {
+        log.info("REST request to import a network data from a file. NetworkName: {}", networkName);
         String message = "";
         if (mpFile.isEmpty()) {
-            message = "Please select the file to uplaad!";
+            message = "Please select the file to upload!";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(message));
         }
 

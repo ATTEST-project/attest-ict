@@ -16,11 +16,16 @@ public class T33Convergence {
         String[] val = new String[data.size()];
         data.toArray(val);
         try {
-            return new T33ConvergenceDTO(
-                Double.valueOf(val[0]).intValue(), // iteration
-                ConverterUtils.roundStringValue(val[1]), // Lower Bound
-                ConverterUtils.roundStringValue(val[2]) // Upper Bound
-            );
+            if (data.size() > 2) {
+                return new T33ConvergenceDTO(
+                    Double.valueOf(val[0]).intValue(), // iteration
+                    ConverterUtils.roundStringValue(val[1]), // Lower Bound
+                    ConverterUtils.roundStringValue(val[2])
+                );
+            } else {
+                log.warn("Missing Upper Bound for Row {} ", data);
+                return null;
+            }
         } catch (Exception ex) {
             log.error("Convert excel Row:{} into T33ConvergenceDTO. Exception: {}", data, ex.getMessage());
             return null;

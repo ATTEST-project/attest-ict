@@ -3,6 +3,7 @@ import { Table } from 'reactstrap';
 import Divider from 'app/shared/components/divider/divider';
 import T42ConfigParamsI from 'app/modules/tools/WP4/T42/model/t42.config.params';
 import { extractFileName } from 'app/shared/util/file-utils';
+import TextTruncate from 'app/shared/components/text/text-truncate';
 
 interface ConfigParamsInterface {
   parameters?: T42ConfigParamsI;
@@ -34,11 +35,26 @@ const ConfigParams = (props: ConfigParamsInterface) => {
             <tbody>
               <tr>
                 <td> {parameters.current_time_period} </td>
-                <td> {extractFileName(parameters.matpower_network_file)} </td>
-                <td> {extractFileName(parameters.flex_devices_tech_char_file)} </td>
-                <td> {extractFileName(parameters.flexibity_devices_states_file)} </td>
-                <td> {extractFileName(parameters.trans_activation_file)} </td>
-                <td> {extractFileName(parameters.state_estimation_csv_file)} </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.matpower_network_file)} />
+                </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.flex_devices_tech_char_file)} />
+                </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.flexibity_devices_states_file)} />
+                </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.trans_activation_file)} />
+                </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.state_estimation_csv_file)} />
+                </td>
                 <td> {parameters.case_name} </td>
                 <td> {parameters.year} </td>
                 <td> {parameters.season} </td>

@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,20 +67,20 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
     @Override
     public void generatorProfile(MultipartFile file, Optional<Network> networkOpt, Boolean headerEnabled) {
         String fileNameFull = file.getOriginalFilename();
-        log.debug("fileName: {} ", fileNameFull);
+        log.debug("generatorProfile() - fileName: {} ", fileNameFull);
 
         int pos = fileNameFull.lastIndexOf(".");
         String fileName = fileNameFull.substring(0, pos);
         String[] profile = fileName.split("_");
 
         String season = ProfileUtil.getSeason(profile);
-        log.debug("season: {} ", season);
+        log.debug("generatorProfile() - season: {} ", season);
 
         String typicalDay = ProfileUtil.getTypicalDay(profile);
-        log.debug("typicalDay: {} ", typicalDay);
+        log.debug("generatorProfile() - typicalDay: {} ", typicalDay);
 
         int mode = ProfileUtil.getMode(season, typicalDay);
-        log.debug("mode: {} ", mode);
+        log.debug("generatorProfile() - mode: {} ", mode);
         generatorProfile(file, networkOpt, mode, season, typicalDay, headerEnabled);
     }
 
@@ -99,9 +98,16 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
         if (headerEnabled != null) isHeaderEnabled = headerEnabled.booleanValue();
 
         Network network = networkOpt.get();
+        log.info(
+            "generatorProfile() - parse the auxiliary file: {} for networkId: {}, mode: {}, season: {}, typicalDay: {} ",
+            file.getOriginalFilename(),
+            network.getId(),
+            mode,
+            season,
+            typicalDay
+        );
         List<Generator> generators = generatorRepository.findByNetworkIdOrderByIdAsc(network.getId());
-
-        log.debug("Num Generators: {} " + generators.size());
+        log.debug("generatorProfile() - Num Generators: {} " + generators.size());
 
         // Parse file
         // busNum;type;val1,.........val_24; if time frame = 1hour
@@ -113,7 +119,7 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
         int numSkipColumns = 2; // first column = busNum , second columns type (P or Q)
         int numColMax = ProfileUtil.getMaxNumCol(data, numSkipColumns);
         double timeInterval = ProfileUtil.getTimeInterval(numColMax);
-        log.debug("numCols: " + numColMax + ", Time Interval: " + timeInterval);
+        log.info("generatorProfile() -  numCols:{} , Time Interval: {} ", numColMax, timeInterval);
 
         // time Interval
         // 1.0 = 1 hour
@@ -138,9 +144,8 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
         for (String[] col : data) {
             Long busNum = Long.valueOf(col[0]);
             String type = col[1];
-
-            //sullo stesso bus si possono trovare + generatori, per recuperare l'gen_id corretto mantengo ordine di lettura
-            //assumendo che i valori inseriti seguono lo stesso ordine della struttura mcp.gen del matpower
+            // On the same bus, you can find multiple generators. To retrieve the correct 'gen_id', we maintain the order of reading,
+            // assuming that the values entered follow the same order as the structure 'mcp.gen' in Matpower
             if (type.equals("P")) {
                 if (!precBusNum.equals(busNum)) {
                     genOrderForBus = 1;
@@ -205,20 +210,16 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
             rowNum++;
         }
 
-        //clean old value loaded precedentily, if there are.
-        //20221130 comment
-        //cleanOldValues(file, mode, timeInterval, season, typicalDay, networkOpt);
-
         // SavefIle in table: inputFile
         InputFileDTO inputFileDto = inputFileServiceImpl.saveFileForNetworkWithDescr(
             file,
             networkMapper.toDto(network),
             AttestConstants.INPUT_FILE_GEN_DESCR
         );
-        log.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+        log.info("New File: {}, saved in InputFile ", inputFileDto.getFileName());
 
         GenProfile lp = saveGenProfile(mode, timeInterval, season, typicalDay, networkOpt, inputFileDto);
-        log.debug("New Generator Profile: {} saved in GenProfile" + lp);
+        log.info("New Generator Profile: {} saved in GenProfile" + lp);
 
         List<GenElVal> loadVals = saveGenProfileVals(mapGenElVal, lp);
         log.info(
@@ -260,6 +261,7 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
             GenElVal newLoadElVal = genElValRepository.save(mapElVal.get(key));
             elVals.add(newLoadElVal);
         }
+        log.info("Number of GenElVal saved: {}", elVals.size());
         return elVals;
     }
 
@@ -279,28 +281,9 @@ public class CsvGeneratorProfileServiceImpl implements CsvGeneratorProfileServic
                 fileName,
                 networkOpt.get().getId()
             );
-
-            /**   Optional<GenProfile> profileOpt = genProfileRepository.findByNetworkIdAndSeasonAndTypicalDayAndModeAndTimeInterval(
-                networkOpt.get().getId(),
-                season,
-                typicalDay,
-                mode,
-                timeInterval
-            );
-            if (profileOpt.isPresent()) {
-                List<GenElVal> loadProfileVals = genElValRepository.findByGenProfileId(profileOpt.get().getId());
-                for (GenElVal val : loadProfileVals) {
-                    genElValRepository.delete(val);
-                }
-                if (!loadProfileVals.isEmpty()) {
-                    log.debug("Old GenElVals deleted succesfully!");
-                }
-                genProfileRepository.delete(profileOpt.get());
-                log.debug(" Old GenProfile: {} deleted succesfully! " + profileOpt.get());
-            }*/
             boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
             if (isRemoved) {
-                log.info("Input File: {} removed succesfully! " + fileName);
+                log.info("Input File: {} removed successfully! " + fileName);
             } else {
                 log.warn("Input File: {} not removed! " + fileName);
             }

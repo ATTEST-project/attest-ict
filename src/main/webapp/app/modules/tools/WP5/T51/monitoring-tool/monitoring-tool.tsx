@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 import { TOOLS_INFO } from 'app/modules/tools/info/tools-names';
 import { WP_IMAGE } from 'app/modules/tools/info/tools-info';
@@ -25,10 +26,9 @@ const T51Monitoring = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
   const toolDescription = TOOLS_INFO.T51_MONITORING.description;
   const toolNum = toolsInfo.WP5[0].name + ' Monitoring';
-
   const dispatch = useAppDispatch();
-
   const methods = useForm();
+
   const {
     register,
     handleSubmit,
@@ -37,7 +37,6 @@ const T51Monitoring = (props: any) => {
   } = methods;
 
   const network = props.location.network || JSON.parse(sessionStorage.getItem('network'));
-
   if (!network) {
     props.history?.goBack();
     return;
@@ -52,9 +51,20 @@ const T51Monitoring = (props: any) => {
   const [form, setForm] = React.useState(null);
   const [showBtnGoToTask, setShowBtnGoToTask] = React.useState<boolean>(false);
 
+  // check if variables (current, oil, temperature ) have been selected
+  const isVariablesSelected = data => {
+    if (
+      isStringEmptyOrNullOrUndefined(data.item1) ||
+      isStringEmptyOrNullOrUndefined(data.item2) ||
+      isStringEmptyOrNullOrUndefined(data.item3)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   const cleanDataForm = (form: any) => {
     const { modelpath1, modelpath2, filepath2, ...rest } = form.config;
-
     const modelFileName = modelpath1?.[0].name;
     const errorModelFileName = modelpath2?.[0].name;
     const inputFileName = filepath2?.[0].name;
@@ -76,8 +86,15 @@ const T51Monitoring = (props: any) => {
       files: [data.config.modelpath1?.[0], data.config.modelpath2?.[0], data.config.filepath2?.[0]],
       jsonConfig: JSON.stringify({ ...cleanDataForm(data) }),
     };
+
     /* eslint-disable-next-line no-console */
     console.log('Final form data: ', finalForm);
+    // check if variables (oil, temperature, and ) have been selected
+    const returnData = JSON.parse(finalForm.jsonConfig);
+    if (!isVariablesSelected(returnData)) {
+      showError('Please select one variable from each set');
+      return;
+    }
 
     setForm({ ...finalForm });
     setOpenModal(true);

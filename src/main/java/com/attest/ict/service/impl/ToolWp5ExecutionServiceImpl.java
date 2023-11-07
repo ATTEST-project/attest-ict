@@ -72,10 +72,10 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
     public ToolWp5ExecutionServiceImpl(ToolsConfiguration toolsConfig) {
         // ATTEST/tools
         this.attestToolsDir = toolsConfig.getPath();
-        log.debug("attestToolsDir {}", attestToolsDir);
+        log.debug("ToolWp5ExecutionServiceImpl() - attestToolsDir {}", attestToolsDir);
         // ATSIM
         this.toolsPathSimulation = toolsConfig.getPathSimulation();
-        log.debug("toolsPathSimulation {}", toolsPathSimulation);
+        log.debug("ToolWp5ExecutionServiceImpl() - toolsPathSimulation {}", toolsPathSimulation);
     }
 
     @Override
@@ -99,19 +99,18 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String jsonConfig,
         MultipartFile[] files
     ) throws RunningToolException, Exception {
-        log.info("Enter prepareT511CharacterizationWorkingDir() ");
         Map<String, String> configMap = new HashMap<String, String>();
         String toolWorkPackage = toolDto.getWorkPackage();
         String toolNum = toolDto.getNum();
         UUID uuidGenerated = UUID.randomUUID();
         String uuid = uuidGenerated.toString();
-        log.info("UUID: {} ", uuid);
+        log.info("prepareT511CharacterizationWorkingDir() - uuid: {} ", uuid);
         configMap.put(UUID_KEY, uuid);
 
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
         // Tool's installation path
         String toolInstallationDir = toolSimulationRef.getToolWorkingDir(toolDto);
-        log.info("TOOL_INSTALL_DIR: {} ", toolInstallationDir);
+        log.info("prepareT511CharacterizationWorkingDir() - tool_installation_dir: {}", toolInstallationDir);
         configMap.put(TOOL_INSTALL_DIR, toolInstallationDir);
         configMap.put(LAUNCH_TOOL_FILE_KEY, T51FileFormat.CHARACTERIZATION_FILE_LAUNCH);
 
@@ -119,7 +118,7 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         // -- ATSIM/WP5/<ToolNum>/<UUID>/
         String simulationWorkingPath = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
         Files.createDirectories(Paths.get(simulationWorkingPath));
-        log.info("DIR: {}, created ", simulationWorkingPath);
+        log.info("prepareT511CharacterizationWorkingDir() - dir: {}, created ", simulationWorkingPath);
         configMap.put(WORKING_DIR_KEY, simulationWorkingPath);
 
         // Create logs dir if not exists
@@ -128,21 +127,21 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String logDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.LOG_DIR);
         Files.createDirectories(Paths.get(logDirPath));
         String logFile = logDirPath.concat(File.separator).concat(ToolFileFormat.LOG_FILE_NAME);
-        log.info("DIR:  {}, created ", logDirPath);
+        log.info("prepareT511CharacterizationWorkingDir() - dir: {}, created ", logDirPath);
         configMap.put(LOG_FILENAME_KEY, logFile);
 
         // Create outputs dir if not exists
         // -- ATSIM/WP5/<ToolNum>/<UUID>/output_data
         String outputDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.OUTPUT_DIR);
         Files.createDirectories(Paths.get(outputDirPath));
-        log.info("DIR:  {}, created ", outputDirPath);
+        log.info("prepareT511CharacterizationWorkingDir() - dir: {}, created ", outputDirPath);
         configMap.put(OUTPUT_DIR_KEY, outputDirPath);
 
         // Create restore_files dir
         // -- ATSIM/WP5/T51/UUID/output-data/restore_files
         String restoreFilesDir = outputDirPath.concat(File.separator).concat(T51FileFormat.CHARACTERIZATION_DIR);
         Files.createDirectories(Paths.get(restoreFilesDir));
-        log.info("DIR:  {}, created ", outputDirPath);
+        log.info("prepareT511CharacterizationWorkingDir() - dir: {}, created ", outputDirPath);
         configMap.put(RESTORE_FILE_DIR_KEY, restoreFilesDir);
 
         // jsonConfig String to jsonFile
@@ -151,8 +150,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             inputParam = mapper.readValue(jsonConfig, T51CharacterizationInputDTO.class);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error converting jsonConfig to T51CharacterizationInputDTO";
-            log.error(errMsg, e);
+            String errMsg = "--- Error converting jsonConfig to T51CharacterizationInputDTO";
+            log.error("prepareT511CharacterizationWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
 
@@ -206,8 +205,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             mapper.writeValue(fileConfigParametersJson, launchParam);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error creating " + T51FileFormat.CHARACTERIZATION_FILE_CONFIG + " file for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating " + T51FileFormat.CHARACTERIZATION_FILE_CONFIG + " file for tool: " + toolDto.getName();
+            log.error("prepareT511CharacterizationWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
 
@@ -225,8 +224,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
                 );
         } catch (Exception e) {
             // toolExecutionServiceImpl.updateTask(taskSaved, TaskStatus.Status.FAILED);
-            String errMsg = "Error saving inputFile for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error saving inputFile for tool: " + toolDto.getName();
+            log.error("prepareT511CharacterizationWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + " " + e.getMessage());
         }
 
@@ -235,8 +234,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             taskDtoSaved = toolExecutionServiceImpl.createTask(toolDto);
         } catch (Exception e) {
-            String errMsg = "Error creating new task for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating new task for tool: " + toolDto.getName();
+            log.error("prepareT511CharacterizationWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg);
         }
 
@@ -254,10 +253,10 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
             taskDtoSaved.setSimulation(simulationDto);
             taskServiceImpl.partialUpdate(taskDtoSaved);
         } catch (Exception ex) {
-            String errMsg = "Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
-            log.error(errMsg, ex);
+            String errMsg = "--- Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
+            log.error("prepareT511CharacterizationWorkingDir() - " + errMsg, ex);
         }
-        log.info("Exit prepareT511CharacterizationWorkingDir() ");
+        log.info("prepareT511CharacterizationWorkingDir() - return: {}", configMap.toString());
         return configMap;
     }
 
@@ -269,19 +268,18 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String jsonConfig,
         MultipartFile[] files
     ) throws Exception {
-        log.info("Enter prepareT512MonitoringWorkingDir() ");
         Map<String, String> configMap = new HashMap<String, String>();
         String toolWorkPackage = toolDto.getWorkPackage();
         String toolNum = toolDto.getNum();
         UUID uuidGenerated = UUID.randomUUID();
         String uuid = uuidGenerated.toString();
-        log.info("UUID: {} ", uuid);
+        log.info("prepareT512MonitoringWorkingDir() - uuid: {} ", uuid);
         configMap.put(UUID_KEY, uuid);
 
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
         // Tool's installation path
         String toolInstallationDir = toolSimulationRef.getToolWorkingDir(toolDto);
-        log.info("TOOL_INSTALL_DIR: {} ", toolInstallationDir);
+        log.info("prepareT512MonitoringWorkingDir() - tool_installation_dir: {}", toolInstallationDir);
         configMap.put(TOOL_INSTALL_DIR, toolInstallationDir);
         configMap.put(LAUNCH_TOOL_FILE_KEY, T51FileFormat.MONITORING_FILE_LAUNCH);
 
@@ -289,7 +287,7 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         // -- ATSIM/WP5/<ToolNum>/<UUID>/
         String simulationWorkingPath = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
         Files.createDirectories(Paths.get(simulationWorkingPath));
-        log.info("DIR: {}, created ", simulationWorkingPath);
+        log.info("prepareT512MonitoringWorkingDir() - dir: {}, created ", simulationWorkingPath);
         configMap.put(WORKING_DIR_KEY, simulationWorkingPath);
 
         // Create logs dir if not exists
@@ -298,14 +296,14 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String logDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.LOG_DIR);
         Files.createDirectories(Paths.get(logDirPath));
         String logFile = logDirPath.concat(File.separator).concat(ToolFileFormat.LOG_FILE_NAME);
-        log.info("DIR:  {}, created ", logDirPath);
+        log.info("prepareT512MonitoringWorkingDir() - dir: {}, created ", logDirPath);
         configMap.put(LOG_FILENAME_KEY, logFile);
 
         // Create outputs dir if not exists
         // -- ATSIM/WP5/<ToolNum>/<UUID>/output_data
         String outputDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.OUTPUT_DIR);
         Files.createDirectories(Paths.get(outputDirPath));
-        log.info("DIR:  {}, created ", outputDirPath);
+        log.info("prepareT512MonitoringWorkingDir() - dir: {}, created ", outputDirPath);
         configMap.put(OUTPUT_DIR_KEY, outputDirPath);
 
         // jsonConfig String to jsonFile
@@ -314,8 +312,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             inputParam = mapper.readValue(jsonConfig, T51MonitoringInputDTO.class);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error converting jsonConfig to T52InputParamDTO";
-            log.error(errMsg, e);
+            String errMsg = "--- Error converting jsonConfig to T52InputParamDTO";
+            log.error("prepareT512MonitoringWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
 
@@ -344,8 +342,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             mapper.writeValue(fileConfigParametersJson, launchParam);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error creating " + T51FileFormat.MONITORING_FILE_CONFIG + " file for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating " + T51FileFormat.MONITORING_FILE_CONFIG + " file for tool: " + toolDto.getName();
+            log.error("prepareT512MonitoringWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
         configMap.put(LAUNCH_JSON_FILE_KEY, configJsonName);
@@ -361,8 +359,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
                     T51FileFormat.MONITORING_INPUT_CONTENT_TYPE
                 );
         } catch (Exception e) {
-            String errMsg = "Error saving input files for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error saving input files for tool: " + toolDto.getName();
+            log.error("prepareT512MonitoringWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + " " + e.getMessage());
         }
 
@@ -371,8 +369,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             taskDtoSaved = toolExecutionServiceImpl.createTask(toolDto);
         } catch (Exception e) {
-            String errMsg = "Error creating new task for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating new task for tool: " + toolDto.getName();
+            log.error("prepareT512MonitoringWorkingDir() - " + errMsg, e);
             throw new Exception(errMsg);
         }
 
@@ -390,8 +388,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
             taskDtoSaved.setSimulation(simulationDto);
             taskServiceImpl.partialUpdate(taskDtoSaved);
         } catch (Exception ex) {
-            String errMsg = "Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
-            log.error(errMsg, ex);
+            String errMsg = "--- Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
+            log.error("prepareT512MonitoringWorkingDir() - " + errMsg, ex);
         }
 
         log.info("Exit prepareT512MonitoringWorkingDir return: {}", configMap.toString());
@@ -402,19 +400,18 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
     @Transactional
     public Map<String, String> prepareT52WorkingDir(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files)
         throws RunningToolException, Exception {
-        log.info("Enter prepareT52WorkingDir() ");
         Map<String, String> configMap = new HashMap<String, String>();
         String toolWorkPackage = toolDto.getWorkPackage();
         String toolNum = toolDto.getNum();
         UUID uuidGenerated = UUID.randomUUID();
         String uuid = uuidGenerated.toString();
-        log.info("UUID: {} ", uuid);
+        log.info("prepareT52WorkingDir() - uuid: {} ", uuid);
         configMap.put(UUID_KEY, uuid);
 
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
         // Tool's installation path
         String toolInstallationDir = toolSimulationRef.getToolWorkingDir(toolDto);
-        log.info("TOOL_INSTALL_DIR: {} ", toolInstallationDir);
+        log.info("prepareT52WorkingDir() - tool_installation_dir: {}", toolInstallationDir);
         configMap.put(TOOL_INSTALL_DIR, toolInstallationDir);
         configMap.put(LAUNCH_TOOL_FILE_KEY, T52FileFormat.LAUNCH_FILE);
 
@@ -422,7 +419,7 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         // -- ATSIM/WP5/<ToolNum>/<UUID>/
         String simulationWorkingPath = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
         Files.createDirectories(Paths.get(simulationWorkingPath));
-        log.info("DIR: {}, created ", simulationWorkingPath);
+        log.info("prepareT52WorkingDir() - dir: {}, created ", simulationWorkingPath);
         configMap.put(WORKING_DIR_KEY, simulationWorkingPath);
 
         // Create logs dir if not exists
@@ -431,14 +428,14 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String logDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.LOG_DIR);
         Files.createDirectories(Paths.get(logDirPath));
         String logFile = logDirPath.concat(File.separator).concat(ToolFileFormat.LOG_FILE_NAME);
-        log.info("DIR:  {}, created ", logDirPath);
+        log.info("prepareT52WorkingDir() - dir: {}, created ", logDirPath);
         configMap.put(LOG_FILENAME_KEY, logFile);
 
         // Create outputs dir if not exists
         // -- ATSIM/WP5/<ToolNum>/<UUID>/output_data
         String outputDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.OUTPUT_DIR);
         Files.createDirectories(Paths.get(outputDirPath));
-        log.info("DIR:  {}, created ", outputDirPath);
+        log.info("prepareT52WorkingDir() - dir: {}, created ", outputDirPath);
         configMap.put(OUTPUT_DIR_KEY, outputDirPath);
 
         // jsonConfig String to jsonFile
@@ -447,8 +444,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             inputParam = mapper.readValue(jsonConfig, T52InputParamDTO.class);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error converting jsonConfig to T52InputParamDTO";
-            log.error(errMsg, e);
+            String errMsg = "--- Error converting jsonConfig to T52InputParamDTO";
+            log.error("prepareT52WorkingDir() - " + errMsg, e);
             throw e;
         }
 
@@ -482,8 +479,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             mapper.writeValue(fileConfigParametersJson, launchParam);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error creating " + ToolFileFormat.CONFIG_FILE + " file for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating " + ToolFileFormat.CONFIG_FILE + " file for tool: " + toolDto.getName();
+            log.error("prepareT52WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
         configMap.put(LAUNCH_JSON_FILE_KEY, configJsonName);
@@ -499,8 +496,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
                     T52FileFormat.INPUT_CONTENT_TYPE
                 );
         } catch (Exception e) {
-            String errMsg = "Error saving inputFile for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error saving inputFile for tool: " + toolDto.getName();
+            log.error("prepareT52WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + " " + e.getMessage());
         }
 
@@ -509,8 +506,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             taskDtoSaved = toolExecutionServiceImpl.createTask(toolDto);
         } catch (Exception e) {
-            String errMsg = "Error creating new task for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating new task for tool: " + toolDto.getName();
+            log.error("prepareT52WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg);
         }
 
@@ -528,8 +525,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
             taskDtoSaved.setSimulation(simulationDto);
             taskServiceImpl.partialUpdate(taskDtoSaved);
         } catch (Exception ex) {
-            String errMsg = "Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
-            log.error(errMsg, ex);
+            String errMsg = "--- Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
+            log.error("prepareT52WorkingDir() - " + errMsg, ex);
         }
 
         log.info("Exit prepareT52WorkingDir return: {}", configMap.toString());
@@ -540,7 +537,6 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
     @Transactional
     public Map<String, String> prepareT53WorkingDir(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files)
         throws RunningToolException, Exception {
-        log.info("Enter prepareT53WorkingDir() ");
         String configDir = "Configs";
         String firstPartDir = "first_part";
         String t52PartDir = "t52_part";
@@ -553,13 +549,13 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String toolNum = toolDto.getNum();
         UUID uuidGenerated = UUID.randomUUID();
         String uuid = uuidGenerated.toString();
-        log.info("UUID: {} ", uuid);
+        log.info("prepareT53WorkingDir() - uuid: {} ", uuid);
         configMap.put(UUID_KEY, uuid);
 
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
         // Tool's installation path
         String toolInstallationDir = toolSimulationRef.getToolWorkingDir(toolDto);
-        log.info("TOOL_INSTALL_DIR: {} ", toolInstallationDir);
+        log.info("prepareT53WorkingDir() - tool_installation_dir: {}", toolInstallationDir);
         configMap.put(TOOL_INSTALL_DIR, toolInstallationDir);
         configMap.put(LAUNCH_TOOL_FILE_KEY, ToolFileFormat.LAUNCH_FILE);
 
@@ -567,7 +563,7 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         // -- ATSIM/WP5/<ToolNum>/<UUID>/
         String simulationWorkingPath = toolSimulationRef.getSimulationWorkingDir(toolWorkPackage, toolNum, uuid);
         Files.createDirectories(Paths.get(simulationWorkingPath));
-        log.info("DIR: {}, created ", simulationWorkingPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", simulationWorkingPath);
         configMap.put(WORKING_DIR_KEY, simulationWorkingPath);
 
         // Create logs dir if not exists
@@ -576,45 +572,45 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         String logDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.LOG_DIR);
         Files.createDirectories(Paths.get(logDirPath));
         String logFile = logDirPath.concat(File.separator).concat(ToolFileFormat.LOG_FILE_NAME);
-        log.info("DIR: {}, created ", logDirPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", logDirPath);
         configMap.put(LOG_FILENAME_KEY, logFile);
 
         // Create outputs dir if not exists
         // -- ATSIM/WP5/<ToolNum>/<UUID>/output_data
         String outputDirPath = simulationWorkingPath.concat(File.separator).concat(ToolFileFormat.OUTPUT_DIR);
         Files.createDirectories(Paths.get(outputDirPath));
-        log.info("DIR: {}, created ", outputDirPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", outputDirPath);
 
         // Create config Dir
         // -- ATSIM/WP5/T53/UUID/Configs
         String configDirPath = simulationWorkingPath.concat(File.separator).concat(configDir);
         Files.createDirectories(Paths.get(configDirPath));
-        log.debug("DIR: {}  created ", configDirPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", configDirPath);
 
         //Create firstPath dir if not exists
         String firstPartPath = outputDirPath.concat(File.separator).concat(firstPartDir);
         Files.createDirectories(Paths.get(firstPartPath));
-        log.debug("DIR: {}  created ", firstPartPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", firstPartPath);
 
         //Create futureScen dir if not exists
         String futureScenPath = firstPartPath.concat(File.separator).concat(futureScenDir);
         Files.createDirectories(Paths.get(futureScenPath));
-        log.debug("DIR: {}  created ", futureScenPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", futureScenPath);
 
         //Create resultFromT52 dir if not exists
         String resultFromT52Path = firstPartPath.concat(File.separator).concat(resultFromT52Dir);
         Files.createDirectories(Paths.get(resultFromT52Path));
-        log.debug("DIR: {}  created ", resultFromT52Path);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", resultFromT52Path);
 
         //Create t52Part dir if not exists
         String t52PartPath = outputDirPath.concat(File.separator).concat(t52PartDir);
         Files.createDirectories(Paths.get(t52PartPath));
-        log.debug("DIR: {}  created ", t52PartPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", t52PartPath);
 
         //Create actionsPart dir if not exists
         String actionsPartPath = outputDirPath.concat(File.separator).concat(actionPartDir);
         Files.createDirectories(Paths.get(actionsPartPath));
-        log.debug("DIR: {}  created ", actionsPartPath);
+        log.info("prepareT53WorkingDir() - dir: {}, created ", actionsPartPath);
         // T53 output file are stored under C:\ATSIM\WP5\T53\<uuid>\output_data\actions_part
         configMap.put(OUTPUT_DIR_KEY, actionsPartPath);
 
@@ -624,8 +620,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             inputParam = mapper.readValue(jsonConfig, T53InputParamDTO.class);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error converting jsonConfig to T53InputParamDTO";
-            log.error(errMsg, e);
+            String errMsg = "--- Error converting jsonConfig to T53InputParamDTO";
+            log.error("prepareT53WorkingDir() - " + errMsg, e);
             throw e;
         }
 
@@ -642,21 +638,21 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
 
         String assetName = inputParam.getAssetsName();
         Integer nScenarios = inputParam.getnScenarios();
-        log.debug("assetName: {} ", assetName);
-        log.debug("nScenarios: {} ", nScenarios);
+        log.info("prepareT53WorkingDir() - assetName: {} ", assetName);
+        log.info("prepareT53WorkingDir() - nScenarios: {} ", nScenarios);
 
         //Create All_config file
         String allCfgPath = (assetName != null && !assetName.isEmpty())
             ? configDirPath.concat(File.separator).concat(assetName).concat("_").concat(T53FileFormat.CONFIG_FILE_SUFFIX_EXTENSION)
             : configDir.concat(File.separator).concat("_").concat(T53FileFormat.CONFIG_FILE_SUFFIX_EXTENSION);
-        log.debug("allCfgPath: {} ", allCfgPath);
+        log.info("prepareT53WorkingDir() - allCfgPath: {} ", allCfgPath);
         File allCfgFile = Paths.get(allCfgPath).toFile();
         mapper = new ObjectMapper();
         try {
             mapper.writeValue(allCfgFile, mainConfigList);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error creating file: " + allCfgPath + " for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating file: " + allCfgPath + " for tool: " + toolDto.getName();
+            log.error("prepareT53WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
 
@@ -688,8 +684,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             mapper.writeValue(fileConfigParametersJson, launchParam);
         } catch (JsonProcessingException e) {
-            String errMsg = "Error creating " + ToolFileFormat.CONFIG_FILE + " file for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating " + ToolFileFormat.CONFIG_FILE + " file for tool: " + toolDto.getName();
+            log.error("prepareT53WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + e.getMessage());
         }
 
@@ -706,8 +702,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
                     T53FileFormat.INPUT_CONTENT_TYPE
                 );
         } catch (Exception e) {
-            String errMsg = "Error saving inputFile for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error saving inputFile for tool: " + toolDto.getName();
+            log.error("prepareT53WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg + " " + e.getMessage());
         }
 
@@ -716,8 +712,8 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
         try {
             taskDtoSaved = toolExecutionServiceImpl.createTask(toolDto);
         } catch (Exception e) {
-            String errMsg = "Error creating new task for tool: " + toolDto.getName();
-            log.error(errMsg, e);
+            String errMsg = "--- Error creating new task for tool: " + toolDto.getName();
+            log.error("prepareT53WorkingDir() - " + errMsg, e);
             throw new Exception(errMsg);
         }
 
@@ -735,16 +731,14 @@ public class ToolWp5ExecutionServiceImpl implements ToolWp5ExecutionService {
             taskDtoSaved.setSimulation(simulationDto);
             taskServiceImpl.partialUpdate(taskDtoSaved);
         } catch (Exception ex) {
-            String errMsg = "Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
-            log.error(errMsg, ex);
+            String errMsg = "--- Error saving simulation data for  tool: " + toolDto.getNum() + " uuid: " + uuid.toString();
+            log.error("prepareT53WorkingDir() - " + errMsg, ex);
         }
-
-        log.info("Exit prepareT53WorkingDir return: {}", configMap.toString());
+        log.info("Exit prepareT52WorkingDir return: {}", configMap.toString());
         return configMap;
     }
 
     //-- Private Methods
-
     private String replaceFilePath(String origFileName, String inputDirPath) {
         return inputDirPath.concat(File.separator).concat(origFileName);
     }

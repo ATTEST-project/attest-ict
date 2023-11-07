@@ -70,14 +70,14 @@ public class CimRepoResource {
         if (constraintName.contains("network.UC_NETWORKNAME_COL")) {
             errorMessage = "A network with the same name already exists!";
         }
-        log.debug("handleConstraintViolationException() return message: {}", errorMessage);
+        log.error("handleConstraintViolationException() return message: {}", errorMessage);
         return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(java.net.ConnectException.class)
     public ResponseEntity<String> handleCimRepoConnectionException(java.net.ConnectException e) {
         String errorMessage = "Unable to connect to CIM_REPO: " + e.getMessage();
-        log.debug("handleCimRepoConnectionException() return message: {}", errorMessage);
+        log.error("handleCimRepoConnectionException() return message: {}", errorMessage);
         return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

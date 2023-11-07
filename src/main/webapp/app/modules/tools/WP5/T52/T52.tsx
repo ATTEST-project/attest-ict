@@ -21,6 +21,7 @@ import { runT52Tool, reset as retry } from 'app/modules/tools/WP5/T52/reducer/to
 import { downloadResults } from 'app/modules/tools/WP5/T52/reducer/tool-table.reducer';
 import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 const T52 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
@@ -56,6 +57,12 @@ const T52 = (props: any) => {
       const { assetsFile, variables, weights, ...rest } = config;
       const fileName = assetsFile[0].name;
       const variablesKeys = Object.keys(variables).filter(k => variables[k]);
+
+      // --if no variables have been selected, show an error message.
+      if (variablesKeys.length === 0) {
+        return { mainConfig: [] };
+      }
+
       const finalWeights = weights.split(',');
       mainConfigCleaned.push({ path: fileName, variables: [...variablesKeys], weights: [...finalWeights], ...rest });
     }
@@ -84,6 +91,12 @@ const T52 = (props: any) => {
       jsonConfig: JSON.stringify({ ...cleanDataForm(data) }),
     };
     data.coordinatesConfig?.coordsFile?.[0] && finalForm.files.push(data.coordinatesConfig?.coordsFile?.[0]);
+
+    const returnData = JSON.parse(finalForm.jsonConfig);
+    if (returnData.mainConfig.length === 0) {
+      showError('Please select one ore more variables from each set');
+      return;
+    }
     /* eslint-disable-next-line no-console */
     console.log('Final form: ', finalForm);
     setForm({ ...finalForm });

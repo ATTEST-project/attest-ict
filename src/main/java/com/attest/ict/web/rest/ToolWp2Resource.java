@@ -79,7 +79,7 @@ public class ToolWp2Resource {
         @RequestParam(name = "files", required = false) MultipartFile[] files, // input files
         @RequestParam("jsonConfig") String jsonConfig
     ) {
-        log.debug("REST Request to run tool: {}", toolName);
+        log.info("REST Request for running tool: {}", toolName);
 
         final String SUCCESS = "ok";
         final String FAILURE = "ko";
@@ -147,7 +147,7 @@ public class ToolWp2Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to download output file for tool: {}", toolName);
+            log.info("REST Request to download output file for the tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);

@@ -19,20 +19,6 @@ const Config = (props: any) => {
   return (
     <div className="section-with-border">
       <SectionHeader title="Upload Auxiliary Data" />
-      {/* moved into InputRow component
-      <Row>
-        <Col md="3">
-          <ValidatedField
-            register={register}
-            error={errors?.assestsType}
-            name="assestsType"
-            label="Assets Type"
-            type="text"
-            placeholder="Assets type..."
-          />
-        </Col>
-      </Row>
-      */}
       <Row>
         {[...Array(nRows).keys()].map((e, i) => (
           <div key={i}>

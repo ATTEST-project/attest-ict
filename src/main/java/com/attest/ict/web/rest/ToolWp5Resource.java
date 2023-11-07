@@ -89,9 +89,7 @@ public class ToolWp5Resource {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(errMsg));
             }
 
-            log.info("Request to get header of  the file: {}", mpFile.getOriginalFilename());
-
-            //String contentType = mpFile.getContentType();
+            log.debug("Request to get header of  the file: {}", mpFile.getOriginalFilename());
             String contentType = MimeUtils.detect(mpFile);
             if (
                 !contentType.equals(FileUtils.CONTENT_TYPE.get("xlsx")) &&
@@ -122,8 +120,7 @@ public class ToolWp5Resource {
         String uuid = "";
         // -- check if the tool exists
         try {
-            log.info("Request to run toolName {} for networkId {} with configFile {}: " + toolName, networkId, jsonConfig);
-
+            log.info("Request to run toolName: {} for networkId: {}, configFile: {}: " + toolName, networkId, jsonConfig);
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
             if (!toolDtoOpt.isPresent()) {
@@ -174,9 +171,6 @@ public class ToolWp5Resource {
 
             if (toolName.equals(ToolVarName.T51_MONITORING)) {
                 try {
-                    //uuid = toolWp5ExecutionServiceImpl.t512MonitoringRun(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    //ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
-                    //return new ResponseEntity<>(runResponse, HttpStatus.OK);
                     Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT512MonitoringWorkingDir(
                         networkDtoOpt.get(),
                         toolDtoOpt.get(),
@@ -199,9 +193,6 @@ public class ToolWp5Resource {
                 }
             } else if (toolName.equals(ToolVarName.T52_INDICATOR)) {
                 try {
-                    //  uuid = toolWp5ExecutionServiceImpl.t52Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    // ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
-                    // return new ResponseEntity<>(runResponse, HttpStatus.OK);
                     Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT52WorkingDir(
                         networkDtoOpt.get(),
                         toolDtoOpt.get(),
@@ -227,9 +218,6 @@ public class ToolWp5Resource {
 
             if (toolName.equals(ToolVarName.T53_MANAGEMENT)) {
                 try {
-                    // uuid = toolWp5ExecutionServiceImpl.t53Run(networkDtoOpt.get(), toolDtoOpt.get(), jsonConfig, files);
-                    // ToolExecutionResponseDTO runResponse = new ToolExecutionResponseDTO(SUCCESS, uuid);
-                    //return new ResponseEntity<>(runResponse, HttpStatus.OK);
                     Map<String, String> configMap = toolWp5ExecutionServiceImpl.prepareT53WorkingDir(
                         networkDtoOpt.get(),
                         toolDtoOpt.get(),
@@ -269,7 +257,7 @@ public class ToolWp5Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to get results file for tool: {}", toolName);
+            log.info("Request to get results file for tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -305,7 +293,7 @@ public class ToolWp5Resource {
         @RequestParam("fileName") String fileName
     ) {
         try {
-            log.debug("Request to show chart's result for tool: {}, FileName: {}", toolName, fileName);
+            log.info("Request to show chart's result for tool: {}, FileName: {}", toolName, fileName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -334,7 +322,7 @@ public class ToolWp5Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to download output file for tool: {}", toolName);
+            log.info("Request to download output file for tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);

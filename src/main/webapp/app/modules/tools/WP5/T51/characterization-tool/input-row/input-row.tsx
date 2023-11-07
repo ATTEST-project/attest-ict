@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Col, Input, Label, Row, Spinner } from 'reactstrap';
+import { toast } from 'react-toastify';
 import { ValidatedField } from 'react-jhipster';
 import { useFormContext } from 'react-hook-form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,6 +8,8 @@ import { getFileHeader } from 'app/modules/tools/WP5/T52/reducer/tool-file-heade
 import { useAppDispatch } from 'app/config/store';
 import Auxiliary from 'app/modules/tools/WP5/T51/characterization-tool/auxiliary/auxiliary';
 import Divider from 'app/shared/components/divider/divider';
+import { showError } from 'app/modules/tools/custom-toast-error';
+import { isStringEmptyOrNullOrUndefined } from 'app/shared/util/string-utils';
 
 const InputRow = (props: any) => {
   const { index, nRows, callbackNRows } = props;
@@ -22,11 +25,11 @@ const InputRow = (props: any) => {
   const dispatch = useAppDispatch();
   const [inputFile, setInputFile] = React.useState<File>(null);
   const [uploadLoading, setUploadLoading] = React.useState<boolean>(false);
-  const [variables, setVariables] = React.useState<string[]>(null);
+  const [variables, setVariables] = React.useState<string[]>([]);
   const results = React.useMemo(() => ['Asset Assessment', 'Number of Clusters assessment', 'Clustering Training Process'], []);
 
-  const [defaultHeader, setDefaultHeader] = React.useState(null);
-  const [checkboxVariables, setCheckboxVariables] = React.useState<string[]>(null);
+  const [defaultHeader, setDefaultHeader] = React.useState('');
+  const [checkboxVariables, setCheckboxVariables] = React.useState<string[]>([]);
 
   const filterAssetTypeAndFirstColumn = (element, index, array) => {
     return index > 0 && !element.includes('asset_type');
@@ -45,7 +48,7 @@ const InputRow = (props: any) => {
   React.useEffect(() => {
     // eslint-disable-next-line no-console
     // console.log('T51  useEffect() enter - defaultHeader :  ', defaultHeader);
-    if (!defaultHeader) {
+    if (isStringEmptyOrNullOrUndefined(defaultHeader)) {
       return;
     }
     setValue(`config[${index}].selectedVariables`, defaultHeader);
@@ -53,12 +56,16 @@ const InputRow = (props: any) => {
 
   const onFileChange = event => {
     setInputFile(event.target.files[0]);
-    setVariables(null);
-    setCheckboxVariables(null);
-    setDefaultHeader(null);
+    setVariables([]);
+    setCheckboxVariables([]);
+    setDefaultHeader('');
   };
 
   const onUploadButtonClick = () => {
+    if (inputFile == null) {
+      showError('Please select a file to upload');
+      return;
+    }
     setUploadLoading(true);
     dispatch(getFileHeader(inputFile))
       .unwrap()
@@ -95,13 +102,13 @@ const InputRow = (props: any) => {
             register={register}
             error={errors?.config?.[index]?.inputFile}
             name={`config[${index}].inputFile`}
-            label="Input File"
+            label="Input File "
             type="file"
             onChange={onFileChange}
             validate={{ required: true }}
           />
         </Col>
-        {!variables ? (
+        {!variables || variables.length === 0 ? (
           <Col style={{ alignSelf: 'end' }}>
             <div className="mb-3">
               <Button color="primary" onClick={onUploadButtonClick}>

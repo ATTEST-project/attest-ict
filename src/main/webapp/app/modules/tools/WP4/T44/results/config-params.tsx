@@ -4,6 +4,7 @@ import Divider from 'app/shared/components/divider/divider';
 import { T44ConfigParamsI } from 'app/modules/tools/WP4/T44/model/t44.config.params';
 import { defaultProfileMap, defaultT44ProblemsMap, defaultFlexibilityMap } from 'app/shared/model/tooltip-tools.model';
 import { extractFileName } from 'app/shared/util/file-utils';
+import TextTruncate from 'app/shared/components/text/text-truncate';
 
 interface T44ConfigParametersInterface {
   parameters?: T44ConfigParamsI;
@@ -50,9 +51,15 @@ const T44ConfigParams = (props: T44ConfigParametersInterface) => {
             <tbody>
               <tr>
                 <td> {parameters.case_name} </td>
-                <td> {extractFileName(parameters.network_file)} </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.network_file)} />
+                </td>
                 <td> {extractFileName(parameters.scenario_file)} </td>
-                <td> {extractFileName(parameters.auxiliary_file)} </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.auxiliary_file)} />{' '}
+                </td>
 
                 <td
                   id="param_problem_id"

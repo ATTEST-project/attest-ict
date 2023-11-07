@@ -39,10 +39,10 @@ public class ToolWp5ShowResultsServiceImpl implements ToolWp5ShowResultsService 
     public ToolWp5ShowResultsServiceImpl(ToolsConfiguration toolsConfig) {
         // ATTEST/tools
         this.attestToolsDir = toolsConfig.getPath();
-        log.debug("attestToolsDir {}", attestToolsDir);
+        log.debug("ToolWp5ShowResultsServiceImpl() - attestToolsDir {}", attestToolsDir);
         // ATSIM
         this.toolsPathSimulation = toolsConfig.getPathSimulation();
-        log.debug("toolsPathSimulation {}", toolsPathSimulation);
+        log.debug("ToolWp5ShowResultsServiceImpl() - toolsPathSimulation {}", toolsPathSimulation);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class ToolWp5ShowResultsServiceImpl implements ToolWp5ShowResultsService 
             return Files.readString(Paths.get(absoluteFileName));
         } catch (IOException ioExc) {
             String errMsg = "Error reading file: " + absoluteFileName;
-            log.error(errMsg, ioExc);
+            log.error("readFile() - " + errMsg, ioExc);
             throw new IOException(errMsg + " " + ioExc.getMessage());
         }
     }

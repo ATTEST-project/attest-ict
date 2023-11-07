@@ -24,15 +24,4 @@ public interface ToolWp5ExecutionService {
 
     Map<String, String> prepareT53WorkingDir(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files)
         throws RunningToolException, Exception;
-    /**
-    String t52Run(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files) throws RunningToolException, Exception;
-
-    String t512MonitoringRun(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files)
-        throws RunningToolException, Exception;
-
-    String t511CharacterizationRun(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files)
-        throws RunningToolException, Exception;
-
-    String t53Run(NetworkDTO networkDto, ToolDTO toolDto, String jsonConfig, MultipartFile[] files) throws RunningToolException, Exception;
-     */
 }

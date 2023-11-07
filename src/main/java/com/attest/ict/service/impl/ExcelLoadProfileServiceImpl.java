@@ -68,21 +68,17 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
     @Override
     public void loadProfile(MultipartFile file, Optional<Network> networkOpt, Boolean headerEnabled) {
         String fileNameFull = file.getOriginalFilename();
-        log.debug("fileName: {} ", fileNameFull);
-
-        // int pos = fileNameFull.lastIndexOf(".");
-        // String fileName = fileNameFull.substring(0, pos);
-        // String[] loadProfile = fileName.split("_");
+        log.debug("loadProfile() - fileName: {} ", fileNameFull);
 
         String[] profile = ProfileUtil.getProfile(fileNameFull);
         String season = ProfileUtil.getSeason(profile);
-        log.debug("season: {} ", season);
+        log.debug("loadProfile() - season: {} ", season);
 
         String typicalDay = ProfileUtil.getTypicalDay(profile);
-        log.debug("typicalDay: {} ", typicalDay);
+        log.debug("loadProfile() - typicalDay: {} ", typicalDay);
 
         int mode = ProfileUtil.getMode(season, typicalDay);
-        log.debug("mode: {} ", mode);
+        log.debug("loadProfile() - mode: {} ", mode);
         loadProfile(file, networkOpt, mode, season, typicalDay, headerEnabled);
     }
 
@@ -98,8 +94,16 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
         // By default header is not present in file
         boolean isHeaderEnabled = Boolean.FALSE.booleanValue();
         if (headerEnabled != null) isHeaderEnabled = headerEnabled.booleanValue();
-
         Network network = networkOpt.get();
+
+        log.info(
+            "loadProfile() - parse the auxiliary file: {} for networkId: {}, mode: {}, season: {}, typicalDay: {} ",
+            file.getOriginalFilename(),
+            network.getId(),
+            mode,
+            season,
+            typicalDay
+        );
 
         // Parse file with one sheet
         // busNum;type;val1,.........val_24; if time frame = 1hour
@@ -111,8 +115,7 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
             List<LoadGeneratorPower> loadsData = mapSheet.get(sheetName);
             int numColMax = ProfileUtil.getMaxNumCol(loadsData);
             double timeInterval = ProfileUtil.getTimeInterval(numColMax);
-            log.debug("numCols: " + numColMax + ", Time Interval: " + timeInterval);
-
+            log.info("loadProfile() - reading SheetName: {},  numCols:{} , Time Interval: {} ", sheetName, numColMax, timeInterval);
             // time Interval
             //1.0 = 1 hour
             // 0.5 = 30 mins
@@ -189,40 +192,21 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
                 }
             }
 
-            //log.debug("==== mapLoadElVal === " );
-            //for (String key : mapLoadElVal.keySet()) {
-            //	LoadElVal lev = mapLoadElVal.get(key);
-            //	log.debug(" Key:  "+key + "   " +lev.toString());
-            //}
-
-            //clean old value loaded precedentily, if there are.
-            //20221130 comment
-            //cleanOldValues(file, mode, timeInterval, season, typicalDay, networkOpt);
-
             // SavefIle in table: inputFile
             InputFileDTO inputFileDto = inputFileServiceImpl.saveFileForNetworkWithDescr(
                 file,
                 networkMapper.toDto(network),
                 AttestConstants.INPUT_FILE_LOAD_DESCR
             );
-            log.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+            log.info("New File: {}, saved in InputFile ", inputFileDto.getFileName());
 
             LoadProfile lp = saveLoadProfile(mode, timeInterval, season, typicalDay, networkOpt, inputFileDto);
-            log.debug("New Load Profile: {} saved in LoadProfile" + lp);
+            log.info("New LoadProfile saved successfully: {} ", lp);
 
             Instant start = Instant.now();
             List<LoadElVal> loadVals = saveLoadProfileVals(mapLoadElVal, lp);
             Duration d = Duration.between(start, Instant.now());
-            log.info(" Insert into LoadElVal takes: {} seconds", d.toSeconds());
-
-            log.info(
-                "New load Profile values saved for network: {}, mode: {} , timeInterval: {} season: {} , typicalDay: {}  ",
-                network,
-                mode,
-                timeInterval,
-                season,
-                typicalDay
-            );
+            log.debug("Insert into LoadElVal takes: {} seconds", d.toSeconds());
         }
     }
 
@@ -254,6 +238,7 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
             LoadElVal newLoadElVal = loadElValRepository.save(mapLoadElVal.get(key));
             loadVals.add(newLoadElVal);
         }
+        log.info("Number of LoadElVal saved: {}", loadVals.size());
         return loadVals;
     }
 
@@ -274,30 +259,9 @@ public class ExcelLoadProfileServiceImpl implements ExcelLoadProfileService {
                 networkOpt.get().getId()
             );
 
-            /*
-
-            Optional<LoadProfile> loadProfileOpt = loadProfileRepository.findByNetworkIdAndSeasonAndTypicalDayAndModeAndTimeInterval(
-                networkOpt.get().getId(),
-                season,
-                typicalDay,
-                mode,
-                timeInterval
-            );
-            if (loadProfileOpt.isPresent()) {
-                List<LoadElVal> loadProfileVals = loadElValRepository.findByLoadProfileId(loadProfileOpt.get().getId());
-                for (LoadElVal val : loadProfileVals) {
-                    loadElValRepository.delete(val);
-                }
-                if (!loadProfileVals.isEmpty()) {
-                    log.debug("Old LoadElVals deleted succesfully!");
-                }
-                loadProfileRepository.delete(loadProfileOpt.get());
-                log.debug(" Old LoadProfile: {} deleted succesfully! " + loadProfileOpt.get());
-            }*/
-
             boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
             if (isRemoved) {
-                log.info("Input File: {} removed succesfully! " + fileName);
+                log.info("Input File: {} removed successfully! " + fileName);
             } else {
                 log.warn("Input File: {} not removed! " + fileName);
             }

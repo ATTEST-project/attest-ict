@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,21 +69,17 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
     @Override
     public void genProfile(MultipartFile file, Optional<Network> networkOpt, Boolean headerEnabled) {
         String fileNameFull = file.getOriginalFilename();
-        log.debug("fileName: {} ", fileNameFull);
-
-        // int pos = fileNameFull.lastIndexOf(".");
-        // String fileName = fileNameFull.substring(0, pos);
-        // String[] profile = fileName.split("_");
+        log.debug("genProfile() - fileName: {} ", fileNameFull);
 
         String[] profile = ProfileUtil.getProfile(fileNameFull);
         String season = ProfileUtil.getSeason(profile);
-        log.debug("season: {} ", season);
+        log.debug("genProfile() - season: {} ", season);
 
         String typicalDay = ProfileUtil.getTypicalDay(profile);
-        log.debug("typicalDay: {} ", typicalDay);
+        log.debug("genProfile() - typicalDay: {} ", typicalDay);
 
         int mode = ProfileUtil.getMode(season, typicalDay);
-        log.debug("mode: {} ", mode);
+        log.debug("genProfile() - mode: {} ", mode);
         genProfile(file, networkOpt, mode, season, typicalDay, headerEnabled);
     }
 
@@ -102,6 +97,14 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
         if (headerEnabled != null) isHeaderEnabled = headerEnabled.booleanValue();
 
         Network network = networkOpt.get();
+        log.info(
+            "genProfile() - parse the auxiliary file: {} for networkId: {}, mode: {}, season: {}, typicalDay: {} ",
+            file.getOriginalFilename(),
+            network.getId(),
+            mode,
+            season,
+            typicalDay
+        );
         List<Generator> generators = generatorRepository.findByNetworkIdOrderByIdAsc(network.getId());
 
         // Parse file with one sheet
@@ -114,8 +117,7 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
             List<LoadGeneratorPower> gensData = mapSheet.get(sheetName);
             int numColMax = ProfileUtil.getMaxNumCol(gensData);
             double timeInterval = ProfileUtil.getTimeInterval(numColMax);
-            log.debug("numCols: " + numColMax + ", Time Interval: " + timeInterval);
-
+            log.info("genProfile() - reading SheetName: {},  numCols:{} , Time Interval: {} ", sheetName, numColMax, timeInterval);
             // time Interval
             //1.0 = 1 hour
             // 0.5 = 30 mins
@@ -142,11 +144,8 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
             for (LoadGeneratorPower demand : gensData) {
                 Long busNum = demand.getBusNum();
                 String type = demand.getPowerType();
-
-                //sullo stesso bus si possono trovare + generatori, per recuperare id corretto mantengo ordine di lettura
-                //assumendo che i valori inseriti seguono lo stesso ordine della struttura mcp.gen del matpower
-                //sullo stesso bus si possono trovare + generatori, per recuperare l'gen_id corretto mantengo ordine di lettura
-                //assumendo che i valori inseriti seguono lo stesso ordine della struttura mcp.gen del matpower
+                // On the same bus, you can find multiple generators. To retrieve the correct 'gen_id', we maintain the order of reading,
+                // assuming that the values entered follow the same order as the structure 'mcp.gen' in Matpower
                 if (type.equals("P")) {
                     if (!precBusNum.equals(busNum)) {
                         genOrderForBus = 1;
@@ -200,33 +199,21 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
                 }
             }
 
-            //clean old value loaded precedentily, if there are.
-            //cleanOldValues(file, mode, timeInterval, season, typicalDay, networkOpt);
-
             // SavefIle in table: inputFile
             InputFileDTO inputFileDto = inputFileServiceImpl.saveFileForNetworkWithDescr(
                 file,
                 networkMapper.toDto(network),
                 AttestConstants.INPUT_FILE_GEN_DESCR
             );
-            log.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+            log.info("New File: {}, saved in InputFile ", inputFileDto.getFileName());
 
             GenProfile lp = saveGenProfile(mode, timeInterval, season, typicalDay, networkOpt, inputFileDto);
-            log.debug("New Gen Profile: {} saved in GenProfile" + lp);
+            log.info("New GenProfile saved successfully: {} ", lp);
 
             Instant start = Instant.now();
             List<GenElVal> genVals = saveGenProfileVals(mapGenElVal, lp);
             Duration d = Duration.between(start, Instant.now());
-            log.info(" Insert into GenElVal takes: {} seconds", d.toSeconds());
-
-            log.info(
-                "New gen Profile values saved for network: {}, mode: {} , timeInterval: {} season: {} , typicalDay: {}  ",
-                network,
-                mode,
-                timeInterval,
-                season,
-                typicalDay
-            );
+            log.debug("Insert into GenElVal takes: {} seconds", d.toSeconds());
         }
     }
 
@@ -258,6 +245,7 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
             GenElVal newLoadElVal = genElValRepository.save(mapLoadElVal.get(key));
             genVals.add(newLoadElVal);
         }
+        log.info("Number of GenElVal saved: {}", genVals.size());
         return genVals;
     }
 
@@ -279,33 +267,9 @@ public class ExcelGenProfileServiceImpl implements ExcelGenProfileService {
                 networkOpt.get().getId()
             );
 
-            /*****
-            Optional<GenProfile> genProfileOpt = genProfileRepository.findByNetworkIdAndSeasonAndTypicalDayAndModeAndTimeInterval(
-                networkOpt.get().getId(),
-                season,
-                typicalDay,
-                mode,
-                timeInterval
-            );
-
-            if (genProfileOpt.isPresent()) {
-
-                List<GenElVal> genProfileVals = genElValRepository.findByGenProfileId(genProfileOpt.get().getId());
-                for (GenElVal val : genProfileVals) {
-                    genElValRepository.delete(val);
-                }
-                if (!genProfileVals.isEmpty()) {
-                    log.debug("Old GenElVals deleted succesfully!");
-                }
-               
-                genProfileRepository.delete(genProfileOpt.get());
-                log.debug(" Old GenProfile: {} deleted succesfully! " + genProfileOpt.get());
-            }
-            *****/
-
             boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
             if (isRemoved) {
-                log.info("Input File: {} removed succesfully! " + fileName);
+                log.info("Input File: {} removed successfully! " + fileName);
             } else {
                 log.warn("Input File: {} not removed! " + fileName);
             }

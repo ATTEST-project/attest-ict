@@ -6,6 +6,8 @@ import { ValidatedField } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch } from 'app/config/store';
 import { getFileHeader } from 'app/modules/tools/WP5/T52/reducer/tool-file-header.reducer';
+import { isStringEmptyOrNullOrUndefined } from 'app/shared/util/string-utils';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 const InputRow = (props: any) => {
   const { index, nRows, callbackNRows } = props;
@@ -25,7 +27,7 @@ const InputRow = (props: any) => {
   const [uploadLoading, setUploadLoading] = React.useState<boolean>(false);
   const [variables, setVariables] = React.useState<string[]>(null);
 
-  const [defaultHeader, setDefaultHeader] = React.useState(null);
+  const [defaultHeader, setDefaultHeader] = React.useState('');
   const [checkboxVariables, setCheckboxVariables] = React.useState<string[]>(null);
 
   const filterAssetTypeAndFirstColumn = (element, index, array) => {
@@ -45,13 +47,18 @@ const InputRow = (props: any) => {
   React.useEffect(() => {
     // eslint-disable-next-line no-console
     // console.log('T52  useEffect() enter - defaultHeader :  ', defaultHeader);
-    if (!defaultHeader) {
+    if (isStringEmptyOrNullOrUndefined(defaultHeader)) {
       return;
     }
+
     setValue(`mainConfig[${index}].index`, defaultHeader);
   }, [defaultHeader]);
 
   const onUploadButtonClick = () => {
+    if (assetsFile == null) {
+      showError('Please select a file to upload');
+      return;
+    }
     setUploadLoading(true);
     dispatch(getFileHeader(assetsFile))
       .unwrap()
@@ -80,7 +87,7 @@ const InputRow = (props: any) => {
   return (
     <>
       <Row>
-        <Col>
+        <Col md="3">
           <ValidatedField
             register={register}
             error={errors?.mainConfig?.[index]?.assetsFile}
@@ -111,67 +118,69 @@ const InputRow = (props: any) => {
           </Col>
         ) : (
           <>
-            <Col>
-              <ValidatedField
-                register={register}
-                error={errors?.mainConfig?.[index]?.index}
-                name={`mainConfig[${index}].index`}
-                label="Header"
-                type="select"
-                value={defaultHeader}
-                validate={{ required: true }}
-              >
-                <option key="select-index-0" value="" hidden>
-                  Header...
-                </option>
-                {variables.map((variable, index) => (
-                  <option key={'select-index-' + index}>{variable}</option>
-                ))}
-              </ValidatedField>
-            </Col>
-            <Col>
-              <Label htmlFor="variables">Variables</Label>
-              <div id="variables" className="variables-container">
-                {checkboxVariables.map((variable, i) => (
-                  <ValidatedField
-                    key={'variable-' + i}
-                    className="input-row-checkbox"
-                    register={register}
-                    errors={errors?.mainConfig?.[index]?.variables?.[variable]}
-                    name={`mainConfig[${index}].variables[${variable}]`}
-                    label={variable}
-                    type="checkbox"
-                  />
-                ))}
-              </div>
-            </Col>
-            <Col>
-              <ValidatedField
-                register={register}
-                error={errors?.mainConfig?.[index]?.config}
-                name={`mainConfig[${index}].config`}
-                label="Dimension"
-                type="select"
-                validate={{ required: true }}
-              >
-                <option value="" hidden>
-                  Dimension...
-                </option>
-                <option value="Life Assessment">Life Assessment</option>
-                <option value="Maintenance Stratgy">Maintenance Strategy</option>
-                <option value="Economic Impact">Economic Impact</option>
-              </ValidatedField>
-            </Col>
-            <Col>
-              <ValidatedField
-                register={register}
-                error={errors?.mainConfig?.[index]?.weights}
-                name={`mainConfig[${index}].weights`}
-                label="Weights"
-                type="text"
-                validate={{ required: true }}
-              />
-            </Col>
+            <Row md="6">
+              <Col>
+                <ValidatedField
+                  register={register}
+                  error={errors?.mainConfig?.[index]?.index}
+                  name={`mainConfig[${index}].index`}
+                  label="Header"
+                  type="select"
+                  value={defaultHeader}
+                  validate={{ required: true }}
+                >
+                  <option key="select-index-0" value="" hidden>
+                    Header...
+                  </option>
+                  {variables.map((variable, index) => (
+                    <option key={'select-index-' + index}>{variable}</option>
+                  ))}
+                </ValidatedField>
+              </Col>
+              <Col>
+                <Label htmlFor="variables">Variables</Label>
+                <div id="variables" className="variables-container">
+                  {checkboxVariables.map((variable, i) => (
+                    <ValidatedField
+                      key={'variable-' + i}
+                      className="input-row-checkbox"
+                      register={register}
+                      errors={errors?.mainConfig?.[index]?.variables?.[variable]}
+                      name={`mainConfig[${index}].variables[${variable}]`}
+                      label={variable}
+                      type="checkbox"
+                    />
+                  ))}
+                </div>
+              </Col>
+              <Col>
+                <ValidatedField
+                  register={register}
+                  error={errors?.mainConfig?.[index]?.config}
+                  name={`mainConfig[${index}].config`}
+                  label="Dimension"
+                  type="select"
+                  validate={{ required: true }}
+                >
+                  <option value="" hidden>
+                    Dimension...
+                  </option>
+                  <option value="Life Assessment">Life Assessment</option>
+                  <option value="Maintenance Stratgy">Maintenance Strategy</option>
+                  <option value="Economic Impact">Economic Impact</option>
+                </ValidatedField>
+              </Col>
+              <Col>
+                <ValidatedField
+                  register={register}
+                  error={errors?.mainConfig?.[index]?.weights}
+                  name={`mainConfig[${index}].weights`}
+                  label="Weights"
+                  type="text"
+                  validate={{ required: true }}
+                />
+              </Col>
+            </Row>
           </>
         )}
         <Col style={{ alignSelf: 'center', textAlign: 'right' }}>

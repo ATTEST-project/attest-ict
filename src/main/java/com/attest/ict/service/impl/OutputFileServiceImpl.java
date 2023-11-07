@@ -201,7 +201,7 @@ public class OutputFileServiceImpl implements OutputFileService {
      */
     @Override
     public List<ToolResultsOutputFileDTO> findToolResults(Long networkId, Long toolId, String fileName, Instant dateTimeEnd) {
-        log.debug(
+        log.info(
             "Search tool's'results filtered by networkId: {}, toolId: {}, fileName: {}, dateTimeEnd: {}",
             networkId,
             toolId,

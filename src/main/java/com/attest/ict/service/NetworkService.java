@@ -68,7 +68,7 @@ public interface NetworkService {
     /**
      * Get the "networkName" networkName.
      *
-     * @param inetworkNamed the name of the entity.
+     * @param networkName the name of the entity.
      * @return the entity.
      */
     Optional<NetworkDTO> findByName(String networkName);
@@ -76,7 +76,7 @@ public interface NetworkService {
     /**
      * Get the list of network by  networkName from startDate to endDate
      *
-     * @param inetworkNamed the name of the entity.
+     * @param networkName the name of the entity.
      * @return the entity.
      */
     List<Network> findNetworkByNameBetweenDate(String networkName, Date startDate, Date endDate);

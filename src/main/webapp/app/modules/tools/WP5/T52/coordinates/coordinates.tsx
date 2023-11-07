@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Col, Collapse, Row, Spinner } from 'reactstrap';
+import { showError } from 'app/modules/tools/custom-toast-error';
 import { useFormContext } from 'react-hook-form';
 import { ValidatedField } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +24,10 @@ const Coordinates = () => {
   const [showCoordsSection, setShowCoordsSection] = React.useState<boolean>(false);
 
   const onUploadButtonClick = () => {
+    if (coordsFile == null) {
+      showError('Please select a coordinates file to upload');
+      return;
+    }
     setUploadLoading(true);
     dispatch(getFileHeader(coordsFile))
       .unwrap()

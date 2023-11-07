@@ -35,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -142,7 +141,7 @@ public class ToolWp3Resource {
         @RequestParam("files") MultipartFile[] files,
         @RequestParam("jsonConfig") String jsonConfig
     ) throws URISyntaxException {
-        log.debug("REST request for running toolName: {}", toolName);
+        log.info("REST request for running toolName: {}", toolName);
 
         final String SUCCESS = "ok";
         final String FAILURE = "ko";
@@ -196,7 +195,7 @@ public class ToolWp3Resource {
         @RequestParam("files") MultipartFile[] files,
         @RequestParam("jsonConfig") String jsonConfig
     ) throws URISyntaxException {
-        log.debug("REST request for tool T33, params: {}, {}, {}, {} ", networkId, toolName, files[0], jsonConfig);
+        log.info("REST request for running tool T33, params: {}, {}, {}, {} ", networkId, toolName, files[0], jsonConfig);
         final String SUCCESS = "ok";
         final String FAILURE = "ko";
 
@@ -247,7 +246,7 @@ public class ToolWp3Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to download output file  for tool: {}", toolName);
+            log.info("REST Request to download output file of the tool: {}", toolName);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -289,7 +288,7 @@ public class ToolWp3Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to prepare list of results produced by the tool: {}", toolName);
+            log.info("REST Request to prepare list of results produced by the tool: {}", toolName);
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
             if (!toolDtoOpt.isPresent()) {
@@ -321,7 +320,7 @@ public class ToolWp3Resource {
         @RequestParam("uuid") String uuid
     ) {
         try {
-            log.debug("Request to show-charts for tool: {} , networkId {},  uuid {} ", toolName, networkId, uuid);
+            log.info("REST Request to show-charts for tool: {} , networkId: {},  uuid: {} ", toolName, networkId, uuid);
 
             // -- check if the tool exists
             Optional<ToolDTO> toolDtoOpt = toolExecutionServiceImpl.findToolByName(toolName);
@@ -368,8 +367,8 @@ public class ToolWp3Resource {
         @RequestParam(name = "title", required = false) String title // required for T33
     ) {
         try {
-            log.debug(
-                "Request to show-charts for tool: {} , networkId {},  uuid {}, node {}, day {}, title {}",
+            log.info(
+                "Request to show-charts for tool: {} , networkId: {},  uuid: {}, node: {}, day: {}, title: {}",
                 toolName,
                 networkId,
                 uuid,

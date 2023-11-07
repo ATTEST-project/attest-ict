@@ -49,8 +49,14 @@ const ConfigParams = (props: ConfigParamsInterface) => {
                 <td> {parameters.case_name} </td>
                 <td> {parameters.current_time_period} </td>
                 <td> {parameters.output_distribution_bus} </td>
-                <td> {extractFileName(parameters.matpower_network_file)} </td>
-                <td> {extractFileName(parameters.flex_devices_tech_char_file)} </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.matpower_network_file)} />{' '}
+                </td>
+                <td>
+                  {' '}
+                  <TextTruncate maxWidth={'550px'} text={extractFileName(parameters.flex_devices_tech_char_file)} />
+                </td>
                 <td>
                   {' '}
                   <TextTruncate maxWidth={'200px'} text={extractFileName(parameters.flexibity_devices_states_file)} />{' '}

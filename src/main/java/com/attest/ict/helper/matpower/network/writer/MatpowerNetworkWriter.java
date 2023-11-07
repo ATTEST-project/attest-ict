@@ -59,11 +59,16 @@ public class MatpowerNetworkWriter {
         MpcElement generator = new MpcElement(MatpowerNetworkSection.GENERATOR);
         if (!model.getGeneratorExtensions().isEmpty()) {
             List<String> extensionFields = getGeneratorExtensionFields(model.getGeneratorExtensions());
+            LOG.debug("extensionFields: {}  ", extensionFields);
             List<String> newComments = new ArrayList<>();
             newComments.add("%% generator data");
-            newComments.add("% " + String.join("\t", extensionFields));
-            generator.setComments(newComments);
-            generator.addContent(convertMpcGenerator(model.getGenerators(), model.getGeneratorExtensions(), extensionFields));
+            if (extensionFields != null) {
+                newComments.add("% " + String.join("\t", extensionFields));
+                generator.setComments(newComments);
+                generator.addContent(convertMpcGenerator(model.getGenerators(), model.getGeneratorExtensions(), extensionFields));
+            } else {
+                generator.addContent(convertMpcGenerator(model.getGenerators()));
+            }
         } else {
             generator.addContent(convertMpcGenerator(model.getGenerators()));
         }

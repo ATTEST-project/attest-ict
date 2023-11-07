@@ -6,6 +6,7 @@ import { getFileHeader } from 'app/modules/tools/WP5/T52/reducer/tool-file-heade
 import { useAppDispatch } from 'app/config/store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SectionHeader from 'app/shared/components/section-header/section-header';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 const Config = (props: any) => {
   const {
@@ -29,6 +30,10 @@ const Config = (props: any) => {
   };
 
   const onUploadButtonClick = () => {
+    if (inputFile == null) {
+      showError('Please select a file to upload');
+      return;
+    }
     setUploadLoading(true);
     dispatch(getFileHeader(inputFile))
       .unwrap()
@@ -123,7 +128,6 @@ const Config = (props: any) => {
                     label={variable}
                     type="radio"
                     value={variable}
-                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
                   />
                 ))}
               </div>
@@ -141,7 +145,6 @@ const Config = (props: any) => {
                     label={variable}
                     type="radio"
                     value={variable}
-                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
                   />
                 ))}
               </div>
@@ -159,7 +162,6 @@ const Config = (props: any) => {
                     label={variable}
                     type="radio"
                     value={variable}
-                    validate={{ required: { value: true, message: 'Variables Selection is required.' } }}
                   />
                 ))}
               </div>

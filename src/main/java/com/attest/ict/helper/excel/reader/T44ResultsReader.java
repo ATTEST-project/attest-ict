@@ -86,7 +86,7 @@ public class T44ResultsReader extends ToolResultReader {
             return;
         }
 
-        log.debug("Parsing sheetName: {} START ", sheet.getSheetName());
+        log.info("Parsing sheetName: {} START ", sheet.getSheetName());
         // Reading each row of the sheet
         for (Row currentRow : sheet) {
             if (ExcelFileUtils.isHeaderToSkip(currentRow.getRowNum())) {
@@ -121,7 +121,7 @@ public class T44ResultsReader extends ToolResultReader {
             sheetData.add(flexibleOption);
         }
 
-        log.debug("Parsing sheetName: {} END ", sheet.getSheetName());
+        log.info("Parsing sheetName: {} END ", sheet.getSheetName());
     }
 
     // Sheet of _PCongintencies_*.xlsx files
@@ -246,7 +246,7 @@ public class T44ResultsReader extends ToolResultReader {
 
             try {
                 Map<String, List<FlexibleOptionWithContin>> mapDataForSheet = new HashMap<String, List<FlexibleOptionWithContin>>();
-                log.info(" -- fileName " + excelFile);
+                log.debug(" -- fileName " + excelFile);
                 mapDataForSheet = this.read(excelFile);
                 numFileRead++;
                 mapAllExcelData.putAll(mapDataForSheet);
@@ -367,7 +367,7 @@ public class T44ResultsReader extends ToolResultReader {
 
     private boolean isT44Results(File excelFile) {
         if (!excelFile.isFile()) {
-            log.info("{} is Not a file, skip ", excelFile.getName());
+            log.debug("{} is Not a file, skip ", excelFile.getName());
             return false;
         }
 

@@ -64,7 +64,7 @@ public class T41ResultsReader {
                 if (!T41FileOutputFormat.FLEX_SHEETS_NAME.contains(sheetName)) {
                     log.debug("parseFlexDataSheets() - Sheet {}, not required skip ", sheetName);
                 } else {
-                    log.info("parseFlexDataSheets() - sheet: {}", sheetName);
+                    log.info("parseFlexDataSheets() - reading sheet: {}", sheetName);
                     List<FlexibleOption> sheetData = new ArrayList<FlexibleOption>();
                     // Reading each row of the sheet
                     for (Row currentRow : sheet) {
@@ -102,7 +102,7 @@ public class T41ResultsReader {
                             }
                             switch (cellIdx) {
                                 case 0:
-                                    log.info(
+                                    log.debug(
                                         "parseFlexDataSheets() - Row: {}  Column: {}  CellType:{}",
                                         currentRow.getRowNum(),
                                         cellIdx,
@@ -117,7 +117,7 @@ public class T41ResultsReader {
                                         } else {
                                             // -- busNum
                                             flexibleOption.setBusNum(Double.valueOf(cellval).longValue());
-                                            log.info("parseFlexDataSheets() - BusNum: {} ", Double.valueOf(cellval).longValue());
+                                            log.debug("parseFlexDataSheets() - BusNum: {} ", Double.valueOf(cellval).longValue());
                                         }
                                         break;
                                     } catch (NumberFormatException nfe) {
@@ -168,7 +168,7 @@ public class T41ResultsReader {
                         log.warn("parseFlexDataSheets() - SheetName: {}, is empty", sheetName);
                     }
                 }
-                log.info("parseFlexDataSheets() - END reading excel file {} ", excel.getName());
+                log.debug("parseFlexDataSheets() - END reading excel file {} ", excel.getName());
             }
         } catch (Exception e) {
             throw new ExcelReaderFileException(

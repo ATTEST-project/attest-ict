@@ -15,10 +15,11 @@
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     tech.jhipster: INFO
     org.hibernate.SQL: INFO
-    com.attest.ict: DEBUG
+    com.attest.ict: INFO
+    com.powsybl: WARN    
 
 eureka:
   instance:

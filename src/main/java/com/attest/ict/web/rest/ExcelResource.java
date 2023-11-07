@@ -2,8 +2,6 @@ package com.attest.ict.web.rest;
 
 import com.attest.ict.custom.message.ResponseMessage;
 import com.attest.ict.domain.Network;
-import com.attest.ict.helper.excel.reader.ExcelProfileReader;
-import com.attest.ict.helper.excel.util.ExcelFileFormat;
 import com.attest.ict.helper.excel.util.ExcelFileUtils;
 import com.attest.ict.helper.utils.ProfileConstants;
 import com.attest.ict.helper.utils.ProfileUtil;
@@ -300,7 +298,7 @@ public class ExcelResource {
                 excelFlexProfileService.flexProfile(file, networkOpt, headerEnabled);
             }
 
-            message = "Uploaded the file succesfully: " + file.getOriginalFilename();
+            message = "Uploaded the file successfully: " + file.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
         } catch (Exception e) {
             message = "Could not upload the file: " + file.getOriginalFilename() + " " + e.getMessage();

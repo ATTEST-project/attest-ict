@@ -157,7 +157,7 @@ const Auxiliary = (props: IT42AuxiliaryFileProp) => {
                 register={register}
                 error={errors?.auxiliary?.flexibity_devices_states_file}
                 id={'flexibity_devices_states_file'}
-                label={titleForT41ResultsFile + ' [e.g. ES_Dx_03_2030_W_Bd_WithoutFlex_output.xlsx]'}
+                label={titleForT41ResultsFile + ' [e.g. ES_Dx_03_2030_W_Bd_WithFlex_output.xlsx]'}
                 name="auxiliary[flexibity_devices_states_file]"
                 data-cy="flexibity_devices_states_file"
                 type="file"

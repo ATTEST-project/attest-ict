@@ -42,11 +42,11 @@ public class ToolWp3ShowResultsServiceImpl implements ToolWp3ShowResultsService 
     public ToolWp3ShowResultsServiceImpl(ToolsConfiguration toolsConfig) {
         // ATTEST/tools
         this.attestToolsDir = toolsConfig.getPath();
-        log.debug("attestToolsDir {}", attestToolsDir);
+        log.debug("ToolWp3ShowResultsServiceImpl() - attestToolsDir {}", attestToolsDir);
 
         // ATSIM
         this.toolsPathSimulation = toolsConfig.getPathSimulation();
-        log.debug("toolsPathSimulation {}", toolsPathSimulation);
+        log.debug("ToolWp3ShowResultsServiceImpl() - toolsPathSimulation {}", toolsPathSimulation);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class ToolWp3ShowResultsServiceImpl implements ToolWp3ShowResultsService 
 
         List<String> extension = findExtensionOutputFileForTool(toolName);
 
-        log.info("Read file present in outputDir: {} ", outputDir);
-        log.info("Filter files with extension: {} ", extension.toString());
+        log.info("getOutputFile() - Read file present in outputDir: {} ", outputDir);
+        log.info("getOutputFile() - Filter files with extension: {} ", extension.toString());
 
         File dir = new File(outputDir);
         if (!dir.isDirectory()) {
@@ -92,26 +92,26 @@ public class ToolWp3ShowResultsServiceImpl implements ToolWp3ShowResultsService 
         int numFile = files.length;
         if (numFile == 0) {
             String errorMsg = "The directory: " + outputDir + " doesn't contain any expected output files for tool: " + toolDto.getName();
-            log.warn(errorMsg);
+            log.warn("getOutputFile() - " + errorMsg);
             throw new FileNotFoundException(errorMsg);
         }
 
         if (numFile == 1) {
-            log.info("Return  Output file {}:  ", files[0].getPath());
+            log.info("getOutputFile() - Return  Output file {}:  ", files[0].getPath());
             return files[0];
         } else {
             //t32 produce _pt1 and _pt2 File return _pt2
             for (int i = 0; i < files.length; i++) {
                 String name = files[i].getName();
                 if (name.contains(T32FileFormat.OUTPUT_SUFFIX.get(1))) {
-                    log.info("Return Output file {}:  ", files[i].getPath());
+                    log.info("getOutputFile() - Return Output file {}:  ", files[i].getPath());
                     return files[i];
                 }
             }
         }
 
         String errorMsg = " Output file not found! for tool: " + toolDto.getName();
-        log.info(errorMsg);
+        log.info("getOutputFile() - " + errorMsg);
         throw new FileNotFoundException(errorMsg);
     }
 

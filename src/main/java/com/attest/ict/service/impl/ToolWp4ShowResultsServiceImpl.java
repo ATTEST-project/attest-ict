@@ -383,7 +383,7 @@ public class ToolWp4ShowResultsServiceImpl implements ToolWp4ShowResultsService 
         // Request Activation flexibility services for DSO
         List<T42T45ActivationDTO> requestForDSOActivations = reader.parseSheetRequestActivation(outputFileResult);
         flexResultsDTO.setActivations(requestForDSOActivations);
-        LOGGER.info("t42T45Charts() - END Reading output file, return: {}", flexResultsDTO);
+        LOGGER.debug("t42T45Charts() - END Reading output file, return: {}", flexResultsDTO);
         return flexResultsDTO;
     }
 

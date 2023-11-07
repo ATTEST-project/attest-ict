@@ -14,9 +14,4 @@ public interface ToolWp2ExecutionService {
         throws Exception;
 
     CompletableFuture<String> t26Async(NetworkDTO networkDto, ToolDTO toolDto, Map<String, String> toolConfigMap) throws Exception;
-    //CompletableFuture<String> t25Async(NetworkDTO networkDto, ToolDTO toolDto, Map<String, String> toolConfigMap) throws Exception;
-
-    //String t26(NetworkDTO networkDTO, ToolDTO toolDTO, MultipartFile[] files, String jsonConfig) throws Exception;
-    //String t25(NetworkDTO networkDTO, ToolDTO toolDTO, MultipartFile[] files, String jsonConfig) throws Exception;
-
 }

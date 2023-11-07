@@ -4,6 +4,7 @@ import LoadingOverlay from 'app/shared/components/loading-overlay/loading-overla
 import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 import Divider from 'app/shared/components/divider/divider';
 import NetworkInfo from 'app/shared/components/network-info/network-info';
@@ -54,13 +55,20 @@ const T51Characterization = (props: any) => {
 
   const cleanDataForm = (form: any) => {
     const configs = [...form.config];
+    /* eslint-disable-next-line no-console */
+    console.log('cleanDataForm: ', configs);
     const configCleaned = [];
+
     for (const config of configs) {
       const { inputFile, inputAuxFile, variables, variables2, results, selectedVariables, component2_field, ...rest } = config;
       const fileName = inputFile[0].name;
       const auxFileName = inputAuxFile[0]?.name || '';
       const variablesKeys = Object.keys(variables).filter(k => variables[k]);
       const resultsKeys = Object.keys(results).filter(k => results[k]);
+      // --if no variables have been selected, show an error message.
+      if (variablesKeys.length === 0) {
+        return { configs: [] };
+      }
 
       configCleaned.push({
         ...rest,
@@ -90,18 +98,21 @@ const T51Characterization = (props: any) => {
           element.inputAuxFile.length > 0 ? [element.inputFile[0], element.inputAuxFile[0]] : [element.inputFile[0]]
         ),
       ],
-
       jsonConfig: JSON.stringify({ ...cleanDataForm(data) }),
     };
-    /* eslint-disable-next-line no-console */
-    console.log('Final form data: ', finalForm);
+
+    const returnData = JSON.parse(finalForm.jsonConfig);
+    if (returnData.configs.length === 0) {
+      showError('Please select one ore more variables from each set');
+      return;
+    }
     setForm({ ...finalForm });
     setOpenModal(true);
   };
 
   const checkAndRun = () => {
     /* eslint-disable-next-line no-console */
-    console.log('Characterization tool - checkAndRun()');
+    // console.log('Characterization tool - checkAndRun()');
     setOpenModal(false);
     setTimeout(() => {
       dispatch(
@@ -150,7 +161,6 @@ const T51Characterization = (props: any) => {
   return (
     <div ref={divRef}>
       {isRunning && <LoadingOverlay ref={divRef} />}
-
       <ToolTitle imageAlt={WP_IMAGE.WP5.alt} title={toolDescription} imageSrc={WP_IMAGE.WP5.src} />
       <Divider />
 

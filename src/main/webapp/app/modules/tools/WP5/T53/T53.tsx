@@ -20,6 +20,7 @@ import { downloadResults } from 'app/modules/tools/WP5/T53/reducer/tool-table.re
 import ModalConfirmToolExecution from 'app/shared/components/tool-confirm-execution/modal-tool-confirm-execution';
 import ToolTitle from 'app/shared/components/tool-title/tool-title';
 import { RUN_TOOL_START, RUN_TOOL_FAILURE } from 'app/shared/util/toast-msg-constants';
+import { showError } from 'app/modules/tools/custom-toast-error';
 
 const T53 = (props: any) => {
   const divRef = React.useRef<HTMLDivElement>();
@@ -55,6 +56,10 @@ const T53 = (props: any) => {
       const { assetsFile, variables, weights, ...rest } = config;
       const fileName = assetsFile[0].name;
       const variablesKeys = Object.keys(variables).filter(k => variables[k]);
+      // --if no variables have been selected, show an error message.
+      if (variablesKeys.length === 0) {
+        return { mainConfig: [] };
+      }
       const finalWeights = weights.split(',');
       mainConfigCleaned.push({ path: fileName, variables: [...variablesKeys], weights: [...finalWeights], ...rest });
     }
@@ -75,6 +80,13 @@ const T53 = (props: any) => {
       files: [...data.mainConfig.map(config => config.assetsFile[0])],
       jsonConfig: JSON.stringify({ ...cleanDataForm(data) }),
     };
+
+    const returnData = JSON.parse(finalForm.jsonConfig);
+
+    if (returnData.mainConfig.length === 0) {
+      showError('Please select one ore more variables from each set');
+      return;
+    }
     /* eslint-disable-next-line no-console */
     console.log('T53 Final form: ', finalForm);
     setForm({ ...finalForm });

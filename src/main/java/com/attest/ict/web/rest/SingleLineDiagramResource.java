@@ -47,7 +47,7 @@ public class SingleLineDiagramResource {
     // EX @GetMapping("/generateEntireNetwork/{networkName}")
     @GetMapping("/sld-network/{networkName}")
     public ResponseEntity<?> generateEntireNetwork(@PathVariable("networkName") String networkName) {
-        log.debug("Request to generate SimpleLineDiagram for Entire Network: {}", networkName);
+        log.info("REST Request to generate the SimpleLineDiagram for network with name: {}", networkName);
         Map<String, Object> svgData = new LinkedHashMap<>();
         try {
             Optional<Network> optNet = networkService.findNetworkByName(networkName);
@@ -60,7 +60,6 @@ public class SingleLineDiagramResource {
             log.debug("Network: {}", network);
             Boolean existMatPowerFile = inputFileService.isNetworkFileAvailable(network.getId());
             if (!existMatPowerFile) {
-                // 20220824 L.p
                 String message = "Please upload: " + networkName + msgMissingFile;
                 log.warn(message);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessage(message));
@@ -69,6 +68,7 @@ public class SingleLineDiagramResource {
             log.debug("Network buses Num: {}", network.getBuses().size());
             log.debug("Network branches NUM: {}", network.getBranches().size());
             log.debug("Network generators NUM: {}", network.getGenerators().size());
+
             if (network.getBuses().isEmpty() || network.getBranches().isEmpty() || network.getGenerators().isEmpty()) {
                 String message = msgEmptyAsset;
                 log.warn(message + " for network: " + networkName);
@@ -77,7 +77,7 @@ public class SingleLineDiagramResource {
             svgData = createSvgData(network);
             return new ResponseEntity<>(svgData, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Exception: ", e);
+            log.error("Exception generating SimpleLineDiagram ", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -85,7 +85,7 @@ public class SingleLineDiagramResource {
     @Transactional
     @GetMapping("/sld-network/id/{networkId}")
     public ResponseEntity<?> generateEntireNetwork(@PathVariable("networkId") Long networkId) {
-        log.debug("Request to generate SimpleLineDiagram for Entire Network with Id: {}", networkId);
+        log.info("Request to generate SimpleLineDiagram for network with ID: {}", networkId);
         Map<String, Object> svgData = new LinkedHashMap<>();
         try {
             Optional<Network> optNet = networkService.findById(networkId);
@@ -118,7 +118,7 @@ public class SingleLineDiagramResource {
     @Transactional
     @GetMapping("/v1/sld-network/{networkName}")
     public ResponseEntity<?> generateEntireNetworkMetadata(@PathVariable("networkName") String networkName) {
-        log.debug("Request to generate SimpleLineDiagram for Entire Network: {}", networkName);
+        log.info("Request to generate SimpleLineDiagram for Entire Network with name: {}", networkName);
         Map<String, Object> svgData = new LinkedHashMap<>();
         try {
             Optional<Network> optNet = networkService.findNetworkByName(networkName);
@@ -151,7 +151,7 @@ public class SingleLineDiagramResource {
     @Transactional
     @GetMapping("/v1/sld-network/id/{networkId}")
     public ResponseEntity<?> generateEntireNetworkMetadataById(@PathVariable("networkId") Long networkId) {
-        log.debug("Request to generate SimpleLineDiagram for Entire NetworkId: {}", networkId);
+        log.info("Request to generate SimpleLineDiagram for network with ID: {}", networkId);
         Map<String, Object> svgData = new LinkedHashMap<>();
         try {
             Optional<Network> optNet = networkService.findById(networkId);
@@ -196,7 +196,7 @@ public class SingleLineDiagramResource {
     //EX @GetMapping("/v2/generateSubstations/{networkName}")
     @GetMapping("/sld-substations/{networkName}")
     public ResponseEntity<?> generateSubstationsMetadata(@PathVariable("networkName") String networkName) {
-        log.debug("Request to generate SimpleLineDiagram for Substations of Network: {}", networkName);
+        log.info("Request to generate SimpleLineDiagram for Substations of Network with  name: {}", networkName);
         try {
             Map<String, Map<String, String>> allSvgData = new LinkedHashMap<>();
             Optional<Network> optNet = networkService.findNetworkByName(networkName);
@@ -227,11 +227,11 @@ public class SingleLineDiagramResource {
                 allSvgData = createSubstationsSvgData(network);
                 return new ResponseEntity<>(allSvgData, HttpStatus.OK);
             } catch (Exception e) {
-                log.error("createSubstationsSvgData raise an Exception: ", e);
+                log.error("createSubstationsSvgData() raise an Exception: ", e);
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            log.error("Exception: ", e);
+            log.error("generateSubstationsMetadata() raise an Exception: ", e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -239,7 +239,8 @@ public class SingleLineDiagramResource {
     @Transactional
     @GetMapping("/sld-substations/id/{networkId}")
     public ResponseEntity<?> generateSubstationsMetadata(@PathVariable("networkId") Long networkId) {
-        log.debug("Request to generate SimpleLineDiagram for Substations of Network with id: {}", networkId);
+        log.info("REST Request to generate SimpleLineDiagram for Substations of Network with ID: {}", networkId);
+
         try {
             Map<String, Map<String, String>> allSvgData = new LinkedHashMap<>();
             Optional<Network> optNet = networkService.findById(networkId);
@@ -270,13 +271,14 @@ public class SingleLineDiagramResource {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            log.error("Exception: ", e);
+            log.error("generateSubstationsMetadata() raise an Exception: ", e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/substations-num/{networkName}")
     public ResponseEntity<?> getNumberOfSubstations(@PathVariable("networkName") String networkName) {
+        log.info("REST Request to getNumberOfSubstations  for Network with name: {}", networkName);
         try {
             Optional<Network> optNet = networkService.findNetworkByName(networkName);
 

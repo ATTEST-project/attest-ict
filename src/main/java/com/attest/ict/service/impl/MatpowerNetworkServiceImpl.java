@@ -95,7 +95,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             "Unable to export network data to '.m'  file, Network:  '" + networkName + "' not found"
         );
 
-        LOGGER.info("Export Network: {}  START ...", networkName);
+        LOGGER.info("exportToMatpowerFile() - Export Network: {}  START ...", networkName);
         try {
             // get networkId from network
             Long networkId = networkOpt.get().getId();
@@ -163,7 +163,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
 
             MatpowerFileStruct struct = MatpowerNetworkWriter.generateMatpowerStructure(model);
 
-            LOGGER.info("Export Network: {}  END ...", networkName);
+            LOGGER.info("exportToMatpowerFile() - Export Network: {}  END", networkName);
             return new ByteArrayInputStream(struct.toString().getBytes());
         } catch (Exception ex) {
             String msg = "Failure exporting Network into matpower file format! ";
@@ -205,7 +205,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             if (model.getBaseMva() != null) {
                 BaseMVA baseMVA = this.createBaseMVA(model, networkSaved);
                 BaseMVA newBaseMva = baseMVARepository.save(baseMVA);
-                LOGGER.info("BaseMVA: {} saved! ", newBaseMva.toString());
+                LOGGER.info("New BaseMVA: {} saved successfully! ", newBaseMva);
             } else {
                 LOGGER.warn("BaseMVA is empty, should not be! ");
             }
@@ -214,7 +214,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             if (model.getvLevels() != null) {
                 VoltageLevel vLevels = this.createVLevels(model, networkSaved);
                 VoltageLevel newVoltageLevel = vLevelsRepository.save(vLevels);
-                LOGGER.info("VLevels: {} saved! ", newVoltageLevel.toString());
+                LOGGER.info("New VLevels: {} saved successfully! ", newVoltageLevel);
             } else {
                 LOGGER.info("VoltageLevel is empty ");
             }
@@ -228,7 +228,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
 
             List<Bus> buses = this.createBuses(model, network);
             List<Bus> newBuses = busRepository.saveAll(buses);
-            LOGGER.info("Num Buses: {} saved! ", newBuses.size());
+            LOGGER.info("Number of Bus saved: {} ", newBuses.size());
 
             // -- store branches
             if (model.getBranches().isEmpty()) {
@@ -238,66 +238,66 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             }
             List<Branch> branches = this.createBranches(model, networkSaved);
             List<Branch> newBranches = branchRepository.saveAll(branches);
-            LOGGER.info("Num branches: {} saved! ", newBranches.size());
+            LOGGER.info("Number of branches: {} saved! ", newBranches.size());
 
             List<Generator> generators = this.createGenerators(model, networkSaved);
             if (!model.getGenerators().isEmpty()) {
                 List<Generator> newGenerators = generatorRepository.saveAll(generators);
-                LOGGER.info("Num generators: {} saved! ", newGenerators.size());
+                LOGGER.info("Number of generators: {} saved! ", newGenerators.size());
             }
 
             if (!model.getBusExtensions().isEmpty()) {
                 List<BusExtension> busExtensions = this.createBusExtensions(model, buses);
                 List<BusExtension> newBusExtensions = busExtensionRepository.saveAll(busExtensions);
-                LOGGER.info("Num BusExtension {} saved! ", newBusExtensions.size());
+                LOGGER.info("Number of BusExtension {} saved! ", newBusExtensions.size());
             }
 
             if (!model.getBranchExtensions().isEmpty()) {
                 List<BranchExtension> branchExtensions = this.createBranchExtensions(model, branches);
                 List<BranchExtension> newBranchExtensions = branchExtensionRepository.saveAll(branchExtensions);
-                LOGGER.info("Num BranchExtension {} saved! ", newBranchExtensions.size());
+                LOGGER.info("Number of BranchExtension {} saved! ", newBranchExtensions.size());
             }
 
             if (!model.getGeneratorExtensions().isEmpty()) {
                 List<GeneratorExtension> generatorExtensions = this.createGeneratorExtensions(model, generators);
                 List<GeneratorExtension> newGeneratorExtensions = generatorExtensionRepository.saveAll(generatorExtensions);
-                LOGGER.info("Num GeneratorExtension {} saved! ", newGeneratorExtensions.size());
+                LOGGER.info("Number of GeneratorExtension {} saved! ", newGeneratorExtensions.size());
             }
 
             if (!model.getBusNames().isEmpty()) {
                 List<BusName> busNames = this.createBusNames(model, buses);
                 List<BusName> newBusNames = busNameRepository.saveAll(busNames);
-                LOGGER.info("Num BusName {} saved! ", newBusNames.size());
+                LOGGER.info("Number of BusName {} saved! ", newBusNames.size());
             }
 
             if (!model.getGenTags().isEmpty()) {
                 List<GenTag> genTags = this.createGenTags(model, generators);
                 List<GenTag> newGenTags = genTagRepository.saveAll(genTags);
-                LOGGER.info("Num GenTag {} saved! ", newGenTags.size());
+                LOGGER.info("Number of GenTag {} saved! ", newGenTags.size());
             }
 
             if (!model.getTransformers().isEmpty()) {
                 List<Transformer> trans = this.createTransformers(model, networkSaved);
                 List<Transformer> newTrans = transformerRepository.saveAll(trans);
-                LOGGER.info("Num Transformer {} saved! ", newTrans.size());
+                LOGGER.info("Number of Transformer {} saved! ", newTrans.size());
             }
 
             if (!model.getBusCoordinates().isEmpty()) {
                 List<BusCoordinate> coords = this.createBusCoords(model, buses);
                 List<BusCoordinate> newCoords = busCoordinatesRepository.saveAll(coords);
-                LOGGER.info("Num BusCoordinate {} saved! ", newCoords.size());
+                LOGGER.info("Number of BusCoordinate {} saved! ", newCoords.size());
             }
 
             if (!model.getGenCosts().isEmpty()) {
                 List<GenCost> genCosts = this.createGenCosts(model, generators);
                 List<GenCost> newGenCosts = genCostRepository.saveAll(genCosts);
-                LOGGER.info("Num GenCost {} saved! ", newGenCosts.size());
+                LOGGER.info("Number of GenCost {} saved! ", newGenCosts.size());
             }
 
             if (!model.getCaps().isEmpty()) {
                 List<CapacitorBankData> caps = this.createCapsBankData(model, networkSaved);
                 List<CapacitorBankData> newCaps = capacitorBankDataRepository.saveAll(caps);
-                LOGGER.info("Num CapacitorBankData {} caps! ", newCaps.size());
+                LOGGER.info("Number of CapacitorBankData {} caps! ", newCaps.size());
             }
 
             InputFileDTO inputFileSavedDTO = inputFileInputServiceImpl.saveFileForNetworkWithDescr(
@@ -305,7 +305,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
                 networkMapper.toDto(networkSaved),
                 AttestConstants.INPUT_FILE_NETWORK_DESCR
             );
-            LOGGER.info("InputFileSavedDTO saved: {} ", inputFileSavedDTO);
+            LOGGER.info("New File: {}, saved in InputFile ", inputFileSavedDTO.getFileName());
 
             LOGGER.info("Import Network from file: {}  END ...", mpFile.getOriginalFilename());
         } catch (Exception e) {
@@ -319,7 +319,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
         BaseMVA baseMVA = new BaseMVA();
         baseMVA.setBaseMva(model.getBaseMva());
         baseMVA.setNetwork(network);
-        LOGGER.info("Return BaseMVA:  {}! ", baseMVA.toString());
+        LOGGER.debug("Return BaseMVA:  {}! ", baseMVA.toString());
         return baseMVA;
     }
 
@@ -329,7 +329,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
         vLevels.setv2(model.getvLevels().getv2());
         vLevels.setv3(model.getvLevels().getv3());
         vLevels.setNetwork(network);
-        LOGGER.info("Return VoltageLevel:  {}! ", vLevels.toString());
+        LOGGER.debug("Return VoltageLevel:  {}! ", vLevels.toString());
         return vLevels;
     }
 
@@ -353,7 +353,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             bus1.setNetwork(network);
             buses.add(bus1);
         }
-        LOGGER.info("Return list of buses of size: {}! ", buses.size());
+        LOGGER.debug("Return list of buses of size: {}! ", buses.size());
         return buses;
     }
 
@@ -374,7 +374,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             busExtension.setBus(buses.get(i));
             busExtensions.add(busExtension);
         }
-        LOGGER.info("Return list of busExtensions of size: {}! ", busExtensions.size());
+        LOGGER.debug("Return list of busExtensions of size: {}! ", busExtensions.size());
         return busExtensions;
     }
 
@@ -398,7 +398,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             branch.setNetwork(network);
             branches.add(branch);
         }
-        LOGGER.info("Return list of branches of size: {}! ", branches.size());
+        LOGGER.debug("Return list of branches of size: {}! ", branches.size());
         return branches;
     }
 
@@ -423,7 +423,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             branchExtension.setBranch(branches.get(i));
             branchExtensions.add(branchExtension);
         }
-        LOGGER.info("Return list of branchExtensions of size: {}! ", branchExtensions.size());
+        LOGGER.debug("Return list of branchExtensions of size: {}! ", branchExtensions.size());
         return branchExtensions;
     }
 
@@ -455,7 +455,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             generator.setNetwork(network);
             generators.add(generator);
         }
-        LOGGER.info("Return list of generators of size: {}! ", generators.size());
+        LOGGER.debug("Return list of generators of size: {}! ", generators.size());
         return generators;
     }
 
@@ -469,7 +469,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             generatorExtension.setGenerator(generators.get(i));
             generatorExtensions.add(generatorExtension);
         }
-        LOGGER.info("Return list of generatorExtensions of size: {}! ", generatorExtensions.size());
+        LOGGER.debug("Return list of generatorExtensions of size: {}! ", generatorExtensions.size());
         return generatorExtensions;
     }
 
@@ -485,7 +485,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             genTag.setGenTag(model.getGenTags().get(i).getGenTag());
             genTags.add(genTag);
         }
-        LOGGER.info("Return list of genTags of size: {}! ", genTags.size());
+        LOGGER.debug("Return list of genTags of size: {}! ", genTags.size());
         return genTags;
     }
 
@@ -501,7 +501,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             busName.setBusName(model.getBusNames().get(i).getBusName());
             busNames.add(busName);
         }
-        LOGGER.info("Return list of busNames of size: {}! ", busNames.size());
+        LOGGER.debug("Return list of busNames of size: {}! ", busNames.size());
         return busNames;
     }
 
@@ -522,7 +522,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             tran.setNetwork(network);
             trans.add(tran);
         }
-        LOGGER.info("Return list of transformers of size: {}! ", trans.size());
+        LOGGER.debug("Return list of transformers of size: {}! ", trans.size());
         return trans;
     }
 
@@ -539,7 +539,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             bc.setY(model.getBusCoordinates().get(i).getY());
             busCoordinates.add(bc);
         }
-        LOGGER.info("Return list of busCoordinates of size: {}! ", busCoordinates.size());
+        LOGGER.debug("Return list of busCoordinates of size: {}! ", busCoordinates.size());
         return busCoordinates;
     }
 
@@ -562,7 +562,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
 
             genCosts.add(genCost);
         }
-        LOGGER.info("Return list of genCosts of size: {}! ", genCosts.size());
+        LOGGER.debug("Return list of genCosts of size: {}! ", genCosts.size());
         return genCosts;
     }
 
@@ -581,7 +581,7 @@ public class MatpowerNetworkServiceImpl implements MatpowerNetworkService {
             cap.setNetwork(network);
             caps.add(cap);
         }
-        LOGGER.info("Return list of capacitors bank data of size: {}! ", caps.size());
+        LOGGER.debug("Return list of capacitors bank data of size: {}! ", caps.size());
         return caps;
     }
 }

@@ -427,7 +427,7 @@ public class ToolExecutionServiceImpl implements ToolExecutionService {
             toolConfigMap.toString()
         );
         String uuid = toolConfigMap.get(UUID_KEY);
-        log.info("uuid: {} ", uuid);
+        log.info("asyncRun() - simulation uuid: {} ", uuid);
 
         Optional<SimulationDTO> simulationOpt = simulationServiceImpl.findByUuid(uuid);
         if (!simulationOpt.isPresent()) {
@@ -500,7 +500,7 @@ public class ToolExecutionServiceImpl implements ToolExecutionService {
             log.error(errMsg, ioex);
         }
 
-        log.info("Exit: asyncRun() uuid: {}", uuid);
+        log.info("Exit: asyncRun() - for tool: {}, simulation uuid: {}", toolDto.getName(), uuid);
         return CompletableFuture.completedFuture(uuid);
     }
 
@@ -508,7 +508,7 @@ public class ToolExecutionServiceImpl implements ToolExecutionService {
         log.debug("Enter: manageErrorExitCode() ");
 
         Optional<TaskDTO> taskDtoUpdatedOpt = taskServiceImpl.findOne(taskDto.getId());
-        log.info("Task: {} " + taskDtoUpdatedOpt.get());
+        log.info("manageErrorExitCode()  - Task: {} " + taskDtoUpdatedOpt.get());
 
         // Verify if Tool raise an exception but it's not a real exception e.g T41:  run this exception "ERROR: LoadError: LoadError: No violations. This case is a waste of time"
         boolean isErrorToSkipPresent = false;
@@ -518,12 +518,12 @@ public class ToolExecutionServiceImpl implements ToolExecutionService {
             if (isErrorToSkipPresent) {
                 log.warn("Tool raises this exception: " + errorToSkip + ", but it mustn't be considered an error!");
                 TaskDTO taskResult = this.updateTaskStatus(taskDto, TaskStatus.Status.PASSED);
-                log.info("Exit:  manageErrorExitCode()  with results: " + taskResult);
+                log.info("Exit:  manageErrorExitCode() - with results: " + taskResult);
                 return taskResult;
             }
         }
         TaskDTO taskResult = this.updateTaskStatus(taskDto, TaskStatus.Status.FAILED);
-        log.info("Exit:  manageErrorExitCode()  with results: " + taskResult);
+        log.info("Exit:  manageErrorExitCode() - with results: " + taskResult);
         return taskResult;
     }
 }

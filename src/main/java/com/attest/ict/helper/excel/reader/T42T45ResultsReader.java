@@ -404,45 +404,4 @@ public class T42T45ResultsReader {
         int count = pages.stream().filter(p -> (p.getSheetName().equals(sheetName) && p.getTitle().equals(pageTitle))).toArray().length;
         return (count > 0);
     }
-
-    public static void main(String[] args) {
-        String relativePath =
-            "C:\\ATSIM\\WP4\\T45\\78ff5ad5-7828-4d3e-8009-bbe86ddd7db7\\output_data\\Transmission_Network_PT_2020_output.xlsx";
-        File fileToParse = new File(relativePath);
-        boolean test1 = true;
-        boolean test2 = false;
-        boolean test3 = false;
-        boolean test4 = false;
-        boolean test5 = false;
-        boolean test6 = false;
-        boolean test7 = false;
-        boolean test8 = false;
-
-        T42T45ResultsReader reader = new T42T45ResultsReader();
-
-        if (test1) {
-            try {
-                Map<String, List<FlexibleOption>> flexResults = new HashMap<String, List<FlexibleOption>>();
-                flexResults = reader.parseFlexDataSheets(fileToParse);
-                System.out.println("======================================================== ");
-                System.out.println("--- Flex Results: ");
-                System.out.println("  " + Arrays.deepToString(flexResults.entrySet().stream().toArray()));
-                System.out.println("======================================================== ");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (test2) {
-            try {
-                List<T42T45ActivationDTO> activations = new ArrayList<T42T45ActivationDTO>();
-                activations = reader.parseSheetRequestActivation(fileToParse);
-                System.out.println("======================================================== ");
-                System.out.println("--- Results Request for DSO activation: " + activations);
-                System.out.println("======================================================== ");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
 }

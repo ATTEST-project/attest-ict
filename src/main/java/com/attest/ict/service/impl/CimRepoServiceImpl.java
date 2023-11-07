@@ -64,7 +64,7 @@ public class CimRepoServiceImpl implements CimRepoService {
 
     @Override
     public List<CimRepositoryNetworkDTO> getNetworks() throws IOException {
-        log.debug("Request to get networks stored in CIM repository");
+        log.info("Request to get networks stored in CIM repository");
         String networksJson = cimRepoClient.getNetworks();
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, Object>> networksData = mapper.readValue(networksJson, new TypeReference<List<Map<String, Object>>>() {});
@@ -87,7 +87,7 @@ public class CimRepoServiceImpl implements CimRepoService {
 
     @Override
     public List<CimRepositoryNetworkVersionDTO> getNetworkVersions(Long networkId) throws IOException {
-        log.debug("Request to get versions of network {} stored in CIM repository", networkId);
+        log.info("Request to get versions of network {} stored in CIM repository", networkId);
         String networkversionsJson = cimRepoClient.getNetworkVersion(networkId);
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, Object>> networkVersionsData = mapper.readValue(
@@ -124,7 +124,7 @@ public class CimRepoServiceImpl implements CimRepoService {
 
     @Override
     public List<Integer> importNetwork(CimRepoNetworkDTO cimRepoNetworkDTO) throws IOException, MatpowerReaderFileException {
-        log.debug("Request to import network from CIM repository: {}", cimRepoNetworkDTO);
+        log.info("Request to import network from CIM repository: {}", cimRepoNetworkDTO);
         // get network versions
         List<CimRepositoryNetworkVersionDTO> cimRepositoryNetworkVersionDTOs = getNetworkVersions(cimRepoNetworkDTO.getNetworkId());
         if (cimRepositoryNetworkVersionDTOs.isEmpty()) {
@@ -168,12 +168,12 @@ public class CimRepoServiceImpl implements CimRepoService {
         // create attest network
         NetworkDTO networkDTO = getNetworkDTO(networkName, cimRepoNetworkDTO, cimRepositoryNetworkVersionDTO);
         // save attest network
-        log.debug("Saving network {}", networkName);
+        log.info("Saving network {}", networkName);
         NetworkDTO result = networkService.save(networkDTO);
         // save matpower file
         Path matpowerFile = getMatpowerFile(networkName, modelFromCim);
         // import matpower file into attest db
-        log.debug("Importing file {} in network {}", matpowerFile.getFileName().toString(), networkName);
+        log.info("Importing file {} in network {}", matpowerFile.getFileName().toString(), networkName);
         matpowerNetworkService.importFromMatpowerFile(getMultipartFile(matpowerFile), result.getId());
         return result.getId();
     }

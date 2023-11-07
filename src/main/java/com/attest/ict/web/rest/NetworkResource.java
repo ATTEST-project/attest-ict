@@ -68,7 +68,7 @@ public class NetworkResource {
      */
     @PostMapping("/networks")
     public ResponseEntity<NetworkDTO> createNetwork(@Valid @RequestBody NetworkDTO networkDTO) throws URISyntaxException {
-        log.debug("REST request to save Network : {}", networkDTO);
+        log.info("REST request to create a new Network : {}", networkDTO);
         if (networkDTO.getId() != null) {
             throw new BadRequestAlertException("A new network cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -106,7 +106,7 @@ public class NetworkResource {
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody NetworkDTO networkDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Network : {}, {}", id, networkDTO);
+        log.info("REST request to update a network with ID: {}, {}", id, networkDTO);
         if (networkDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -141,7 +141,7 @@ public class NetworkResource {
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody NetworkDTO networkDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Network partially : {}, {}", id, networkDTO);
+        log.info("REST request to partial update Network partially : {}, {}", id, networkDTO);
         if (networkDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -212,7 +212,7 @@ public class NetworkResource {
      */
     @DeleteMapping("/networks/{id}")
     public ResponseEntity<Void> deleteNetwork(@PathVariable Long id) {
-        log.debug("REST request to delete Network : {}", id);
+        log.info("REST request to delete Network with ID: {}", id);
         networkService.delete(id);
         return ResponseEntity
             .noContent()

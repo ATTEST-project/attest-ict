@@ -109,24 +109,11 @@ public class T33ResultsReader {
         ExcelReader reader = new ExcelReader(outputFile);
         try {
             String sheetName = T33FileFormat.MAP_PAGE_SHEETNAME.get(pageTitle);
-            log.debug("Start Parsing sheet: " + sheetName);
-
+            log.info("getTableData() -  Parsing sheet: {} START ...", sheetName);
             Sheet sheet = reader.getSheetByName(sheetName);
             if (sheet == null) {
-                // log.debug("Sheet referring to pageTitle: " + pageTitle + " not found! ");
                 throw new ExcelReaderFileException("Sheet " + pageTitle + " not found");
             }
-
-            /*
-            Sheet MainInfo compliant with t33 old version
-            boolean headerExists = !sheetName.equals(T33FileFormat.SHEETS_TO_SHOW.get(6));
-            if (sheetName.equals(T33FileFormat.SHEETS_TO_SHOW.get(6))) {
-                List<ColumnDefDTO> columnsDefs = Stream
-                    .of(new ColumnDefDTO("Info", false, "Info"), new ColumnDefDTO("Description", false, "Description"))
-                    .collect(toList());
-                table.setColumnDefs(columnsDefs);
-            }
-            */
 
             boolean headerExists = true;
             int indexHeader = 0;
@@ -145,10 +132,12 @@ public class T33ResultsReader {
                     columnsDefs.add(colDef);
                 }
                 table.setColumnDefs(columnsDefs);
-                headerExists = false;
-                indexHeader = 2;
+                //headerExists = false;
+                headerExists = true;
+                indexHeader = 1;
             }
-            if (headerExists) {
+            // if (headerExists) {
+            if (indexHeader == 0) {
                 String[] headers = reader.parseHeaderBySheetName(sheetName, indexHeader);
                 log.debug("Sheet header: " + " " + Arrays.stream(headers).collect(toList()));
                 // The first version of tool: T33  doesn't contain the Operator column in the sheet: 'Shared ESS'. To allow correct visualization, we add it with a default value = 'ESSO'

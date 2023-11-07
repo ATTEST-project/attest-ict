@@ -96,7 +96,7 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
      */
     @Override
     public void importNetworkFromOdsFile(Long networkId, MultipartFile multiPartFile) throws OdsReaderFileException {
-        log.info("File Ods: {} import start ...", multiPartFile.getOriginalFilename());
+        log.info("importNetworkFromOdsFile() - File Ods: {} import start ...", multiPartFile.getOriginalFilename());
         String origFileName = StringUtils.cleanPath(multiPartFile.getOriginalFilename());
 
         Optional<Network> networkOpt = networkService.findById(networkId);
@@ -110,7 +110,7 @@ public class OdsNetworkServiceImpl implements OdsNetworkService {
         NetworkDTO networkDTO = networkMapper.toDto(network);
         if (origFileName != null) {
             String fileName = FileUtils.getFileLessExtension(origFileName);
-            log.info("Network fileName: {}", fileName);
+            log.debug("Network fileName: {}", fileName);
             network.setMpcName(fileName);
             Optional<NetworkDTO> networkDtoOptSaved = networkService.partialUpdate(networkMapper.toDto(network));
             if (networkDtoOptSaved.isPresent()) {

@@ -68,10 +68,10 @@ public class ToolWp3ExecutionServiceImpl implements ToolWp3ExecutionService {
     public ToolWp3ExecutionServiceImpl(ToolsConfiguration toolsConfig) {
         // ATTEST/tools
         this.attestToolsDir = toolsConfig.getPath();
-        log.debug("attestToolsDir {}", attestToolsDir);
+        log.debug("ToolWp3ExecutionServiceImpl() - attestToolsDir {}", attestToolsDir);
         // ATSIM
         this.toolsPathSimulation = toolsConfig.getPathSimulation();
-        log.debug("toolsPathSimulation {}", toolsPathSimulation);
+        log.debug("ToolWp3ExecutionServiceImpl() - toolsPathSimulation {}", toolsPathSimulation);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ToolWp3ExecutionServiceImpl implements ToolWp3ExecutionService {
         // Tool's installation path
         ToolSimulationReferencies toolSimulationRef = new ToolSimulationReferencies(this.attestToolsDir, this.toolsPathSimulation);
         String toolInstallationDir = toolSimulationRef.getToolWorkingDir(toolDto);
-        log.info("prepareT31WorkingDir() - tool_instalation_dir: {}", toolInstallationDir);
+        log.info("prepareT31WorkingDir() - tool_installation_dir: {}", toolInstallationDir);
         configMap.put(TOOL_INSTALL_DIR, toolInstallationDir);
         configMap.put(LAUNCH_TOOL_FILE_KEY, ToolFileFormat.LAUNCH_FILE);
 

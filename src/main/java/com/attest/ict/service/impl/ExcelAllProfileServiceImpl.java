@@ -113,6 +113,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         // header is present in file
         boolean isHeaderEnabled = Boolean.TRUE.booleanValue();
         Long networkId = network.getId();
+        LOGGER.info(
+            "allProfile() - parse the auxiliary file: {} for networkId: {}, mode: {}, season: {}, typicalDay: {} ",
+            file.getOriginalFilename(),
+            networkId,
+            mode,
+            season,
+            typicalDay
+        );
         Workbook workbook = null;
         InputStream inputStream = null;
         try {
@@ -208,17 +216,13 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             } // end for all sheets
 
-            // clean old value loaded precedentily, if there are.
-            //20221130  comment
-            //cleanOldValues(file, mode, season, typicalDay, network, ExcelProfilesFormat.TX_TIME_INTERVAL);
-
             // SavefIle in table: inputFile
             InputFileDTO inputFileDto = inputFileServiceImpl.saveFileForNetworkWithDescr(
                 file,
                 networkMapper.toDto(network),
                 AttestConstants.INPUT_FILE_ALL_PROFILE_DESCR
             );
-            LOGGER.debug("New File: {}, saved in InputFile ", inputFileDto.getFileName());
+            LOGGER.info("allProfile() - New File: {}, saved successfully in InputFile ", inputFileDto.getFileName());
 
             // Save Data on DB
             if (!genElMap.isEmpty()) {
@@ -237,7 +241,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 saveBranchProfile(inputFileDto, network, mode, season, typicalDay, ExcelProfilesFormat.TX_TIME_INTERVAL, branchElMap);
             }
         } catch (ExcelReaderFileException ex) {
-            LOGGER.error("Exception reading file: {}", ex.getMessage());
+            LOGGER.error("allProfile() - Exception reading file: {}", ex.getMessage());
         } catch (IOException e) {
             throw new ExcelReaderFileException("fail to parse Excel File:  " + file.getOriginalFilename());
         } finally {
@@ -245,14 +249,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 try {
                     workbook.close();
                 } catch (IOException e) {
-                    LOGGER.error("Error closing workbook: " + e.getMessage());
+                    LOGGER.error("allProfile() - Error closing workbook: " + e.getMessage());
                 }
             }
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.error("Error closing inputStream " + e.getMessage());
+                    LOGGER.error("allProfile() - Error closing inputStream " + e.getMessage());
                 }
             }
         }
@@ -260,13 +264,11 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
     private void parseTransf(Long networkId, Sheet sheet, Map<String, TransfElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        LOGGER.debug("Reading sheet {}: ", sheetName);
+        LOGGER.info("parseTransf() - Reading sheet {}: ", sheetName);
 
         Iterator<Row> rows = sheet.iterator();
-
         Long fromBusNum = null;
         Long toBusNum = null;
-
         Double value = null;
         String voltage = null; // present only for HR TX profile .xlsx
         Long transfIdOnSubstation = null; // present only for HR TX profile .xlsx
@@ -482,7 +484,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-        LOGGER.debug("********************* Transformer Profile End	******************");
+        LOGGER.debug("parseTransf() - Exit");
     }
 
     private void setTransfElVal(Branch branch, int hour, int min, double value, Map<String, TransfElVal> elValMap, String valueType) {
@@ -550,7 +552,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
     private void parseBranch(Long networkId, Sheet sheet, Map<String, BranchElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        LOGGER.debug("Reading sheet {}: ", sheetName);
+        LOGGER.info("parseBranch() - Reading sheet {}: ", sheetName);
 
         Iterator<Row> rows = sheet.iterator();
 
@@ -749,7 +751,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-        LOGGER.debug("********************* Branch Profile End	******************");
+        LOGGER.debug("parseBranch() - Exit");
     }
 
     private void setBranchElVal(Branch branch, int hour, int min, double value, Map<String, BranchElVal> elValMap, String valueType) {
@@ -808,9 +810,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
 
     private void parseLoad(Long networkId, Sheet sheet, Map<String, LoadElVal> elValMap, String powerType) {
         String sheetName = sheet.getSheetName();
-
-        LOGGER.debug("Reading sheet {}: ", sheetName);
-
+        LOGGER.info("parseLoad() - Reading sheet {}: ", sheetName);
         Iterator<Row> rows = sheet.iterator();
         Long busNum = null;
         Double value = null;
@@ -970,8 +970,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-
-        LOGGER.debug("********************* Load Profile End******************");
+        LOGGER.debug("parseLoad() -exit");
     }
 
     private void setLoadElVal(
@@ -1030,13 +1029,14 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
     }
 
     /**
+     * @param networkId
      * @param sheet
      * @param elValMap
-     * @param valueType possible values are: P, Q; Status, Vg
+     * @param valueType possible values are: P, Q, Status, Vg
      */
     private void parseGen(Long networkId, Sheet sheet, Map<String, GenElVal> elValMap, String valueType) {
         String sheetName = sheet.getSheetName();
-        LOGGER.debug("Reading sheet {}: ", sheetName);
+        LOGGER.info("parseGen() - Reading sheet {}: ", sheetName);
 
         String columnTitle = "";
         List<String> headers = new ArrayList<String>();
@@ -1242,7 +1242,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 }
             }
         }
-        LOGGER.debug("********************* Generator Profile End ******************");
+        LOGGER.debug("ParseGen() - exit ");
     }
 
     private boolean isNumeric(String valStr) {
@@ -1284,7 +1284,11 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 //  LOGGER.debug(" CellCell type BLANK,  Value: {}; -  return null", cell.getStringCellValue() );
             }
         } catch (Exception e) {
-            LOGGER.error("Error reading excel file. CellValue {} is not a number. Return null. Error: {}", cell, e.getMessage());
+            LOGGER.error(
+                "getNumericCellValue() - Error reading excel file. CellValue {} is not a number. Return null. Error: {}",
+                cell,
+                e.getMessage()
+            );
         }
         // LOGGER.debug(" Cell Type: {} "+ cell.getCellType()  + " return  " +val);
         return val;
@@ -1388,7 +1392,6 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
                 // Gen P spreadSheet
                 genElVal.setP(value);
         }
-
         elValMap.put(key, genElVal);
     }
 
@@ -1412,6 +1415,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         profile.setNetwork(network);
         profile.setInputFile(inputFile);
         BranchProfile profileSaved = branchProfileRepository.save(profile);
+        LOGGER.info("New BranchProfile saved successfully: {} ", profileSaved);
 
         // -- save electrical values Status, etc.
         List<BranchElVal> values = new ArrayList<BranchElVal>();
@@ -1421,6 +1425,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
             BranchElVal newElVal = branchElValRepository.save(mapElValues.get(key));
             values.add(newElVal);
         }
+        LOGGER.info("Number of BranchElVal saved: {}", values.size());
     }
 
     private void saveTransfProfile(
@@ -1443,6 +1448,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         profile.setNetwork(network);
         profile.setInputFile(inputFile);
         TransfProfile profileSaved = transfProfileRepository.save(profile);
+        LOGGER.info("New TransfProfile saved successfully: {} ", profileSaved);
 
         // -- save electrical values tapRatio, Status, etc.
         List<TransfElVal> values = new ArrayList<TransfElVal>();
@@ -1452,6 +1458,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
             TransfElVal newElVal = transfElValRepository.save(mapElValues.get(key));
             values.add(newElVal);
         }
+        LOGGER.info("Number of TransfElVal saved: {}", values.size());
     }
 
     private void saveLoadProfiles(
@@ -1474,6 +1481,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         profile.setNetwork(network);
         profile.setInputFile(inputFile);
         LoadProfile profileSaved = loadProfileRepository.save(profile);
+        LOGGER.info("New LoadProfile saved successfully: {} ", profileSaved);
 
         // -- save electrical values P, Q, Status, etc.
         List<LoadElVal> values = new ArrayList<LoadElVal>();
@@ -1483,6 +1491,7 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
             LoadElVal newElVal = loadElValRepository.save(mapElValues.get(key));
             values.add(newElVal);
         }
+        LOGGER.info("Number of LoadElVal saved: {}", values.size());
     }
 
     private void saveGenProfiles(
@@ -1504,8 +1513,8 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
         profile.setUploadDateTime(Instant.now());
         profile.setNetwork(network);
         profile.setInputFile(inputFile);
-
         GenProfile profileSaved = genProfileRepository.save(profile);
+        LOGGER.info("New GenProfile saved successfully: {} ", profileSaved);
 
         // -- save electrical's values P, Status, Vg etc.
         List<GenElVal> values = new ArrayList<GenElVal>();
@@ -1515,68 +1524,6 @@ public class ExcelAllProfileServiceImpl implements ExcelAllProfileService {
             GenElVal newElVal = genElValRepository.save(mapElValues.get(key));
             values.add(newElVal);
         }
+        LOGGER.info("Number of GenElVal saved: {}", values.size());
     }
-    /*
-    private void cleanOldValues(MultipartFile file, Integer mode, String season, String typicalDay, Network network, Double timeInterval) {
-        String fileName = file.getOriginalFilename();
-        Optional<InputFileDTO> inputFileDto = inputFileServiceImpl.findFileByNetworkIdAndFileName(network.getId(), fileName);
-        if (inputFileDto.isPresent()) {
-            LOGGER.info(
-                "The file: {}, for networkId: {} is already present on db;  inputFile, profile and electrical value will be removed! ",
-                fileName,
-                network.getId()
-            );
-
-            /**
-             * // remove all generation profiles and generation electrical values linked to
-             * inputFile Optional<GenProfile> genProfileOpt =
-             * genProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (genProfileOpt.isPresent()) { List<GenElVal>
-             * profileValues =
-             * genElValRepository.findByGenProfileId(genProfileOpt.get().getId()); for
-             * (GenElVal val : profileValues) { genElValRepository.delete(val); }
-             *
-             * genProfileRepository.delete(genProfileOpt.get()); LOGGER.debug(" Old GenProfile:
-             * {} deleted succesfully! " + genProfileOpt.get()); }
-             *
-             * // remove all load profiles and load electrical values linked to inputFile
-             * Optional<LoadProfile> loadProfileOpt =
-             * loadProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (loadProfileOpt.isPresent()) {
-             * List<LoadElVal> elValues =
-             * loadElValRepository.findByLoadProfileId(loadProfileOpt.get().getId()); for
-             * (LoadElVal val : elValues) { loadElValRepository.delete(val); }
-             *
-             * loadProfileRepository.delete(loadProfileOpt.get()); LOGGER.debug(" Old Load
-             * Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
-             *
-             * // remove all transformer profiles and electrical values linked to inputFile
-             * Optional<TransfProfile> transfProfileOpt =
-             * transfProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (transfProfileOpt.isPresent()) {
-             * List<TransfElVal> elValues =
-             * transfElValRepository.findByTransfProfileId(transfProfileOpt.get().getId());
-             * for (TransfElVal val : elValues) { transfElValRepository.delete(val); }
-             * transfProfileRepository.delete(transfProfileOpt.get()); LOGGER.debug(" Old
-             * Transformer Profile: {} deleted succesfully! " + transfProfileOpt.get()); }
-             *
-             * // remove all transformer profiles and electrical values linked to inputFile
-             * Optional<BranchProfile> branchProfileOpt =
-             * branchProfileRepository.findByNetworkIdAndInputFileId( network.getId(),
-             * inputFileDto.get().getId() ); if (branchProfileOpt.isPresent()) {
-             * List<BranchElVal> elValues =
-             * branchElValRepository.findByBranchProfileId(branchProfileOpt.get().getId());
-             * for (BranchElVal val : elValues) { branchElValRepository.delete(val); }
-             * branchProfileRepository.delete(branchProfileOpt.get()); LOGGER.debug(" Old
-             * branch Profile: {} deleted succesfully! " + loadProfileOpt.get()); }
-
-            boolean isRemoved = inputFileServiceImpl.delete(inputFileDto.get().getId());
-            if (isRemoved) {
-                LOGGER.info("Input File: {} removed succesfully! " + fileName);
-            } else {
-                LOGGER.warn("Input File: {} not removed! " + fileName);
-            }
-        }
-    }*/
-
 }
