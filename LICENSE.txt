@@ -1,3 +1,6 @@
+EUROPEAN UNION PUBLIC LICENCE v. 1.2
+EUPL © the European Union 2007, 2016
+
 Copyright (C) 2023, Softlab S.p.A.
 
 ATTEST ICT Platform: In the ATTEST project's context the ICT platform integrates the open-source toolbox (a set of tools for supporting TSOs and DSOs during asset management and coordinated network planning and operation). The platform includes a common data access layer enabling data integration, an infrastructure aimed at the integration of the tools from the toolbox and a web-based GUI with a set of visualization components.
